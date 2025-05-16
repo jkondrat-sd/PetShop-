@@ -1,0 +1,136 @@
+.home-container {
+  padding: 24px;
+
+  .HotDocument,
+  .NewDocument {
+    .ant-typography {
+      margin-bottom: 24px;
+    }
+  }
+
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+  }
+
+  // Grid styles
+  .ant-row {
+    .ant-col {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 16px;
+    }
+  }
+
+  // Card styles
+  .ant-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .ant-card-cover {
+      height: 200px;
+      padding: 16px;
+      background: #f8f9fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      img {
+        max-height: 100%;
+        max-width: 100%;
+        object-fit: contain;
+      }
+    }
+
+    .ant-card-body {
+      flex: 1;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  // Category tag
+  .category {
+    margin-bottom: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  // Card content
+  .card-meta {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+
+    .title {
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.4;
+      height: 40px; // Fixed height for 2 lines
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      margin-bottom: 8px;
+      color: #262626;
+    }
+
+    .info {
+      display: flex;
+      justify-content: space-between;
+      color: #8c8c8c;
+      font-size: 13px;
+      margin-top: auto;
+
+      span {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        .anticon {
+          font-size: 14px;
+        }
+      }
+    }
+  }
+
+  // Pagination
+  .pagination-container {
+    margin-top: 32px;
+    display: flex;
+    justify-content: center;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .home-container {
+    padding: 16px;
+
+    .ant-card {
+      .ant-card-cover {
+        height: 160px;
+      }
+
+      .card-meta {
+        .title {
+          font-size: 13px;
+          height: 36px;
+        }
+      }
+    }
+  }
+}

@@ -1,13 +1,4 @@
-doc# Bài tập lớn học phần Thực tập cơ sở
 
-## Chủ đề
-- Xây dựng hệ thống lưu trữ và phân phối học liệu
-
-## Các thành viên
-- Chu Ngọc Thắng  
-- Phạm Văn Đức  
-- Hà Quang Minh  
-- Bùi Văn Hiến
 
 ## Các bước để chạy code backend
 - Có cài docker desktop

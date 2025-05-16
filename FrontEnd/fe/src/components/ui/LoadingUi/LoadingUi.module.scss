@@ -1,0 +1,49 @@
+.loadingContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 1000;
+  
+  &.fullScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+  
+  &:not(.fullScreen) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+}
+
+.loadingContent {
+  text-align: center;
+
+  :global {
+    .ant-spin {
+      color: #1677ff; // Primary text color
+
+      .ant-spin-dot-item {
+        background-color: #1677ff; // Spinner color
+      }
+
+      .ant-spin-text {
+        color: #1677ff; // Loading text color
+        font-size: 14px;
+        margin-top: 8px;
+      }
+    }
+  }
+}
+
+.spinContent {
+  padding: 50px;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 4px;
+}

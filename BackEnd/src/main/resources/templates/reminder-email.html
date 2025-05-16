@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: Arial, sans-serif; color: #333; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
+        .header { background-color: #f5f5f5; padding: 10px; text-align: center; border-radius: 5px 5px 0 0; }
+        .content { padding: 20px; }
+        .button { display: inline-block; padding: 10px 20px; background-color: #007bff; color: #fff; text-decoration: none; border-radius: 5px; }
+        .button-secondary { background-color: #28a745; }
+        .footer { text-align: center; font-size: 12px; color: #777; margin-top: 20px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h2>Nhắc nhở từ Hệ thống</h2>
+    </div>
+    <div class="content">
+        <p>Chào <strong th:text="${userFullName}"></strong>,</p>
+        <p>Đây là thông báo nhắc nhở của bạn:</p>
+        <ul>
+            <li><strong>Tiêu đề:</strong> <span th:text="${reminderTitle}"></span></li>
+            <li><strong>Mô tả:</strong> <span th:text="${reminderDescription}"></span></li>
+            <li><strong>Thời gian:</strong> <span th:text="${remindAt}"></span></li>
+            <li th:if="${hasDocument}">
+                <strong>Tài liệu:</strong> <span th:text="${documentTitle}"></span>
+            </li>
+        </ul>
+        <p>Nếu bạn có thắc mắc, vui lòng liên hệ qua email: <a href="mailto:support@system.com">support@system.com</a>.</p>
+    </div>
+    <div class="footer">
+        <p>Hệ thống quản lý tài liệu | © 2025</p>
+    </div>
+</div>
+</body>
+</html>

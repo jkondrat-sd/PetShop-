@@ -1,0 +1,55 @@
+.comment-section {
+  .comment-input {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+
+    :global(.ant-input) {
+      flex: 1;
+    }
+
+    .submit-btn {
+      align-self: flex-end;
+    }
+  }
+}
+
+.comment-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+
+  &:hover {
+    color: #1890ff;
+  }
+}
+
+.load-more {
+  text-align: center;
+  margin-top: 20px;
+
+  button {
+    width: 200px;
+  }
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .username {
+    font-weight: 600;
+  }
+
+  .date {
+    color: rgba(0, 0, 0, 0.45);
+    font-size: 12px;
+    font-weight: normal;
+  }
+}
+.des {
+  color: rgb(0 0 0 / 73%);
+  font-size: 16px;
+  line-height: 1.5714285714285714;
+}

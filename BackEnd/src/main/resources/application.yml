@@ -1,0 +1,63 @@
+server:
+  port: 8089
+
+spring:
+  application:
+    name: back-end
+  datasource:
+    url: "jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}"
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  servlet:
+    multipart:
+      enabled: ${SPRING_SERVLET_MULTIPART_ENABLED}
+      max-file-size: ${SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE}
+      max-request-size: ${SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+  data:
+    redis:
+      port: ${REDIS_PORT:6380}
+      host: ${REDIS_HOST}
+    elasticsearch:
+      uris: ${URIS:elasticsearch:9201}
+      connection-timeout: 30s
+      socket-timeout: 30s
+      max-retry-attempts: 10
+      retry-interval: 5000ms
+      create-index-on-startup: true
+  mail:
+    from: ${SPRING_MAIL_FROM}
+    host: ${SPRING_MAIL_HOST}
+    port: ${SPRING_MAIL_PORT}
+    username: ${SPRING_MAIL_USERNAME}
+    password: ${SPRING_MAIL_PASSWORD}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_SECRET}
+            redirect-uri: ${GOOGLE_REDIRECT_URL}
+            scope: ${GOOGLE_SCOPE}
+        provider:
+          google:
+            user-info-uri: ${USER_INFO_URI}
+  image:
+    cloud-name: ${CLOUD_NAME}
+    api-key: ${CLOUD_API_KEY}
+    api-secret: ${CLOUD_API_SECRET}
+
+jwt:
+  signerKey: ${JWT_SIGNER_KEY}
+  valid-duration: ${JWT_VALID_DURATION}
+  refreshable-duration: ${JWT_REFRESHABLE_DURATION}

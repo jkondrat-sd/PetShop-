@@ -1,0 +1,204 @@
+.category-page {
+  padding: 24px;
+  background-color: #f5f5f5;
+
+  .category-title {
+    margin-bottom: 24px;
+    font-size: 28px;
+    font-weight: 700;
+    color: #075aa8;
+    text-transform: uppercase;
+    position: relative;
+    padding-bottom: 12px;
+    text-align: center;
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 4px;
+      background: linear-gradient(90deg, #1890ff, #40a9ff);
+      border-radius: 2px;
+    }
+
+    &::before {
+      content: "📚";
+      margin-right: 12px;
+      font-size: 32px;
+      vertical-align: middle;
+    }
+
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      color: #40a9ff;
+
+      &::after {
+        width: 100px;
+      }
+    }
+  }
+
+  .card-meta {
+    .title {
+      font-size: 16px;
+      font-weight: 500;
+      color: #262626;
+      margin-bottom: 12px;
+      line-height: 1.4;
+      height: 44px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+    }
+
+    .info {
+      display: flex;
+      justify-content: flex-start;
+      gap: 16px;
+      color: #8c8c8c;
+      font-size: 14px;
+
+      span {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        &:hover {
+          color: #1890ff;
+        }
+      }
+    }
+  }
+
+  :global(.ant-card) {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    border: 1px solid #f0f0f0;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .ant-card-cover {
+      height: 250px;
+      padding: 16px;
+      background-color: #fafafa;
+      border-radius: 8px 8px 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      img {
+        max-height: 100%;
+        width: auto;
+        object-fit: contain;
+        border-radius: 4px;
+      }
+    }
+
+    .ant-card-body {
+      padding: 16px;
+      height: 120px;
+      flex-shrink: 0;
+    }
+  }
+
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+  }
+
+  .error {
+    padding: 24px;
+    text-align: center;
+    color: #ff4d4f;
+    font-size: 16px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  }
+
+  .pagination-container {
+    margin-top: 32px;
+    display: flex;
+    justify-content: center;
+
+    :global {
+      .ant-pagination-item {
+        border-radius: 4px;
+        transition: all 0.3s ease;
+
+        &:hover {
+          border-color: #1890ff;
+          a {
+            color: #1890ff;
+          }
+        }
+      }
+
+      .ant-pagination-item-active {
+        background-color: #1890ff;
+        border-color: #1890ff;
+
+        a {
+          color: #fff;
+        }
+
+        &:hover {
+          background-color: #40a9ff;
+          border-color: #40a9ff;
+        }
+      }
+
+      .ant-pagination-prev,
+      .ant-pagination-next {
+        button {
+          border-radius: 4px;
+
+          &:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .category-page {
+    padding: 16px;
+
+    .category-title {
+      font-size: 20px;
+    }
+
+    .card-meta {
+      .title {
+        font-size: 14px;
+        height: 40px;
+      }
+
+      .info {
+        font-size: 12px;
+        gap: 12px;
+      }
+    }
+  }
+}
