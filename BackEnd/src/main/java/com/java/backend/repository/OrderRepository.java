@@ -8,8 +8,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
-    
     Page<OrderEntity> findByUserId(Long userId, Pageable pageable);
-    
     Page<OrderEntity> findByStatus(String status, Pageable pageable);
 }

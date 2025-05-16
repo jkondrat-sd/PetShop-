@@ -1,4 +1,3 @@
-
 package com.java.backend.repository;
 
 import com.java.backend.entity.OrderDetailEntity;
@@ -9,6 +8,5 @@ import java.util.List;
 
 @Repository
 public interface OrderDetailRepository extends JpaRepository<OrderDetailEntity, Long> {
-    
     List<OrderDetailEntity> findByOrderId(Long orderId);
 }

@@ -1,21 +1,21 @@
 package com.java.backend.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.HashSet;
-import java.util.Set;
-
+@Entity
+@Table(name = "users")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "users")
-public class UserEntity extends BaseEntity {
-    
+public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long userId;
     
     @Column(nullable = false, unique = true)
@@ -27,23 +27,19 @@ public class UserEntity extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String email;
     
-    private String fullName;
+    @Column(name = "first_name")
+    private String firstName;
     
-    private String phoneNumber;
+    @Column(name = "last_name")
+    private String lastName;
+    
+    @ManyToOne
+    @JoinColumn(name = "role_id", nullable = false)
+    private RoleEntity role;
     
     private String address;
-    
+    private String phone;
     private String avatar;
     
-    @Column(nullable = false)
-    private String role; // ROLE_USER, ROLE_ADMIN
-    
-    @Column(nullable = false)
-    private boolean enabled;
-    
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<OrderEntity> orders = new HashSet<>();
-    
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<ReviewEntity> reviews = new HashSet<>();
+    private boolean enabled = true;
 }

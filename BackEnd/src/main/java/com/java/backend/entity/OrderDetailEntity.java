@@ -3,31 +3,36 @@ package com.java.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+@Entity
+@Table(name = "order_details")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "order_details")
-public class OrderDetailEntity extends BaseEntity {
-    
+public class OrderDetailEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "order_detail_id")
     private Long orderDetailId;
     
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")
+    @ManyToOne
+    @JoinColumn(name = "order_id", nullable = false)
     private OrderEntity order;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    private String itemType; // pet/accessory
+    
+    @ManyToOne
     @JoinColumn(name = "pet_id")
     private PetEntity pet;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "accessory_id")
     private AccessoryEntity accessory;
     
     private Integer quantity;
     
+    @Column(name = "unit_price")
     private Double unitPrice;
+    
+    private Double discount;
 }

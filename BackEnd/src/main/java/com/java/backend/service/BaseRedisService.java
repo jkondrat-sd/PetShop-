@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -13,59 +12,45 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class BaseRedisService {
     private final RedisTemplate<String, Object> redisTemplate;
-
+    
     public void set(String key, Object value) {
         try {
             redisTemplate.opsForValue().set(key, value);
         } catch (Exception e) {
-            log.error("Redis set error: {}", e.getMessage(), e);
+            log.error("Error setting value in Redis: {}", e.getMessage());
         }
     }
-
+    
     public void setObjectForMinutes(String key, Object value, long minutes) {
         try {
             redisTemplate.opsForValue().set(key, value, minutes, TimeUnit.MINUTES);
         } catch (Exception e) {
-            log.error("Redis setObjectForMinutes error: {}", e.getMessage(), e);
+            log.error("Error setting value with timeout in Redis: {}", e.getMessage());
         }
     }
-
-    public void setObjectForHours(String key, Object value, long hours) {
-        try {
-            redisTemplate.opsForValue().set(key, value, hours, TimeUnit.HOURS);
-        } catch (Exception e) {
-            log.error("Redis setObjectForHours error: {}", e.getMessage(), e);
-        }
-    }
-
+    
     public Object get(String key) {
         try {
             return redisTemplate.opsForValue().get(key);
         } catch (Exception e) {
-            log.error("Redis get error: {}", e.getMessage(), e);
+            log.error("Error getting value from Redis: {}", e.getMessage());
             return null;
         }
     }
-
-    public boolean deleteKey(String key) {
+    
+    public void delete(String key) {
         try {
-            return Boolean.TRUE.equals(redisTemplate.delete(key));
+            redisTemplate.delete(key);
         } catch (Exception e) {
-            log.error("Redis deleteKey error: {}", e.getMessage(), e);
-            return false;
+            log.error("Error deleting key from Redis: {}", e.getMessage());
         }
     }
-
-    public long deleteKeys(String pattern) {
+    
+    public void deleteByPattern(String pattern) {
         try {
-            Set<String> keys = redisTemplate.keys(pattern);
-            if (keys != null && !keys.isEmpty()) {
-                return redisTemplate.delete(keys);
-            }
-            return 0;
+            redisTemplate.delete(redisTemplate.keys(pattern + "*"));
         } catch (Exception e) {
-            log.error("Redis deleteKeys error: {}", e.getMessage(), e);
-            return 0;
+            log.error("Error deleting keys with pattern from Redis: {}", e.getMessage());
         }
     }
 }

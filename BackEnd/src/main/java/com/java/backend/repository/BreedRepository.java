@@ -8,10 +8,5 @@ import java.util.List;
 
 @Repository
 public interface BreedRepository extends JpaRepository<BreedEntity, Long> {
-    
-    List<BreedEntity> findByPetType(String petType);
-    
-    List<BreedEntity> findByPetTypeAndStatus(String petType, String status);
-    
-    boolean existsByBreedNameAndPetType(String breedName, String petType);
+    List<BreedEntity> findByBreedNameContainingIgnoreCase(String name);
 }

@@ -3,33 +3,20 @@ package com.java.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.HashSet;
-import java.util.Set;
-
+@Entity
+@Table(name = "breeds")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "breeds")
-public class BreedEntity extends BaseEntity {
-    
+public class BreedEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "breed_id")
     private Long breedId;
     
-    @Column(nullable = false)
+    @Column(name = "breed_name", nullable = false)
     private String breedName;
     
-    @Column(nullable = false)
-    private String petType; // dog/cat
-    
-    @Column(columnDefinition = "TEXT")
     private String description;
-    
-    @Column(nullable = false)
-    private String status; // active/inactive
-    
-    @OneToMany(mappedBy = "breed", cascade = CascadeType.ALL)
-    private Set<PetEntity> pets = new HashSet<>();
 }

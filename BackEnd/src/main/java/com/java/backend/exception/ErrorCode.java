@@ -11,12 +11,14 @@ public enum ErrorCode {
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "Unauthorized"),
     FORBIDDEN(HttpStatus.FORBIDDEN, "Forbidden"),
     NOT_FOUND(HttpStatus.NOT_FOUND, "Resource not found"),
+    AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, "Authentication failed"),
     
     // User
     USER_NOT_EXISTED(HttpStatus.NOT_FOUND, "User not found"),
     USER_EXISTED(HttpStatus.BAD_REQUEST, "Username already exists"),
     EMAIL_EXISTED(HttpStatus.BAD_REQUEST, "Email already exists"),
     PASSWORD_NOT_MATCH(HttpStatus.BAD_REQUEST, "Password does not match"),
+    ROLE_NOT_FOUND(HttpStatus.NOT_FOUND, "Role not found"),
     
     // Pet
     PET_NOT_FOUND(HttpStatus.NOT_FOUND, "Pet not found"),

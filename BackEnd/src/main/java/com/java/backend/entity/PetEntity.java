@@ -1,49 +1,41 @@
-// filepath: c:\Users\Window 11\Desktop\C++28tech\Front-End\LT_Web\BackEnd\src\main\java\com\java\backend\entity\PetEntity.java
 package com.java.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.HashSet;
-import java.util.Set;
-
+@Entity
+@Table(name = "pets")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "pets")
-public class PetEntity extends BaseEntity {
-    
+public class PetEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "pet_id")
     private Long petId;
     
-    @Column(nullable = false)
+    @Column(name = "pet_name", nullable = false)
     private String petName;
     
     @Column(nullable = false)
     private String type; // dog/cat
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "breed_id")
     private BreedEntity breed;
     
     private String gender;
+    
+    @Column(name = "unit_price")
     private Double unitPrice;
+    
     private Integer age;
     
-    @Column(nullable = false)
     private String status; // available/sold
     
     private String thumbnail;
     
     @Column(columnDefinition = "TEXT")
     private String images;
-    
-    @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL)
-    private Set<OrderDetailEntity> orderDetails = new HashSet<>();
-    
-    @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL)
-    private Set<ReviewEntity> reviews = new HashSet<>();
 }

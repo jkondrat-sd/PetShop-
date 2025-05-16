@@ -3,29 +3,27 @@ package com.java.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.HashSet;
-import java.util.Set;
-
+@Entity
+@Table(name = "suppliers")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "suppliers")
-public class SupplierEntity extends BaseEntity {
-    
+public class SupplierEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "supplier_id")
     private Long supplierId;
     
-    @Column(nullable = false)
+    @Column(name = "supplier_name", nullable = false)
     private String supplierName;
     
+    @Column(name = "contact_name")
     private String contactName;
-    private String address;
-    private String phone;
-    private String email;
     
-    @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL)
-    private Set<AccessoryEntity> accessories = new HashSet<>();
+    private String address;
+    
+    private String phone;
+    
+    private String email;
 }

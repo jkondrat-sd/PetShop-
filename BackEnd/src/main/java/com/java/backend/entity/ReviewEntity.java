@@ -3,33 +3,37 @@ package com.java.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "reviews")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "reviews")
-public class ReviewEntity extends BaseEntity {
-    
+public class ReviewEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "review_id")
     private Long reviewId;
     
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @ManyToOne
+    @JoinColumn(name = "customer_id", nullable = false)
     private UserEntity user;
     
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pet_id")
-    private PetEntity pet;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "accessory_id")
     private AccessoryEntity accessory;
     
-    @Column(nullable = false)
-    private Integer rating; // 1-5 stars
+    @ManyToOne
+    @JoinColumn(name = "pet_id")
+    private PetEntity pet;
+    
+    private Integer rating;
     
     @Column(columnDefinition = "TEXT")
     private String comment;
+    
+    @Column(name = "created_at")
+    private LocalDateTime createdAt = LocalDateTime.now();
 }

@@ -3,30 +3,20 @@ package com.java.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.HashSet;
-import java.util.Set;
-
+@Entity
+@Table(name = "categories")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "categories")
-public class CategoryEntity extends BaseEntity {
-    
+public class CategoryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "category_id")
     private Long categoryId;
     
-    @Column(nullable = false)
+    @Column(name = "category_name", nullable = false)
     private String categoryName;
     
-    @Column(columnDefinition = "TEXT")
     private String description;
-    
-    @Column(nullable = false)
-    private String status; // active/inactive
-    
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-    private Set<AccessoryEntity> accessories = new HashSet<>();
 }

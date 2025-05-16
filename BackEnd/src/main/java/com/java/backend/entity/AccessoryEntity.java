@@ -3,46 +3,40 @@ package com.java.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.HashSet;
-import java.util.Set;
-
+@Entity
+@Table(name = "accessories")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "accessories")
-public class AccessoryEntity extends BaseEntity {
-    
+public class AccessoryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "accessories_id")
     private Long accessoryId;
     
-    @Column(nullable = false)
-    private String accessoryName;
+    private String name;
+    
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private CategoryEntity category;
     
     @Column(columnDefinition = "TEXT")
     private String description;
     
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    private CategoryEntity category;
-    
+    @Column(name = "unit_price")
     private Double unitPrice;
     
-    private Integer stockQuantity;
-    
-    @Column(nullable = false)
-    private String status; // active/inactive
+    private Integer stock;
     
     private String thumbnail;
     
     @Column(columnDefinition = "TEXT")
     private String images;
     
-    @OneToMany(mappedBy = "accessory", cascade = CascadeType.ALL)
-    private Set<OrderDetailEntity> orderDetails = new HashSet<>();
+    @ManyToOne
+    @JoinColumn(name = "supplier_id")
+    private SupplierEntity supplier;
     
-    @OneToMany(mappedBy = "accessory", cascade = CascadeType.ALL)
-    private Set<ReviewEntity> reviews = new HashSet<>();
+    private String status = "active";
 }

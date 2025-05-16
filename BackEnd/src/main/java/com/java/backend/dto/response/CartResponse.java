@@ -1,40 +1,32 @@
-DogCatStore_Backend/
-│
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── com/
-│   │   │       └── dogcatstore/
-│   │   │           ├── DogCatStoreApplication.java
-│   │   │           ├── controller/
-│   │   │           │   ├── AnimalController.java
-│   │   │           │   └── AccessoryController.java
-│   │   │           ├── service/
-│   │   │           │   ├── AnimalService.java
-│   │   │           │   └── AccessoryService.java
-│   │   │           ├── repository/
-│   │   │           │   ├── AnimalRepository.java
-│   │   │           │   └── AccessoryRepository.java
-│   │   │           ├── entity/
-│   │   │           │   ├── AnimalEntity.java
-│   │   │           │   └── AccessoryEntity.java
-│   │   │           ├── dto/
-│   │   │           │   ├── AnimalDTO.java
-│   │   │           │   └── AccessoryDTO.java
-│   │   │           └── exception/
-│   │   │               ├── ResourceNotFoundException.java
-│   │   │               └── GlobalExceptionHandler.java
-│   │   └── resources/
-│   │       ├── application.properties
-│   │       └── static/
-│   │           └── images/
-│   └── test/
-│       └── java/
-│           └── com/
-│               └── dogcatstore/
-│                   ├── AnimalControllerTest.java
-│                   └── AccessoryControllerTest.java
-│
-├── .gitignore
-├── pom.xml
-└── README.md
+package com.java.backend.dto.response;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class CartResponse {
+    private List<CartItemResponse> items;
+    private Double totalAmount;
+    private Integer totalItems;
+}
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+class CartItemResponse {
+    private String itemType;
+    private Long itemId;
+    private String name;
+    private String thumbnail;
+    private Double price;
+    private Integer quantity;
+    private Double subtotal;
+}

@@ -6,8 +6,8 @@ import com.java.backend.dto.response.ApiResponse;
 import com.java.backend.dto.response.Pagination;
 import com.java.backend.service.AccessoryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,50 +17,58 @@ import java.util.List;
 @RequestMapping("/api/accessories")
 @RequiredArgsConstructor
 public class AccessoryController {
-    
     private final AccessoryService accessoryService;
     
     @GetMapping
     public ResponseEntity<ApiResponse<Pagination<AccessoryResponse>>> getAllAccessories(
+            @RequestParam(defaultValue = "active") String status,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) String name,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) Long categoryId) {
+            @RequestParam(defaultValue = "10") int size) {
         
-        Pagination<AccessoryResponse> accessories = accessoryService.getAllAccessories(page, size, categoryId);
-        return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.value(), "Accessories fetched successfully", accessories));
+        Pagination<AccessoryResponse> accessories = accessoryService.getAllAccessories(status, categoryId, name, page, size);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Accessories retrieved successfully", accessories));
     }
     
-    @GetMapping("/{accessoryId}")
-    public ResponseEntity<ApiResponse<AccessoryResponse>> getAccessoryById(@PathVariable Long accessoryId) {
-        AccessoryResponse accessory = accessoryService.getAccessoryById(accessoryId);
-        return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.value(), "Accessory fetched successfully", accessory));
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<AccessoryResponse>> getAccessoryById(@PathVariable Long id) {
+        AccessoryResponse accessory = accessoryService.getAccessoryById(id);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Accessory retrieved successfully", accessory));
     }
     
     @PostMapping
-    public ResponseEntity<ApiResponse<AccessoryResponse>> addAccessory(
-            @RequestPart("accessory") AccessoryRequest accessoryRequest,
-            @RequestPart("thumbnail") MultipartFile thumbnail,
-            @RequestPart("images") List<MultipartFile> images) {
-        
-        AccessoryResponse accessory = accessoryService.addAccessory(accessoryRequest, thumbnail, images);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponse<>(HttpStatus.CREATED.value(), "Accessory added successfully", accessory));
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<AccessoryResponse>> createAccessory(@RequestBody AccessoryRequest accessoryRequest) {
+        AccessoryResponse accessory = accessoryService.createAccessory(accessoryRequest);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Accessory created successfully", accessory));
     }
     
-    @PutMapping("/{accessoryId}")
-    public ResponseEntity<ApiResponse<AccessoryResponse>> updateAccessory(
-            @PathVariable Long accessoryId,
-            @RequestPart(value = "accessory") AccessoryRequest accessoryRequest,
-            @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail,
-            @RequestPart(value = "images", required = false) List<MultipartFile> images) {
-        
-        AccessoryResponse accessory = accessoryService.updateAccessory(accessoryId, accessoryRequest, thumbnail, images);
-        return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.value(), "Accessory updated successfully", accessory));
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<AccessoryResponse>> updateAccessory(@PathVariable Long id, @RequestBody AccessoryRequest accessoryRequest) {
+        AccessoryResponse accessory = accessoryService.updateAccessory(id, accessoryRequest);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Accessory updated successfully", accessory));
     }
     
-    @DeleteMapping("/{accessoryId}")
-    public ResponseEntity<ApiResponse<Void>> deleteAccessory(@PathVariable Long accessoryId) {
-        accessoryService.deleteAccessory(accessoryId);
-        return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.value(), "Accessory deleted successfully", null));
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<String>> deleteAccessory(@PathVariable Long id) {
+        accessoryService.deleteAccessory(id);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Accessory deleted successfully", null));
+    }
+    
+    @PostMapping("/{id}/images")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<AccessoryResponse>> uploadAccessoryImages(@PathVariable Long id, @RequestParam("files") List<MultipartFile> files) {
+        AccessoryResponse accessory = accessoryService.uploadAccessoryImages(id, files);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Accessory images uploaded successfully", accessory));
+    }
+    
+    @PostMapping("/{id}/thumbnail")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<AccessoryResponse>> uploadAccessoryThumbnail(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+        AccessoryResponse accessory = accessoryService.uploadAccessoryThumbnail(id, file);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Accessory thumbnail uploaded successfully", accessory));
     }
 }

@@ -8,8 +8,5 @@ import java.util.List;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> {
-    
-    List<CategoryEntity> findByStatus(String status);
-    
-    boolean existsByCategoryName(String categoryName);
+    List<CategoryEntity> findByCategoryNameContainingIgnoreCase(String name);
 }

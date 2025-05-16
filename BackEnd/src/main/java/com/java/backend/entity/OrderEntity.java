@@ -3,42 +3,45 @@ package com.java.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+@Entity
+@Table(name = "orders")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "orders")
-public class OrderEntity extends BaseEntity {
-    
+public class OrderEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "order_id")
     private Long orderId;
     
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
     private UserEntity user;
     
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date orderDate;
+    @Column(name = "order_date")
+    private LocalDateTime orderDate = LocalDateTime.now();
     
-    @Column(nullable = false)
-    private String status; // pending/processing/shipped/delivered/cancelled
+    @Column(name = "shipped_date")
+    private LocalDateTime shippedDate;
     
-    @Column(nullable = false)
-    private String shippingAddress;
-    
-    @Column(nullable = false)
-    private String contactPhone;
-    
-    private String paymentMethod;
-    
+    @Column(name = "total_amount")
     private Double totalAmount;
     
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private Set<OrderDetailEntity> orderDetails = new HashSet<>();
+    private Double freight;
+    
+    @Column(name = "ship_name")
+    private String shipName;
+    
+    @Column(name = "ship_address")
+    private String shipAddress;
+    
+    private String status = "pending"; 
+    
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderDetailEntity> orderDetails = new ArrayList<>();
 }
