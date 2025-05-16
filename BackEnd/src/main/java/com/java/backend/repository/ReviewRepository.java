@@ -1,40 +1,24 @@
-DogCatStore_Backend/
-│
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── com/
-│   │   │       └── dogcatstore/
-│   │   │           ├── DogCatStoreApplication.java
-│   │   │           ├── config/
-│   │   │           │   └── WebConfig.java
-│   │   │           ├── controller/
-│   │   │           │   ├── AnimalController.java
-│   │   │           │   └── AccessoryController.java
-│   │   │           ├── dto/
-│   │   │           │   ├── AnimalDTO.java
-│   │   │           │   └── AccessoryDTO.java
-│   │   │           ├── entity/
-│   │   │           │   ├── AnimalEntity.java
-│   │   │           │   └── AccessoryEntity.java
-│   │   │           ├── repository/
-│   │   │           │   ├── AnimalRepository.java
-│   │   │           │   └── AccessoryRepository.java
-│   │   │           ├── service/
-│   │   │           │   ├── AnimalService.java
-│   │   │           │   └── AccessoryService.java
-│   │   │           └── exception/
-│   │   │               └── ResourceNotFoundException.java
-│   │   └── resources/
-│   │       ├── application.properties
-│   │       └── static/
-│   │           └── images/
-│   └── test/
-│       └── java/
-│           └── com/
-│               └── dogcatstore/
-│                   ├── AnimalControllerTest.java
-│                   └── AccessoryControllerTest.java
-│
-├── pom.xml
-└── README.md
+// filepath: c:\Users\Window 11\Desktop\C++28tech\Front-End\LT_Web\BackEnd\src\main\java\com\java\backend\repository\ReviewRepository.java
+package com.java.backend.repository;
+
+import com.java.backend.entity.ReviewEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+
+@Repository
+public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> {
+    
+    Page<ReviewEntity> findByPetId(Long petId, Pageable pageable);
+    
+    Page<ReviewEntity> findByAccessoryId(Long accessoryId, Pageable pageable);
+    
+    Page<ReviewEntity> findByUserId(Long userId, Pageable pageable);
+    
+    Optional<ReviewEntity> findByUserIdAndPetId(Long userId, Long petId);
+    
+    Optional<ReviewEntity> findByUserIdAndAccessoryId(Long userId, Long accessoryId);
+}

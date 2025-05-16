@@ -1,36 +1,16 @@
-DogCatStore_Backend/
-│
-├── src/
-│   └── main/
-│       └── java/
-│           └── com/
-│               └── dogcatstore/
-│                   ├── DogCatStoreApplication.java
-│                   ├── config/
-│                   │   └── WebConfig.java
-│                   ├── controller/
-│                   │   ├── AnimalController.java
-│                   │   └── AccessoryController.java
-│                   ├── entity/
-│                   │   ├── AnimalEntity.java
-│                   │   └── AccessoryEntity.java
-│                   ├── repository/
-│                   │   ├── AnimalRepository.java
-│                   │   └── AccessoryRepository.java
-│                   ├── service/
-│                   │   ├── AnimalService.java
-│                   │   └── AccessoryService.java
-│                   └── dto/
-│                       ├── AnimalDTO.java
-│                       └── AccessoryDTO.java
-│
-├── src/
-│   └── test/
-│       └── java/
-│           └── com/
-│               └── dogcatstore/
-│                   ├── AnimalControllerTest.java
-│                   └── AccessoryControllerTest.java
-│
-├── pom.xml
-└── README.md
+package com.java.backend.dto.response;
+
+import lombok.Builder;
+import lombok.Data;
+
+@Data
+@Builder
+public class AuthResponse {
+    private String accessToken;
+    private String tokenType;
+    private Long userId;
+    private String username;
+    private String email;
+    private String fullName;
+    private String role;
+}

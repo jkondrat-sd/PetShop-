@@ -18,19 +18,23 @@ public class CustomerEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long customerId;
     
-    @Column(name = "first_name", nullable = false)
-    private String firstName;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
     
-    @Column(name = "last_name", nullable = false)
-    private String lastName;
+    private String fullName;
     
-    private String address;
-    private String phone;
+    @Column(nullable = false)
     private String email;
     
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
-    private Set<OrderEntity> orders = new HashSet<>();
+    private String phone;
+    
+    @Column(columnDefinition = "TEXT")
+    private String address;
     
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private Set<ReviewEntity> reviews = new HashSet<>();
+    
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<OrderEntity> orders = new HashSet<>();
 }

@@ -1,33 +1,17 @@
-DogCatStore_Backend/
-│
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── com/
-│   │   │       └── dogcatstore/
-│   │   │           ├── controller/
-│   │   │           │   ├── AnimalController.java
-│   │   │           │   └── AccessoryController.java
-│   │   │           ├── entity/
-│   │   │           │   ├── Dog.java
-│   │   │           │   ├── Cat.java
-│   │   │           │   └── Accessory.java
-│   │   │           ├── repository/
-│   │   │           │   ├── DogRepository.java
-│   │   │           │   ├── CatRepository.java
-│   │   │           │   └── AccessoryRepository.java
-│   │   │           ├── service/
-│   │   │           │   ├── AnimalService.java
-│   │   │           │   └── AccessoryService.java
-│   │   │           └── DogCatStoreApplication.java
-│   │   └── resources/
-│   │       ├── application.properties
-│   │       └── static/
-│   │           └── images/
-│   └── test/
-│       └── java/
-│           └── com/
-│               └── dogcatstore/
-│                   ├── AnimalControllerTest.java
-│                   └── AccessoryControllerTest.java
-└── pom.xml (or build.gradle)
+package com.java.backend.repository;
+
+import com.java.backend.entity.BreedEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface BreedRepository extends JpaRepository<BreedEntity, Long> {
+    
+    List<BreedEntity> findByPetType(String petType);
+    
+    List<BreedEntity> findByPetTypeAndStatus(String petType, String status);
+    
+    boolean existsByBreedNameAndPetType(String breedName, String petType);
+}

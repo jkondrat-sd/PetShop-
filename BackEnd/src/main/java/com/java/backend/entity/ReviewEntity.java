@@ -3,8 +3,6 @@ package com.java.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
 @Builder
@@ -18,23 +16,20 @@ public class ReviewEntity extends BaseEntity {
     private Long reviewId;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id")
-    private CustomerEntity customer;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "accessory_id")
-    private AccessoryEntity accessory;
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pet_id")
     private PetEntity pet;
     
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "accessory_id")
+    private AccessoryEntity accessory;
+    
     @Column(nullable = false)
-    private Integer rating; // 1-5 rating
+    private Integer rating; // 1-5 stars
     
     @Column(columnDefinition = "TEXT")
     private String comment;
-    
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
 }

@@ -1,38 +1,19 @@
-DogCatStore_Backend/
-│
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── com/
-│   │   │       └── dogcatstore/
-│   │   │           ├── DogCatStoreApplication.java
-│   │   │           ├── config/
-│   │   │           │   └── WebConfig.java
-│   │   │           ├── controller/
-│   │   │           │   ├── AnimalController.java
-│   │   │           │   └── AccessoryController.java
-│   │   │           ├── entity/
-│   │   │           │   ├── AnimalEntity.java
-│   │   │           │   └── AccessoryEntity.java
-│   │   │           ├── repository/
-│   │   │           │   ├── AnimalRepository.java
-│   │   │           │   └── AccessoryRepository.java
-│   │   │           ├── service/
-│   │   │           │   ├── AnimalService.java
-│   │   │           │   └── AccessoryService.java
-│   │   │           └── dto/
-│   │   │               ├── AnimalDTO.java
-│   │   │               └── AccessoryDTO.java
-│   │   └── resources/
-│   │       ├── application.properties
-│   │       └── static/
-│   │           └── images/
-│   └── test/
-│       └── java/
-│           └── com/
-│               └── dogcatstore/
-│                   └── DogCatStoreApplicationTests.java
-│
-├── .gitignore
-├── pom.xml
-└── README.md
+package com.java.backend.repository;
+
+import com.java.backend.entity.PetEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface PetRepository extends JpaRepository<PetEntity, Long> {
+    
+    Page<PetEntity> findByStatus(String status, Pageable pageable);
+    
+    Page<PetEntity> findByTypeAndStatus(String type, String status, Pageable pageable);
+    
+    Page<PetEntity> findByBreedIdAndStatus(Long breedId, String status, Pageable pageable);
+    
+    Page<PetEntity> findByTypeAndBreedIdAndStatus(String type, Long breedId, String status, Pageable pageable);
+}

@@ -1,40 +1,15 @@
-DogCatStore_Backend/
-│
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── com/
-│   │   │       └── dogcatstore/
-│   │   │           ├── DogCatStoreApplication.java
-│   │   │           ├── config/
-│   │   │           │   └── WebConfig.java
-│   │   │           ├── controller/
-│   │   │           │   ├── AnimalController.java
-│   │   │           │   └── AccessoryController.java
-│   │   │           ├── dto/
-│   │   │           │   ├── AnimalDTO.java
-│   │   │           │   └── AccessoryDTO.java
-│   │   │           ├── entity/
-│   │   │           │   ├── AnimalEntity.java
-│   │   │           │   └── AccessoryEntity.java
-│   │   │           ├── repository/
-│   │   │           │   ├── AnimalRepository.java
-│   │   │           │   └── AccessoryRepository.java
-│   │   │           ├── service/
-│   │   │           │   ├── AnimalService.java
-│   │   │           │   └── AccessoryService.java
-│   │   │           └── exception/
-│   │   │               └── ResourceNotFoundException.java
-│   │   └── resources/
-│   │       ├── application.properties
-│   │       └── static/
-│   │           └── images/
-│   └── test/
-│       └── java/
-│           └── com/
-│               └── dogcatstore/
-│                   ├── AnimalControllerTest.java
-│                   └── AccessoryControllerTest.java
-│
-├── pom.xml
-└── README.md
+package com.java.backend.repository;
+
+import com.java.backend.entity.CategoryEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> {
+    
+    List<CategoryEntity> findByStatus(String status);
+    
+    boolean existsByCategoryName(String categoryName);
+}

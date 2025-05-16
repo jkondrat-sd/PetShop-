@@ -1,41 +1,19 @@
-DogCatStore_Backend/
-│
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── com/
-│   │   │       └── dogcatstore/
-│   │   │           ├── DogCatStoreApplication.java
-│   │   │           ├── config/
-│   │   │           │   └── WebConfig.java
-│   │   │           ├── controller/
-│   │   │           │   ├── AnimalController.java
-│   │   │           │   └── AccessoryController.java
-│   │   │           ├── dto/
-│   │   │           │   ├── AnimalDTO.java
-│   │   │           │   └── AccessoryDTO.java
-│   │   │           ├── entity/
-│   │   │           │   ├── AnimalEntity.java
-│   │   │           │   └── AccessoryEntity.java
-│   │   │           ├── repository/
-│   │   │           │   ├── AnimalRepository.java
-│   │   │           │   └── AccessoryRepository.java
-│   │   │           ├── service/
-│   │   │           │   ├── AnimalService.java
-│   │   │           │   └── AccessoryService.java
-│   │   │           └── exception/
-│   │   │               └── ResourceNotFoundException.java
-│   │   └── resources/
-│   │       ├── application.properties
-│   │       └── static/
-│   │           └── images/
-│   └── test/
-│       └── java/
-│           └── com/
-│               └── dogcatstore/
-│                   ├── AnimalControllerTest.java
-│                   └── AccessoryControllerTest.java
-│
-├── .gitignore
-├── pom.xml
-└── README.md
+package com.java.backend.dto.response;
+
+import lombok.Builder;
+import lombok.Data;
+
+import java.util.Date;
+
+@Data
+@Builder
+public class ReviewResponse {
+    private Long reviewId;
+    private String username;
+    private String userAvatar;
+    private Integer rating;
+    private String comment;
+    private Long petId;
+    private Long accessoryId;
+    private Date createdAt;
+}
