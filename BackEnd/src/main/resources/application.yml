@@ -58,6 +58,15 @@ spring:
     api-secret: ${CLOUD_API_SECRET}
 
 jwt:
-  signerKey: ${JWT_SIGNER_KEY}
+  signerKey: ${APP_JWT_SECRET}
   valid-duration: ${JWT_VALID_DURATION}
   refreshable-duration: ${JWT_REFRESHABLE_DURATION}
+
+app:
+  jwt-expiration-ms: 3600000
+  jwt-refresh-expiration-ms: 86400000
+
+cloudinary:
+  cloud-name: ${CLOUDINARY_CLOUD_NAME}
+  api-key: ${CLOUDINARY_API_KEY}
+  api-secret: ${CLOUDINARY_API_SECRET}

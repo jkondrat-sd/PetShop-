@@ -1,8 +1,9 @@
 package com.java.backend.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.java.backend.dto.request.ReviewRequest;
-import com.java.backend.dto.response.Pagination;
 import com.java.backend.dto.response.ReviewResponse;
+import com.java.backend.dto.response.Pagination;
 import com.java.backend.entity.AccessoryEntity;
 import com.java.backend.entity.PetEntity;
 import com.java.backend.entity.ReviewEntity;
@@ -24,7 +25,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,8 +41,12 @@ public class ReviewService {
     private final UserRepository userRepository;
     private final BaseRedisService baseRedisService;
 
+    private static final int MAX_COMMENT_LENGTH = 1000;
+    private static final int MIN_RATING = 1;
+    private static final int MAX_RATING = 5;
+
     // Lấy thông tin người dùng hiện tại
-    public UserEntity getUser() {
+    private UserEntity getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new AppException(ErrorCode.UNAUTHORIZED);
@@ -49,183 +56,192 @@ public class ReviewService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
     }
 
-    // Tạo đánh giá cho pet
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public ReviewResponse addPetReview(Long petId, ReviewRequest request) {
-        UserEntity user = getUser();
-        PetEntity pet = petRepository.findById(petId)
-                .orElseThrow(() -> new AppException(ErrorCode.PET_NOT_FOUND));
-        
-        // Kiểm tra xem người dùng đã đánh giá pet này chưa
-        if (reviewRepository.findByUserIdAndPetId(user.getUserId(), petId).isPresent()) {
-            throw new AppException(ErrorCode.ALREADY_REVIEWED);
+    private void validateReviewRequest(ReviewRequest request) {
+        // Validate rating
+        if (request.getRating() == null || request.getRating() < MIN_RATING || request.getRating() > MAX_RATING) {
+            throw new AppException(ErrorCode.BAD_REQUEST, "Rating must be between " + MIN_RATING + " and " + MAX_RATING);
         }
-        
-        ReviewEntity review = ReviewEntity.builder()
-                .user(user)
-                .pet(pet)
-                .rating(request.getRating())
-                .comment(request.getComment())
-                .build();
-        
-        ReviewEntity savedReview = reviewRepository.save(review);
-        
-        // Clear cache
-        baseRedisService.deleteKeys("pet_reviews_*");
-        baseRedisService.deleteKey("pet_" + petId);
-        
-        return convertToReviewResponse(savedReview);
-    }
-    
-    // Tạo đánh giá cho accessory
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public ReviewResponse addAccessoryReview(Long accessoryId, ReviewRequest request) {
-        UserEntity user = getUser();
-        AccessoryEntity accessory = accessoryRepository.findById(accessoryId)
-                .orElseThrow(() -> new AppException(ErrorCode.ACCESSORY_NOT_FOUND));
-        
-        // Kiểm tra xem người dùng đã đánh giá accessory này chưa
-        if (reviewRepository.findByUserIdAndAccessoryId(user.getUserId(), accessoryId).isPresent()) {
-            throw new AppException(ErrorCode.ALREADY_REVIEWED);
+
+        // Validate comment length
+        if (request.getComment() != null && request.getComment().length() > MAX_COMMENT_LENGTH) {
+            throw new AppException(ErrorCode.BAD_REQUEST, "Comment must not exceed " + MAX_COMMENT_LENGTH + " characters");
         }
-        
-        ReviewEntity review = ReviewEntity.builder()
-                .user(user)
-                .accessory(accessory)
-                .rating(request.getRating())
-                .comment(request.getComment())
-                .build();
-        
-        ReviewEntity savedReview = reviewRepository.save(review);
-        
-        // Clear cache
-        baseRedisService.deleteKeys("accessory_reviews_*");
-        baseRedisService.deleteKey("accessory_" + accessoryId);
-        
-        return convertToReviewResponse(savedReview);
-    }
-    
-    // Lấy danh sách đánh giá của một pet
-    public Pagination<ReviewResponse> getPetReviews(Long petId, int page, int size) {
-        String cacheKey = "pet_reviews_" + petId + "_" + page + "_" + size;
-        
-        // Kiểm tra cache
-        Object cachedResult = baseRedisService.get(cacheKey);
-        if (cachedResult instanceof Pagination) {
-            return (Pagination<ReviewResponse>) cachedResult;
-        }
-        
-        try {
-            // Kiểm tra pet tồn tại
-            if (!petRepository.existsById(petId)) {
+
+        // Validate item existence
+        if (request.getPetId() != null) {
+            if (!petRepository.existsById(request.getPetId())) {
                 throw new AppException(ErrorCode.PET_NOT_FOUND);
             }
-            
-            Pageable pageable = PageRequest.of(page, size);
-            Page<ReviewEntity> reviewPage = reviewRepository.findByPetId(petId, pageable);
-            
-            List<ReviewResponse> reviews = reviewPage.getContent().stream()
-                    .map(this::convertToReviewResponse)
-                    .collect(Collectors.toList());
-            
-            Pagination<ReviewResponse> pagination = new Pagination<>();
-            pagination.setContent(reviews);
-            pagination.setPage(page);
-            pagination.setSize(size);
-            pagination.setTotalElements(reviewPage.getTotalElements());
-            pagination.setTotalPages(reviewPage.getTotalPages());
-            
-            // Lưu vào cache
-            baseRedisService.setObjectForMinutes(cacheKey, pagination, 10);
-            
-            return pagination;
-        } catch (AppException e) {
-            throw e;
-        } catch (Exception e) {
-            log.error("Error getting pet reviews: {}", e.getMessage());
-            throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
-        }
-    }
-    
-    // Lấy danh sách đánh giá của một accessory
-    public Pagination<ReviewResponse> getAccessoryReviews(Long accessoryId, int page, int size) {
-        String cacheKey = "accessory_reviews_" + accessoryId + "_" + page + "_" + size;
-        
-        // Kiểm tra cache
-        Object cachedResult = baseRedisService.get(cacheKey);
-        if (cachedResult instanceof Pagination) {
-            return (Pagination<ReviewResponse>) cachedResult;
-        }
-        
-        try {
-            // Kiểm tra accessory tồn tại
-            if (!accessoryRepository.existsById(accessoryId)) {
+        } else if (request.getAccessoryId() != null) {
+            if (!accessoryRepository.existsById(request.getAccessoryId())) {
                 throw new AppException(ErrorCode.ACCESSORY_NOT_FOUND);
             }
-            
-            Pageable pageable = PageRequest.of(page, size);
-            Page<ReviewEntity> reviewPage = reviewRepository.findByAccessoryId(accessoryId, pageable);
-            
-            List<ReviewResponse> reviews = reviewPage.getContent().stream()
-                    .map(this::convertToReviewResponse)
-                    .collect(Collectors.toList());
-            
-            Pagination<ReviewResponse> pagination = new Pagination<>();
-            pagination.setContent(reviews);
-            pagination.setPage(page);
-            pagination.setSize(size);
-            pagination.setTotalElements(reviewPage.getTotalElements());
-            pagination.setTotalPages(reviewPage.getTotalPages());
-            
-            // Lưu vào cache
-            baseRedisService.setObjectForMinutes(cacheKey, pagination, 10);
-            
-            return pagination;
-        } catch (AppException e) {
-            throw e;
-        } catch (Exception e) {
-            log.error("Error getting accessory reviews: {}", e.getMessage());
-            throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+        } else {
+            throw new AppException(ErrorCode.BAD_REQUEST, "Either petId or accessoryId must be provided");
         }
     }
-    
-    // Xóa đánh giá
+
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public void deleteReview(Long reviewId) {
-        ReviewEntity review = reviewRepository.findById(reviewId)
+    public ReviewResponse createReview(ReviewRequest request) {
+        UserEntity currentUser = getCurrentUser();
+        request.setUserId(currentUser.getUserId());
+
+        validateReviewRequest(request);
+
+        // Check if user has already reviewed this item
+        if (request.getPetId() != null) {
+            ReviewEntity existingReview = reviewRepository.findByUser_UserIdAndPet_PetId(request.getUserId(), request.getPetId());
+            if (existingReview != null) {
+                throw new AppException(ErrorCode.ALREADY_REVIEWED);
+            }
+        } else if (request.getAccessoryId() != null) {
+            ReviewEntity existingReview = reviewRepository.findByUser_UserIdAndAccessory_AccessoryId(request.getUserId(), request.getAccessoryId());
+            if (existingReview != null) {
+                throw new AppException(ErrorCode.ALREADY_REVIEWED);
+            }
+        }
+
+        ReviewEntity review = ReviewEntity.builder()
+                .userId(request.getUserId())
+                .petId(request.getPetId())
+                .accessoryId(request.getAccessoryId())
+                .rating(request.getRating())
+                .comment(request.getComment())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        ReviewEntity savedReview = reviewRepository.save(review);
+        
+        // Clear cache
+        if (review.getPetId() != null) {
+            baseRedisService.deleteKeys("reviews:pet:*");
+        }
+        if (review.getAccessoryId() != null) {
+            baseRedisService.deleteKeys("reviews:accessory:*");
+        }
+        
+        return mapToResponse(savedReview);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    public ReviewResponse updateReview(Long id, ReviewRequest request) {
+        ReviewEntity review = reviewRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.REVIEW_NOT_FOUND));
         
-        UserEntity user = getUser();
+        UserEntity currentUser = getCurrentUser();
+        
+        // Chỉ admin hoặc chính người tạo đánh giá mới có thể cập nhật
+        if (!currentUser.getRole().getName().equals("ROLE_ADMIN") && !review.getUserId().equals(currentUser.getUserId())) {
+            throw new AppException(ErrorCode.UNAUTHORIZED);
+        }
+
+        validateReviewRequest(request);
+
+        review.setRating(request.getRating());
+        review.setComment(request.getComment());
+        review.setUpdatedAt(LocalDateTime.now());
+
+        ReviewEntity updatedReview = reviewRepository.save(review);
+        
+        // Clear cache
+        if (review.getPetId() != null) {
+            baseRedisService.deleteKeys("reviews:pet:*");
+        }
+        if (review.getAccessoryId() != null) {
+            baseRedisService.deleteKeys("reviews:accessory:*");
+        }
+        
+        return mapToResponse(updatedReview);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    public void deleteReview(Long id) {
+        ReviewEntity review = reviewRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.REVIEW_NOT_FOUND));
+        
+        UserEntity currentUser = getCurrentUser();
         
         // Chỉ admin hoặc chính người tạo đánh giá mới có thể xóa
-        if (!user.getRole().equals("ROLE_ADMIN") && !review.getUser().getUserId().equals(user.getUserId())) {
+        if (!currentUser.getRole().getName().equals("ROLE_ADMIN") && !review.getUserId().equals(currentUser.getUserId())) {
             throw new AppException(ErrorCode.UNAUTHORIZED);
         }
         
         reviewRepository.delete(review);
         
         // Clear cache
-        if (review.getPet() != null) {
-            baseRedisService.deleteKeys("pet_reviews_*");
-            baseRedisService.deleteKey("pet_" + review.getPet().getPetId());
+        if (review.getPetId() != null) {
+            baseRedisService.deleteKeys("reviews:pet:*");
         }
-        
-        if (review.getAccessory() != null) {
-            baseRedisService.deleteKeys("accessory_reviews_*");
-            baseRedisService.deleteKey("accessory_" + review.getAccessory().getAccessoryId());
+        if (review.getAccessoryId() != null) {
+            baseRedisService.deleteKeys("reviews:accessory:*");
         }
     }
-    
-    private ReviewResponse convertToReviewResponse(ReviewEntity review) {
+
+    public Pagination<ReviewResponse> getReviewsByPetId(Long petId, int page, int size) {
+        String cacheKey = "reviews:pet:" + petId + ":" + page + ":" + size;
+        
+        Pagination<ReviewResponse> cachedResult = baseRedisService.get(cacheKey, new TypeReference<Pagination<ReviewResponse>>() {});
+        if (cachedResult != null) {
+            return cachedResult;
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ReviewEntity> reviewPage = reviewRepository.findByPetId(petId, pageable);
+        
+        List<ReviewResponse> reviews = reviewPage.getContent().stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+
+        Pagination<ReviewResponse> pagination = Pagination.<ReviewResponse>builder()
+                .content(reviews)
+                .page(page)
+                .size(size)
+                .totalElements(reviewPage.getTotalElements())
+                .totalPages(reviewPage.getTotalPages())
+                .build();
+
+        baseRedisService.setObjectForMinutes(cacheKey, pagination, 30);
+        return pagination;
+    }
+
+    public Pagination<ReviewResponse> getReviewsByAccessoryId(Long accessoryId, int page, int size) {
+        String cacheKey = "reviews:accessory:" + accessoryId + ":" + page + ":" + size;
+        
+        Pagination<ReviewResponse> cachedResult = baseRedisService.get(cacheKey, new TypeReference<Pagination<ReviewResponse>>() {});
+        if (cachedResult != null) {
+            return cachedResult;
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ReviewEntity> reviewPage = reviewRepository.findByAccessoryId(accessoryId, pageable);
+        
+        List<ReviewResponse> reviews = reviewPage.getContent().stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+
+        Pagination<ReviewResponse> pagination = Pagination.<ReviewResponse>builder()
+                .content(reviews)
+                .page(page)
+                .size(size)
+                .totalElements(reviewPage.getTotalElements())
+                .totalPages(reviewPage.getTotalPages())
+                .build();
+
+        baseRedisService.setObjectForMinutes(cacheKey, pagination, 30);
+        return pagination;
+    }
+
+    private ReviewResponse mapToResponse(ReviewEntity review) {
         return ReviewResponse.builder()
                 .reviewId(review.getReviewId())
-                .username(review.getUser().getUsername())
-                .userAvatar(review.getUser().getAvatar())
+                .userId(review.getUserId())
+                .petId(review.getPetId())
+                .accessoryId(review.getAccessoryId())
                 .rating(review.getRating())
                 .comment(review.getComment())
-                .petId(review.getPet() != null ? review.getPet().getPetId() : null)
-                .accessoryId(review.getAccessory() != null ? review.getAccessory().getAccessoryId() : null)
                 .createdAt(review.getCreatedAt())
+                .updatedAt(review.getUpdatedAt())
                 .build();
     }
 }

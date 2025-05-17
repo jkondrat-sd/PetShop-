@@ -6,7 +6,7 @@ import lombok.Data;
 public class AccessoryRequest {
     private String accessoryName;
     private String description;
-    private Long categoryId;
+    private Long id;
     private Double unitPrice;
     private Integer stockQuantity;
     private String status;

@@ -1,39 +1,50 @@
 package com.java.backend.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+@Data
 @Entity
-@Table(name = "reviews")
-@Getter
-@Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "reviews")
 public class ReviewEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "review_id")
     private Long reviewId;
-    
-    @ManyToOne
-    @JoinColumn(name = "customer_id", nullable = false)
-    private UserEntity user;
-    
-    @ManyToOne
-    @JoinColumn(name = "accessory_id")
-    private AccessoryEntity accessory;
-    
-    @ManyToOne
-    @JoinColumn(name = "pet_id")
-    private PetEntity pet;
-    
+
+    @Column(nullable = false)
+    private Long userId;
+
+    private Long petId;
+    private Long accessoryId;
+
+    @Column(nullable = false)
     private Integer rating;
-    
-    @Column(columnDefinition = "TEXT")
+
+    @Column(length = 1000)
     private String comment;
-    
-    @Column(name = "created_at")
-    private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

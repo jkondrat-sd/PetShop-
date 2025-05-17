@@ -9,14 +9,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderDetailResponse {
-    private Long id;
-    private String itemType; // "pet" or "accessory"
+public class CartItemResponse {
+    private String itemType;
     private Long itemId;
     private String name;
     private String thumbnail;
-    private Double unitPrice;
+    private Double price;
     private Integer quantity;
-    private Double discount;
     private Double subtotal;
 }

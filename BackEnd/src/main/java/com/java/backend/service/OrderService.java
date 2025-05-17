@@ -2,7 +2,10 @@ package com.java.backend.service;
 
 import com.java.backend.dto.request.OrderRequest;
 import com.java.backend.dto.response.OrderResponse;
+import com.java.backend.dto.response.OrderDetailResponse;
 import com.java.backend.dto.response.Pagination;
+import com.java.backend.dto.response.CartResponse;
+import com.java.backend.dto.response.CartItemResponse;
 import com.java.backend.entity.AccessoryEntity;
 import com.java.backend.entity.OrderDetailEntity;
 import com.java.backend.entity.OrderEntity;
@@ -101,7 +104,7 @@ public class OrderService {
     
     public Pagination<OrderResponse> getUserOrders(int page, int size) {
         UserEntity currentUser = userService.getCurrentUser();
-        Page<OrderEntity> orderPage = orderRepository.findByUserId(currentUser.getUserId(), PageRequest.of(page, size));
+        Page<OrderEntity> orderPage = orderRepository.findByUser_UserId(currentUser.getUserId(), PageRequest.of(page, size));
         
         List<OrderResponse> orders = orderPage.getContent()
                 .stream()

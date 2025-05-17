@@ -10,5 +10,6 @@ import org.springframework.stereotype.Repository;
 public interface PetRepository extends JpaRepository<PetEntity, Long> {
     Page<PetEntity> findByStatus(String status, Pageable pageable);
     Page<PetEntity> findByTypeAndStatus(String type, String status, Pageable pageable);
-    Page<PetEntity> findByBreedIdAndStatus(Long breedId, String status, Pageable pageable);
+    Page<PetEntity> findByTypeAndBreed_BreedIdAndStatus(String type, Long id, String status, Pageable pageable);
+    Page<PetEntity> findByBreed_BreedIdAndStatus(Long id, String status, Pageable pageable);
 }

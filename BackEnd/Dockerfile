@@ -17,8 +17,8 @@ WORKDIR /app
 
 # Sao chép file JAR từ build
 COPY --from=builder /build/target/BackEnd-0.0.1-SNAPSHOT.jar api-service.jar
-# Expose cổng 8088
-EXPOSE 8088
+# Expose cổng 8089
+EXPOSE 8089
 
 # Chạy ứng dụng
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar api-service.jar"]

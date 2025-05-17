@@ -21,13 +21,12 @@ public class PetController {
     
     @GetMapping
     public ResponseEntity<ApiResponse<Pagination<PetResponse>>> getAllPets(
-            @RequestParam(defaultValue = "available") String status,
-            @RequestParam(required = false) String type,
-            @RequestParam(required = false) Long breedId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) Long breedId) {
         
-        Pagination<PetResponse> pets = petService.getAllPets(status, type, breedId, page, size);
+        Pagination<PetResponse> pets = petService.getAllPets(page, size, type, breedId);
         return ResponseEntity.ok(new ApiResponse<>(true, "Pets retrieved successfully", pets));
     }
     
@@ -39,15 +38,22 @@ public class PetController {
     
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<PetResponse>> createPet(@RequestBody PetRequest petRequest) {
-        PetResponse pet = petService.createPet(petRequest);
+    public ResponseEntity<ApiResponse<PetResponse>> createPet(
+            @RequestBody PetRequest petRequest,
+            @RequestParam("thumbnail") MultipartFile thumbnail,
+            @RequestParam("images") List<MultipartFile> images) {
+        PetResponse pet = petService.addPet(petRequest, thumbnail, images);
         return ResponseEntity.ok(new ApiResponse<>(true, "Pet created successfully", pet));
     }
     
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<PetResponse>> updatePet(@PathVariable Long id, @RequestBody PetRequest petRequest) {
-        PetResponse pet = petService.updatePet(id, petRequest);
+    public ResponseEntity<ApiResponse<PetResponse>> updatePet(
+            @PathVariable Long id,
+            @RequestBody PetRequest petRequest,
+            @RequestParam(value = "thumbnail", required = false) MultipartFile thumbnail,
+            @RequestParam(value = "images", required = false) List<MultipartFile> images) {
+        PetResponse pet = petService.updatePet(id, petRequest, thumbnail, images);
         return ResponseEntity.ok(new ApiResponse<>(true, "Pet updated successfully", pet));
     }
     
@@ -56,19 +62,5 @@ public class PetController {
     public ResponseEntity<ApiResponse<String>> deletePet(@PathVariable Long id) {
         petService.deletePet(id);
         return ResponseEntity.ok(new ApiResponse<>(true, "Pet deleted successfully", null));
-    }
-    
-    @PostMapping("/{id}/images")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<PetResponse>> uploadPetImages(@PathVariable Long id, @RequestParam("files") List<MultipartFile> files) {
-        PetResponse pet = petService.uploadPetImages(id, files);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Pet images uploaded successfully", pet));
-    }
-    
-    @PostMapping("/{id}/thumbnail")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<PetResponse>> uploadPetThumbnail(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
-        PetResponse pet = petService.uploadPetThumbnail(id, file);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Pet thumbnail uploaded successfully", pet));
     }
 }

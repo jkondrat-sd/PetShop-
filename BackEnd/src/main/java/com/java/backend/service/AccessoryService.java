@@ -26,6 +26,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.concurrent.TimeUnit;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 @Service
 @Slf4j
@@ -60,7 +62,7 @@ public class AccessoryService {
     public AccessoryResponse addAccessory(AccessoryRequest request, MultipartFile thumbnailFile, List<MultipartFile> imageFiles) {
         try {
             // Kiểm tra category tồn tại
-            CategoryEntity category = categoryRepository.findById(request.getCategoryId())
+            CategoryEntity category = categoryRepository.findById(request.getId())
                     .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
 
             // Upload thumbnail
@@ -98,12 +100,12 @@ public class AccessoryService {
     }
 
     // Lấy danh sách phụ kiện
-    public Pagination<AccessoryResponse> getAllAccessories(int page, int size, Long categoryId) {
-        String cacheKey = "accessories_" + page + "_" + size + "_" + categoryId;
+    public Pagination<AccessoryResponse> getAllAccessories(String status, Long id, String name, int page, int size) {
+        String cacheKey = "accessories_" + status + "_" + id + "_" + name + "_" + page + "_" + size;
         
         // Kiểm tra cache
-        Object cachedResult = baseRedisService.get(cacheKey);
-        if (cachedResult instanceof Pagination) {
+        Object cachedResult = baseRedisService.get(cacheKey, new TypeReference<Pagination<AccessoryResponse>>() {});
+        if (cachedResult != null) {
             return (Pagination<AccessoryResponse>) cachedResult;
         }
         
@@ -111,25 +113,28 @@ public class AccessoryService {
             Pageable pageable = PageRequest.of(page, size);
             Page<AccessoryEntity> accessoryPage;
             
-            if (categoryId != null) {
-                accessoryPage = accessoryRepository.findByCategoryIdAndStatus(categoryId, "active", pageable);
+            if (id != null) {
+                accessoryPage =  accessoryRepository.findByCategory_CategoryIdAndStatus(id, status, pageable);
+            } else if (name != null && !name.isEmpty()) {
+                accessoryPage = accessoryRepository.findByAccessoryNameContainingIgnoreCase(name, pageable);
             } else {
-                accessoryPage = accessoryRepository.findByStatus("active", pageable);
+                accessoryPage = accessoryRepository.findByStatus(status, pageable);
             }
             
             List<AccessoryResponse> accessories = accessoryPage.getContent().stream()
                     .map(this::convertToAccessoryResponse)
                     .collect(Collectors.toList());
             
-            Pagination<AccessoryResponse> pagination = new Pagination<>();
-            pagination.setContent(accessories);
-            pagination.setPage(page);
-            pagination.setSize(size);
-            pagination.setTotalElements(accessoryPage.getTotalElements());
-            pagination.setTotalPages(accessoryPage.getTotalPages());
+            Pagination<AccessoryResponse> pagination = Pagination.<AccessoryResponse>builder()
+                    .content(accessories)
+                    .page(page)
+                    .size(size)
+                    .totalElements(accessoryPage.getTotalElements())
+                    .totalPages(accessoryPage.getTotalPages())
+                    .build();
             
             // Lưu vào cache
-            baseRedisService.setObjectForMinutes(cacheKey, pagination, 10);
+            baseRedisService.set(cacheKey, pagination, 10, TimeUnit.MINUTES);
             
             return pagination;
         } catch (Exception e) {
@@ -143,9 +148,9 @@ public class AccessoryService {
         String cacheKey = "accessory_" + accessoryId;
         
         // Kiểm tra cache
-        Object cachedResult = baseRedisService.get(cacheKey);
-        if (cachedResult instanceof AccessoryResponse) {
-            return (AccessoryResponse) cachedResult;
+        AccessoryResponse cachedResult = baseRedisService.get(cacheKey, new TypeReference<AccessoryResponse>() {});
+        if (cachedResult != null) {
+            return cachedResult;
         }
         
         AccessoryEntity accessory = accessoryRepository.findById(accessoryId)
@@ -154,20 +159,20 @@ public class AccessoryService {
         AccessoryResponse response = convertToAccessoryResponse(accessory);
         
         // Lưu vào cache
-        baseRedisService.setObjectForMinutes(cacheKey, response, 30);
+        baseRedisService.set(cacheKey, response, 30, TimeUnit.MINUTES);
         
         return response;
     }
 
     // Cập nhật thông tin phụ kiện
     @PreAuthorize("hasRole('ADMIN')")
-    public AccessoryResponse updateAccessory(Long accessoryId, AccessoryRequest request, MultipartFile thumbnailFile, List<MultipartFile> imageFiles) {
+    public AccessoryResponse updateAccessory(Long accessoryId, AccessoryRequest request) {
         AccessoryEntity accessory = accessoryRepository.findById(accessoryId)
                 .orElseThrow(() -> new AppException(ErrorCode.ACCESSORY_NOT_FOUND));
         
         // Cập nhật thông tin danh mục nếu có
-        if (request.getCategoryId() != null) {
-            CategoryEntity category = categoryRepository.findById(request.getCategoryId())
+        if (request.getId() != null) {
+            CategoryEntity category = categoryRepository.findById(request.getId())
                     .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
             accessory.setCategory(category);
         }
@@ -178,22 +183,6 @@ public class AccessoryService {
         if (request.getUnitPrice() != null) accessory.setUnitPrice(request.getUnitPrice());
         if (request.getStockQuantity() != null) accessory.setStockQuantity(request.getStockQuantity());
         if (request.getStatus() != null) accessory.setStatus(request.getStatus());
-        
-        // Cập nhật thumbnail nếu có
-        if (thumbnailFile != null && !thumbnailFile.isEmpty()) {
-            String thumbnail = uploadFileService.uploadFile(thumbnailFile);
-            accessory.setThumbnail(thumbnail);
-        }
-        
-        // Cập nhật images nếu có
-        if (imageFiles != null && !imageFiles.isEmpty()) {
-            List<String> imageUrls = new ArrayList<>();
-            for (MultipartFile imageFile : imageFiles) {
-                String imageUrl = uploadFileService.uploadFile(imageFile);
-                imageUrls.add(imageUrl);
-            }
-            accessory.setImages(String.join(",", imageUrls));
-        }
         
         AccessoryEntity updatedAccessory = accessoryRepository.save(accessory);
         
@@ -234,7 +223,7 @@ public class AccessoryService {
                 .accessoryName(accessory.getAccessoryName())
                 .description(accessory.getDescription())
                 .category(accessory.getCategory() != null ? accessory.getCategory().getCategoryName() : null)
-                .categoryId(accessory.getCategory() != null ? accessory.getCategory().getCategoryId() : null)
+                .categoryId(accessory.getCategory() != null ? accessory.getCategory().getId() : null)
                 .unitPrice(accessory.getUnitPrice())
                 .stockQuantity(accessory.getStockQuantity())
                 .status(accessory.getStatus())
@@ -243,5 +232,69 @@ public class AccessoryService {
                 .createdAt(accessory.getCreatedAt())
                 .updatedAt(accessory.getUpdatedAt())
                 .build();
+    }
+
+    public AccessoryResponse createAccessory(AccessoryRequest request) {
+        try {
+            // Kiểm tra category tồn tại
+            CategoryEntity category = categoryRepository.findById(request.getId())
+                    .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
+            
+            // Lưu dữ liệu vào DB
+            AccessoryEntity accessory = AccessoryEntity.builder()
+                    .accessoryName(request.getAccessoryName())
+                    .description(request.getDescription())
+                    .category(category)
+                    .unitPrice(request.getUnitPrice())
+                    .stockQuantity(request.getStockQuantity())
+                    .status("active")
+                    .build();
+            
+            AccessoryEntity savedAccessory = accessoryRepository.save(accessory);
+            
+            // Clear cache
+            baseRedisService.deleteKeys("accessories_*");
+            
+            return convertToAccessoryResponse(savedAccessory);
+        } catch (Exception e) {
+            log.error("Error adding accessory: {}", e.getMessage());
+            throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public AccessoryResponse uploadAccessoryImages(Long accessoryId, List<MultipartFile> files) {
+        AccessoryEntity accessory = accessoryRepository.findById(accessoryId)
+                .orElseThrow(() -> new AppException(ErrorCode.ACCESSORY_NOT_FOUND));
+        
+        List<String> imageUrls = new ArrayList<>();
+        for (MultipartFile file : files) {
+            String imageUrl = uploadFileService.uploadFile(file);
+            imageUrls.add(imageUrl);
+        }
+        
+        accessory.setImages(String.join(",", imageUrls));
+        AccessoryEntity updatedAccessory = accessoryRepository.save(accessory);
+        
+        // Clear cache
+        baseRedisService.deleteKey("accessory_" + accessoryId);
+        baseRedisService.deleteKeys("accessories_*");
+        
+        return convertToAccessoryResponse(updatedAccessory);
+    }
+
+    public AccessoryResponse uploadAccessoryThumbnail(Long accessoryId, MultipartFile file) {
+        AccessoryEntity accessory = accessoryRepository.findById(accessoryId)
+                .orElseThrow(() -> new AppException(ErrorCode.ACCESSORY_NOT_FOUND));
+        
+        String thumbnail = uploadFileService.uploadFile(file);
+        accessory.setThumbnail(thumbnail);
+        
+        AccessoryEntity updatedAccessory = accessoryRepository.save(accessory);
+        
+        // Clear cache
+        baseRedisService.deleteKey("accessory_" + accessoryId);
+        baseRedisService.deleteKeys("accessories_*");
+        
+        return convertToAccessoryResponse(updatedAccessory);
     }
 }

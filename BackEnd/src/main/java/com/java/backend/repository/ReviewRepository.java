@@ -8,7 +8,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> {
+    ReviewEntity findByUser_UserIdAndPet_PetId(Long userId, Long petId);
+    ReviewEntity findByUser_UserIdAndAccessory_AccessoryId(Long userId, Long accessoryId);
     Page<ReviewEntity> findByPetId(Long petId, Pageable pageable);
     Page<ReviewEntity> findByAccessoryId(Long accessoryId, Pageable pageable);
-    Page<ReviewEntity> findByUserId(Long userId, Pageable pageable);
 }

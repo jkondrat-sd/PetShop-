@@ -8,138 +8,112 @@ import com.java.backend.exception.AppException;
 import com.java.backend.exception.ErrorCode;
 import com.java.backend.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+
 @Service
-@Slf4j
 @RequiredArgsConstructor
-@Transactional
 public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final BaseRedisService baseRedisService;
 
-    public Pagination<CategoryResponse> getAllCategories(int page, int size) {
-        String cacheKey = "categories_" + page + "_" + size;
-        
-        // Kiểm tra cache
-        Object cachedResult = baseRedisService.get(cacheKey);
-        if (cachedResult instanceof Pagination) {
-            return (Pagination<CategoryResponse>) cachedResult;
+    public Pagination<CategoryResponse> getAllCategories(String status, int page, int size) {
+        String cacheKey = "categories:" + status + ":" + page + ":" + size;
+        Pagination<CategoryResponse> cachedResult = baseRedisService.get(cacheKey, new TypeReference<Pagination<CategoryResponse>>() {});
+        if (cachedResult != null) {
+            return cachedResult;
         }
-        
-        try {
-            Pageable pageable = PageRequest.of(page, size);
-            Page<CategoryEntity> categoryPage = categoryRepository.findByStatus("active", pageable);
-            
-            List<CategoryResponse> categories = categoryPage.getContent().stream()
-                    .map(this::convertToCategoryResponse)
-                    .collect(Collectors.toList());
-            
-            Pagination<CategoryResponse> pagination = new Pagination<>();
-            pagination.setContent(categories);
-            pagination.setPage(page);
-            pagination.setSize(size);
-            pagination.setTotalElements(categoryPage.getTotalElements());
-            pagination.setTotalPages(categoryPage.getTotalPages());
-            
-            // Lưu vào cache
-            baseRedisService.setObjectForMinutes(cacheKey, pagination, 10);
-            
-            return pagination;
-        } catch (Exception e) {
-            log.error("Error getting categories: {}", e.getMessage());
-            throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
-        }
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<CategoryEntity> categoryPage = categoryRepository.findByStatus(status, pageable);
+        List<CategoryResponse> categories = categoryPage.getContent().stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+
+        Pagination<CategoryResponse> pagination = Pagination.<CategoryResponse>builder()
+                .content(categories)
+                .totalElements(categoryPage.getTotalElements())
+                .totalPages(categoryPage.getTotalPages())
+                .page(page)
+                .build();
+
+        baseRedisService.set(cacheKey, pagination, 60 * 24, TimeUnit.MINUTES);
+        return pagination;
     }
 
-    public CategoryResponse getCategoryById(Long categoryId) {
-        String cacheKey = "category_" + categoryId;
-        
-        // Kiểm tra cache
-        Object cachedResult = baseRedisService.get(cacheKey);
-        if (cachedResult instanceof CategoryResponse) {
-            return (CategoryResponse) cachedResult;
+    public CategoryResponse getCategoryById(Long id) {
+        String cacheKey = "category:" + id;
+        CategoryResponse cachedCategory = baseRedisService.get(cacheKey, CategoryResponse.class);
+        if (cachedCategory != null) {
+            return cachedCategory;
         }
-        
-        CategoryEntity category = categoryRepository.findById(categoryId)
+
+        CategoryEntity category = categoryRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
-        
-        CategoryResponse response = convertToCategoryResponse(category);
-        
-        // Lưu vào cache
-        baseRedisService.setObjectForMinutes(cacheKey, response, 30);
-        
+        CategoryResponse response = mapToResponse(category);
+        baseRedisService.set(cacheKey, response, 60 * 24, TimeUnit.MINUTES);
         return response;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    public CategoryResponse addCategory(CategoryRequest request) {
+    @Transactional
+    public CategoryResponse createCategory(CategoryRequest request) {
         if (categoryRepository.existsByCategoryName(request.getCategoryName())) {
-            throw new AppException(ErrorCode.CATEGORY_EXISTED);
+            throw new AppException(ErrorCode.CATEGORY_ALREADY_EXISTS);
         }
-        
+
         CategoryEntity category = CategoryEntity.builder()
                 .categoryName(request.getCategoryName())
                 .description(request.getDescription())
-                .status("active")
+                .status(request.getStatus())
                 .build();
-        
+
         CategoryEntity savedCategory = categoryRepository.save(category);
-        
-        // Clear cache
-        baseRedisService.deleteKeys("categories_*");
-        
-        return convertToCategoryResponse(savedCategory);
+        return mapToResponse(savedCategory);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    public CategoryResponse updateCategory(Long categoryId, CategoryRequest request) {
-        CategoryEntity category = categoryRepository.findById(categoryId)
+    @Transactional
+    public CategoryResponse updateCategory(Long id, CategoryRequest request) {
+        CategoryEntity category = categoryRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
-        
-        // Update fields
-        if (request.getCategoryName() != null) category.setCategoryName(request.getCategoryName());
-        if (request.getDescription() != null) category.setDescription(request.getDescription());
-        if (request.getStatus() != null) category.setStatus(request.getStatus());
-        
+
+        if (!category.getCategoryName().equals(request.getCategoryName()) &&
+                categoryRepository.existsByCategoryName(request.getCategoryName())) {
+            throw new AppException(ErrorCode.CATEGORY_ALREADY_EXISTS);
+        }
+
+        category.setCategoryName(request.getCategoryName());
+        category.setDescription(request.getDescription());
+        category.setStatus(request.getStatus());
+
         CategoryEntity updatedCategory = categoryRepository.save(category);
-        
-        // Clear cache
-        baseRedisService.deleteKey("category_" + categoryId);
-        baseRedisService.deleteKeys("categories_*");
-        
-        return convertToCategoryResponse(updatedCategory);
+        return mapToResponse(updatedCategory);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    public void deleteCategory(Long categoryId) {
-        CategoryEntity category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
-        
-        // Soft delete - set status to inactive
-        category.setStatus("inactive");
-        categoryRepository.save(category);
-        
-        // Clear cache
-        baseRedisService.deleteKey("category_" + categoryId);
-        baseRedisService.deleteKeys("categories_*");
+    @Transactional
+    public void deleteCategory(Long id) {
+        if (!categoryRepository.existsById(id)) {
+            throw new AppException(ErrorCode.CATEGORY_NOT_FOUND);
+        }
+        categoryRepository.deleteById(id);
     }
-    
-    private CategoryResponse convertToCategoryResponse(CategoryEntity category) {
+
+    private CategoryResponse mapToResponse(CategoryEntity entity) {
         return CategoryResponse.builder()
-                .categoryId(category.getCategoryId())
-                .categoryName(category.getCategoryName())
-                .description(category.getDescription())
-                .status(category.getStatus())
+                .categoryId(entity.getId())
+                .categoryName(entity.getCategoryName())
+                .description(entity.getDescription())
+                .status(entity.getStatus())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
                 .build();
     }
 }

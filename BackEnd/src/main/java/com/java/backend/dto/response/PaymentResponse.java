@@ -11,11 +11,12 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryResponse {
-    private Long categoryId;
-    private String categoryName;
-    private String description;
+public class PaymentResponse {
+    private boolean success;
+    private String transactionId;
+    private Long orderId;
+    private Double amount;
+    private String paymentMethod;
+    private LocalDateTime paymentDate;
     private String status;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 }

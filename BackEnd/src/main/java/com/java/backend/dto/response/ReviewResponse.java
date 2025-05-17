@@ -1,19 +1,23 @@
 package com.java.backend.dto.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ReviewResponse {
     private Long reviewId;
-    private String username;
-    private String userAvatar;
-    private Integer rating;
-    private String comment;
+    private Long userId;
     private Long petId;
     private Long accessoryId;
-    private Date createdAt;
+    private Integer rating;
+    private String comment;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

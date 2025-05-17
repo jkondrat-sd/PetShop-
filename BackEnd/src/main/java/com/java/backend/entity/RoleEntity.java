@@ -1,4 +1,3 @@
-
 package com.java.backend.entity;
 
 import jakarta.persistence.*;

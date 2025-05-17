@@ -5,8 +5,9 @@ import java.util.List;
 
 @Data
 public class OrderRequest {
-    private String shippingAddress;
-    private String contactPhone;
+    private String shipName;
+    private String shipAddress;
+    private Double freight;
     private String paymentMethod;
     private List<OrderItemRequest> items;
 }

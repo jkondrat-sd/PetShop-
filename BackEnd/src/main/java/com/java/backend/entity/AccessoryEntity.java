@@ -2,6 +2,7 @@ package com.java.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "accessories")
@@ -9,13 +10,15 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class AccessoryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "accessories_id")
     private Long accessoryId;
     
-    private String name;
+    @Column(name = "accessory_name")
+    private String accessoryName;
     
     @ManyToOne
     @JoinColumn(name = "category_id")
@@ -27,7 +30,8 @@ public class AccessoryEntity {
     @Column(name = "unit_price")
     private Double unitPrice;
     
-    private Integer stock;
+    @Column(name = "stock_quantity")
+    private Integer stockQuantity;
     
     private String thumbnail;
     
@@ -39,4 +43,21 @@ public class AccessoryEntity {
     private SupplierEntity supplier;
     
     private String status = "active";
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

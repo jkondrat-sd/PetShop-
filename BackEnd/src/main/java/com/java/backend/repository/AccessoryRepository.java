@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AccessoryRepository extends JpaRepository<AccessoryEntity, Long> {
     Page<AccessoryEntity> findByStatus(String status, Pageable pageable);
-    Page<AccessoryEntity> findByCategoryIdAndStatus(Long categoryId, String status, Pageable pageable);
-    Page<AccessoryEntity> findByNameContainingIgnoreCase(String name, Pageable pageable);
+    Page<AccessoryEntity> findByCategory_CategoryIdAndStatus(Long id, String status, Pageable pageable);
+    Page<AccessoryEntity> findByAccessoryNameContainingIgnoreCase(String accessoryName, Pageable pageable);
 }

@@ -2,7 +2,7 @@ package com.java.backend.dto.response;
 
 import lombok.Builder;
 import lombok.Data;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -19,6 +19,6 @@ public class PetResponse {
     private String status;
     private String thumbnail;
     private List<String> images;
-    private Date createdAt;
-    private Date updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

@@ -41,7 +41,7 @@ public class InventoryService {
             petRepository.save(pet);
             
             // Xóa cache
-            baseRedisService.deleteByPattern("pets:");
+            baseRedisService.deleteKey("pets:");
             
             return true;
         } else if ("accessory".equals(itemType)) {
@@ -49,16 +49,16 @@ public class InventoryService {
                 .orElseThrow(() -> new AppException(ErrorCode.ACCESSORY_NOT_FOUND));
                 
             // Kiểm tra số lượng tồn
-            if (accessory.getStock() < quantity) {
+            if (accessory.getStockQuantity() < quantity) {
                 return false;
             }
             
             // Cập nhật số lượng tồn
-            accessory.setStock(accessory.getStock() - quantity);
+            accessory.setStockQuantity(accessory.getStockQuantity() - quantity);
             accessoryRepository.save(accessory);
             
             // Xóa cache
-            baseRedisService.deleteByPattern("accessories:");
+            baseRedisService.deleteKey("accessories:");
             
             return true;
         }
@@ -78,17 +78,17 @@ public class InventoryService {
                 petRepository.save(pet);
                 
                 // Xóa cache
-                baseRedisService.deleteByPattern("pets:");
+                baseRedisService.deleteKey("pets:");
             } else if ("accessory".equals(itemType)) {
                 AccessoryEntity accessory = accessoryRepository.findById(itemId)
                     .orElseThrow(() -> new AppException(ErrorCode.ACCESSORY_NOT_FOUND));
                 
                 // Cập nhật số lượng tồn
-                accessory.setStock(accessory.getStock() + quantity);
+                accessory.setStockQuantity(accessory.getStockQuantity() + quantity);
                 accessoryRepository.save(accessory);
                 
                 // Xóa cache
-                baseRedisService.deleteByPattern("accessories:");
+                baseRedisService.deleteKey("accessories:");
             }
         } catch (Exception e) {
             log.error("Error restoring inventory: {}", e.getMessage());

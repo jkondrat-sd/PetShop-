@@ -1,7 +1,9 @@
 package com.java.backend.service;
 
 import com.java.backend.dto.request.CartRequest;
+import com.java.backend.dto.request.CartItemRequest;
 import com.java.backend.dto.response.CartResponse;
+import com.java.backend.dto.response.CartItemResponse;
 import com.java.backend.entity.AccessoryEntity;
 import com.java.backend.entity.PetEntity;
 import com.java.backend.entity.UserEntity;
@@ -19,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.concurrent.TimeUnit;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 @Service
 @Slf4j
@@ -57,7 +61,7 @@ public class CartService {
             cartResponse.setTotalItems(totalItems);
             
             // Save to Redis
-            baseRedisService.setObjectForMinutes(cartKey, cartResponse, 60 * 24); // 24 hours
+            baseRedisService.set(cartKey, cartResponse, 60 * 24, TimeUnit.MINUTES); // 24 hours
             
             return cartResponse;
         } catch (Exception e) {
@@ -71,19 +75,19 @@ public class CartService {
         UserEntity user = userService.getCurrentUser();
         String cartKey = "cart:" + user.getUserId();
         
-        Object cartObj = baseRedisService.get(cartKey);
-        if (cartObj == null) {
+        CartResponse cart = baseRedisService.get(cartKey, new TypeReference<CartResponse>() {});
+        if (cart == null) {
             return new CartResponse(new ArrayList<>(), 0.0, 0);
         }
         
-        return (CartResponse) cartObj;
+        return cart;
     }
     
     // Clear cart
     public void clearCart() {
         UserEntity user = userService.getCurrentUser();
         String cartKey = "cart:" + user.getUserId();
-        baseRedisService.delete(cartKey);
+        baseRedisService.deleteKey(cartKey);
     }
     
     // Process individual cart item
@@ -116,8 +120,8 @@ public class CartService {
                 throw new AppException(ErrorCode.BAD_REQUEST, "Accessory is not active");
             }
             
-            if (accessory.getStock() < item.getQuantity()) {
-                throw new AppException(ErrorCode.OUT_OF_STOCK, "Insufficient stock for " + accessory.getName());
+            if (accessory.getStockQuantity() < item.getQuantity()) {
+                throw new AppException(ErrorCode.OUT_OF_STOCK, "Insufficient stock for " + accessory.getAccessoryName());
             }
             
             double subtotal = accessory.getUnitPrice() * item.getQuantity();
@@ -125,7 +129,7 @@ public class CartService {
             return CartItemResponse.builder()
                     .itemType("accessory")
                     .itemId(accessory.getAccessoryId())
-                    .name(accessory.getName())
+                    .name(accessory.getAccessoryName())
                     .thumbnail(accessory.getThumbnail())
                     .price(accessory.getUnitPrice())
                     .quantity(item.getQuantity())

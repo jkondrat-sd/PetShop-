@@ -26,6 +26,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.concurrent.TimeUnit;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 @Service
 @Slf4j
@@ -103,9 +105,9 @@ public class PetService {
         String cacheKey = "pets_" + page + "_" + size + "_" + type + "_" + breedId;
         
         // Kiểm tra cache
-        Object cachedResult = baseRedisService.get(cacheKey);
-        if (cachedResult instanceof Pagination) {
-            return (Pagination<PetResponse>) cachedResult;
+        Pagination<PetResponse> cachedResult = baseRedisService.get(cacheKey, new TypeReference<Pagination<PetResponse>>() {});
+        if (cachedResult != null) {
+            return cachedResult;
         }
         
         try {
@@ -113,11 +115,11 @@ public class PetService {
             Page<PetEntity> petPage;
             
             if (type != null && breedId != null) {
-                petPage = petRepository.findByTypeAndBreedIdAndStatus(type, breedId, "available", pageable);
+                petPage = petRepository.findByTypeAndBreed_BreedIdAndStatus(type, breedId, "available", pageable);
             } else if (type != null) {
                 petPage = petRepository.findByTypeAndStatus(type, "available", pageable);
             } else if (breedId != null) {
-                petPage = petRepository.findByBreedIdAndStatus(breedId, "available", pageable);
+                petPage = petRepository.findByBreed_BreedIdAndStatus(breedId, "available", pageable);
             } else {
                 petPage = petRepository.findByStatus("available", pageable);
             }
@@ -148,9 +150,9 @@ public class PetService {
         String cacheKey = "pet_" + petId;
         
         // Kiểm tra cache
-        Object cachedResult = baseRedisService.get(cacheKey);
-        if (cachedResult instanceof PetResponse) {
-            return (PetResponse) cachedResult;
+        PetResponse cachedResult = baseRedisService.get(cacheKey, new TypeReference<PetResponse>() {});
+        if (cachedResult != null) {
+            return cachedResult;
         }
         
         PetEntity pet = petRepository.findById(petId)
@@ -159,7 +161,7 @@ public class PetService {
         PetResponse response = convertToPetResponse(pet);
         
         // Lưu vào cache
-        baseRedisService.setObjectForMinutes(cacheKey, response, 30);
+        baseRedisService.set(cacheKey, response, 30, TimeUnit.MINUTES);
         
         return response;
     }
@@ -238,7 +240,7 @@ public class PetService {
                 .petName(pet.getPetName())
                 .type(pet.getType())
                 .breed(pet.getBreed() != null ? pet.getBreed().getBreedName() : null)
-                .breedId(pet.getBreed() != null ? pet.getBreed().getBreedId() : null)
+                .breedId(pet.getBreed() != null ? pet.getBreed().getId() : null)
                 .gender(pet.getGender())
                 .unitPrice(pet.getUnitPrice())
                 .age(pet.getAge())
