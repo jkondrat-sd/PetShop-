@@ -80,4 +80,7 @@ springdoc:
     operationsSorter: method
     tagsSorter: alpha
     docExpansion: none
+    disable-swagger-default-url: true
+    csrf:
+      enabled: false
   packages-to-scan: com.java.backend.controller
