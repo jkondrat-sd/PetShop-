@@ -1,4 +1,4 @@
-package com.java.backend.config;
+package com.java.backend.configuration;
 
 import com.cloudinary.Cloudinary;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,10 +1,14 @@
+
 package com.java.backend.controller;
 
 import com.java.backend.dto.request.OrderRequest;
+import com.java.backend.dto.request.PaymentRequest;
 import com.java.backend.dto.response.ApiResponse;
 import com.java.backend.dto.response.OrderResponse;
 import com.java.backend.dto.response.Pagination;
+import com.java.backend.dto.response.PaymentResponse;
 import com.java.backend.service.OrderService;
+import com.java.backend.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class OrderController {
     private final OrderService orderService;
+    private final PaymentService paymentService;
     
     @PostMapping
     public ResponseEntity<ApiResponse<OrderResponse>> createOrder(@RequestBody OrderRequest orderRequest) {
@@ -41,6 +46,18 @@ public class OrderController {
     public ResponseEntity<ApiResponse<String>> cancelOrder(@PathVariable Long id) {
         orderService.cancelOrder(id);
         return ResponseEntity.ok(new ApiResponse<>(true, "Order cancelled successfully", null));
+    }
+    
+    @PostMapping("/{id}/payment")
+    public ResponseEntity<ApiResponse<PaymentResponse>> processPayment(
+            @PathVariable Long id, 
+            @RequestBody PaymentRequest paymentRequest) {
+        
+        // Gán orderId từ đường dẫn
+        paymentRequest.setOrderId(id);
+        
+        PaymentResponse response = paymentService.processPayment(paymentRequest);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Thanh toán thành công", response));
     }
     
     @GetMapping("/admin/all")

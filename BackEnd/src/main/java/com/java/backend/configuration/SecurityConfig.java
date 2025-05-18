@@ -1,4 +1,5 @@
-package com.java.backend.config;
+package com.java.backend.configuration;
+
 
 import com.java.backend.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;

@@ -114,7 +114,7 @@ public class AccessoryService {
             Page<AccessoryEntity> accessoryPage;
             
             if (id != null) {
-                accessoryPage =  accessoryRepository.findByCategory_CategoryIdAndStatus(id, status, pageable);
+                accessoryPage =  accessoryRepository.findByCategory_IdAndStatus(id, status, pageable);
             } else if (name != null && !name.isEmpty()) {
                 accessoryPage = accessoryRepository.findByAccessoryNameContainingIgnoreCase(name, pageable);
             } else {

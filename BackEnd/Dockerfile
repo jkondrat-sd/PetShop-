@@ -1,24 +1,17 @@
-FROM maven:3.8.5-openjdk-17 AS builder
-
+# Build stage
+FROM maven:3.8.5-openjdk-17 AS build
 WORKDIR /build
-
 COPY pom.xml .
+COPY settings.xml /root/.m2/settings.xml
 RUN mvn dependency:go-offline
-
-# Sao chép mã nguồn và build
-COPY . .
-
+COPY src ./src
 RUN mvn clean package -DskipTests
 
-# Stage 2: Chạy ứng dụng
+# Run stage
 FROM openjdk:17-slim
-
 WORKDIR /app
-
-# Sao chép file JAR từ build
-COPY --from=builder /build/target/BackEnd-0.0.1-SNAPSHOT.jar api-service.jar
-# Expose cổng 8089
+COPY --from=build /build/target/*.jar app.jar
 EXPOSE 8089
-
-# Chạy ứng dụng
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar api-service.jar"]
+ENV SERVER_PORT=8089
+ENV SPRING_PROFILES_ACTIVE=prod
+ENTRYPOINT ["java", "-jar", "app.jar"]

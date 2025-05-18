@@ -90,12 +90,12 @@ public class ReviewService {
 
         // Check if user has already reviewed this item
         if (request.getPetId() != null) {
-            ReviewEntity existingReview = reviewRepository.findByUser_UserIdAndPet_PetId(request.getUserId(), request.getPetId());
+            ReviewEntity existingReview = reviewRepository.findByUserIdAndPetId(request.getUserId(), request.getPetId());
             if (existingReview != null) {
                 throw new AppException(ErrorCode.ALREADY_REVIEWED);
             }
         } else if (request.getAccessoryId() != null) {
-            ReviewEntity existingReview = reviewRepository.findByUser_UserIdAndAccessory_AccessoryId(request.getUserId(), request.getAccessoryId());
+            ReviewEntity existingReview = reviewRepository.findByUserIdAndAccessoryId(request.getUserId(), request.getAccessoryId());
             if (existingReview != null) {
                 throw new AppException(ErrorCode.ALREADY_REVIEWED);
             }

@@ -12,6 +12,7 @@ public enum ErrorCode {
     FORBIDDEN(HttpStatus.FORBIDDEN, "Forbidden"),
     NOT_FOUND(HttpStatus.NOT_FOUND, "Resource not found"),
     AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, "Authentication failed"),
+    UNAUTHENTICATED(HttpStatus.UNAUTHORIZED, "ERR.UNAUTHENTICATED"), // Thêm vào danh sách enum
     
     // User
     USER_NOT_EXISTED(HttpStatus.NOT_FOUND, "User not found"),
@@ -57,5 +58,13 @@ public enum ErrorCode {
     ErrorCode(HttpStatus status, String message) {
         this.status = status;
         this.message = message;
+    }
+    
+    public HttpStatus getStatusCode() {
+        return status;
+    }
+    
+    public String getMessage() {
+        return message;
     }
 }
