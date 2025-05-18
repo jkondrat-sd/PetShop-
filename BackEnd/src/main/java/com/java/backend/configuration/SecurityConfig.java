@@ -44,6 +44,8 @@ public class SecurityConfig {
                     .requestMatchers("/api/pets/**", "/api/accessories/**", "/api/categories/**").permitAll()
                     .requestMatchers("/api/suppliers/**", "/api/customers/register").permitAll()
                     .requestMatchers("/api/reviews/public/**").permitAll()
+                    // Add these lines for Swagger UI access
+                    .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                     .anyRequest().authenticated()
             )
             .sessionManagement(session -> session

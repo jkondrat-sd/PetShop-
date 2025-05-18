@@ -136,6 +136,7 @@ services:
       retries: 3
     networks:
       - web-network
+    command: java -jar app.jar --debug
 volumes:
   redis_data:
     driver: local
