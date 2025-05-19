@@ -66,7 +66,11 @@ public class CartService {
             
             // Save to Redis
             log.info("CartService.processCart saving to Redis: key={}, items={}", cartKey, cartItems.size());
-            baseRedisService.set(cartKey, cartResponse, 60 * 24, TimeUnit.MINUTES); // 24 hours
+            boolean saved = baseRedisService.set(cartKey, cartResponse, 60 * 24, TimeUnit.MINUTES);
+            if (!saved) {
+                log.error("CartService.processCart: Failed to save cart to Redis for user {}", user.getUserId());
+                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR, "Failed to save cart");
+            }
             
             return cartResponse;
         } catch (Exception e) {

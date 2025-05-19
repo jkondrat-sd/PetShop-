@@ -238,7 +238,29 @@ public class OrderService {
     }
     
     private OrderDetailResponse mapOrderDetailToResponse(OrderDetailEntity orderDetail) {
-        // Implement mapping logic
-        return null; // Simplified
+        if (orderDetail == null) return null;
+        String name = null;
+        String thumbnail = null;
+        Long itemId = null;
+        if ("pet".equals(orderDetail.getItemType()) && orderDetail.getPet() != null) {
+            name = orderDetail.getPet().getPetName();
+            thumbnail = orderDetail.getPet().getThumbnail();
+            itemId = orderDetail.getPet().getPetId();
+        } else if ("accessory".equals(orderDetail.getItemType()) && orderDetail.getAccessory() != null) {
+            name = orderDetail.getAccessory().getAccessoryName();
+            thumbnail = orderDetail.getAccessory().getThumbnail();
+            itemId = orderDetail.getAccessory().getAccessoryId();
+        }
+        return OrderDetailResponse.builder()
+            .id(orderDetail.getOrderDetailId())
+            .itemType(orderDetail.getItemType())
+            .itemId(itemId)
+            .name(name)
+            .thumbnail(thumbnail)
+            .unitPrice(orderDetail.getUnitPrice())
+            .quantity(orderDetail.getQuantity())
+            .discount(orderDetail.getDiscount())
+            .subtotal(orderDetail.getUnitPrice() * orderDetail.getQuantity() - orderDetail.getDiscount())
+            .build();
     }
 }

@@ -25,11 +25,13 @@ public class BaseRedisService {
         }
     }
 
-    public void set(String key, Object value, long timeout, TimeUnit unit) {
+    public boolean set(String key, Object value, long timeout, TimeUnit unit) {
         try {
             redisTemplate.opsForValue().set(key, value, timeout, unit);
+            return true;
         } catch (Exception e) {
             log.error("Error setting Redis key with timeout: {}", key, e);
+            return false;
         }
     }
 
