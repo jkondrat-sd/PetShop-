@@ -38,7 +38,9 @@ public class CartService {
     public CartResponse processCart(CartRequest request) {
         try {
             UserEntity user = userService.getCurrentUser();
+            log.info("CartService.processCart userId={}, username={}", user.getUserId(), user.getUsername());
             String cartKey = "cart:" + user.getUserId();
+            log.info("CartService.processCart cartKey={}", cartKey);
             
             List<CartItemResponse> cartItems = new ArrayList<>();
             Double totalAmount = 0.0;
@@ -46,6 +48,8 @@ public class CartService {
             
             // Process each item in the cart request
             for (CartItemRequest item : request.getItems()) {
+                log.info("CartService.processCart processing item: type={}, id={}, quantity={}", 
+                    item.getItemType(), item.getItemId(), item.getQuantity());
                 CartItemResponse cartItem = processCartItem(item);
                 if (cartItem != null) {
                     cartItems.add(cartItem);
@@ -61,26 +65,51 @@ public class CartService {
             cartResponse.setTotalItems(totalItems);
             
             // Save to Redis
+            log.info("CartService.processCart saving to Redis: key={}, items={}", cartKey, cartItems.size());
             baseRedisService.set(cartKey, cartResponse, 60 * 24, TimeUnit.MINUTES); // 24 hours
             
             return cartResponse;
         } catch (Exception e) {
-            log.error("Error processing cart: {}", e.getMessage());
+            log.error("Error processing cart: {}", e.getMessage(), e);
             throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
     
     // Get cart from Redis
     public CartResponse getCart() {
-        UserEntity user = userService.getCurrentUser();
-        String cartKey = "cart:" + user.getUserId();
-        
-        CartResponse cart = baseRedisService.get(cartKey, new TypeReference<CartResponse>() {});
-        if (cart == null) {
-            return new CartResponse(new ArrayList<>(), 0.0, 0);
+        try {
+            UserEntity user = userService.getCurrentUser();
+            if (user == null) {
+                log.error("CartService.getCart: User not found");
+                throw new AppException(ErrorCode.UNAUTHORIZED);
+            }
+            
+            log.info("CartService.getCart userId={}, username={}", user.getUserId(), user.getUsername());
+            String cartKey = "cart:" + user.getUserId();
+            log.info("CartService.getCart cartKey={}", cartKey);
+            
+            CartResponse cart = baseRedisService.get(cartKey, new TypeReference<CartResponse>() {});
+            log.info("CartService.getCart result from Redis: {}", cart != null ? "found" : "not found");
+            
+            if (cart == null) {
+                log.info("CartService.getCart: No cart found for user {}, returning empty cart", user.getUserId());
+                return new CartResponse(new ArrayList<>(), 0.0, 0);
+            }
+            
+            // Validate cart data
+            if (cart.getItems() == null) {
+                log.warn("CartService.getCart: Cart items is null for user {}, returning empty cart", user.getUserId());
+                return new CartResponse(new ArrayList<>(), 0.0, 0);
+            }
+            
+            return cart;
+        } catch (AppException e) {
+            log.error("CartService.getCart: AppException occurred", e);
+            throw e;
+        } catch (Exception e) {
+            log.error("CartService.getCart: Unexpected error occurred", e);
+            throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
-        
-        return cart;
     }
     
     // Clear cart
