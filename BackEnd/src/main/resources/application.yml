@@ -66,6 +66,7 @@ app:
   jwt-expiration-ms: 3600000
   jwt-refresh-expiration-ms: 86400000
   frontend-url: http://localhost:3000 
+  jwt-secret: 3eee010fe8d801cd2bbbd50038025d9176edeba30dce73a2c4efc9d1757d534e
 
 cloudinary:
   cloud-name: ${CLOUDINARY_CLOUD_NAME}
