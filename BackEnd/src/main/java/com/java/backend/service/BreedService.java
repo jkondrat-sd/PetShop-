@@ -98,7 +98,9 @@ public class BreedService {
 
         BreedEntity breed = BreedEntity.builder()
                 .breedName(request.getBreedName())
+                .petType(request.getPetType())
                 .description(request.getDescription())
+                .status(request.getStatus())
                 .build();
 
         BreedEntity savedBreed = breedRepository.save(breed);
@@ -116,7 +118,9 @@ public class BreedService {
         }
 
         breed.setBreedName(request.getBreedName());
+        breed.setPetType(request.getPetType());
         breed.setDescription(request.getDescription());
+        breed.setStatus(request.getStatus());
 
         BreedEntity updatedBreed = breedRepository.save(breed);
         return mapToResponse(updatedBreed);

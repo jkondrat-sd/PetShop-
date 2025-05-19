@@ -71,7 +71,7 @@ public class PetController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<PetResponse>> createPet(
-            @Parameter(description = "Pet data") @RequestBody PetRequest petRequest,
+            @Parameter(description = "Pet data") @ModelAttribute PetRequest petRequest,
             @Parameter(description = "Pet thumbnail image") @RequestParam("thumbnail") MultipartFile thumbnail,
             @Parameter(description = "Pet additional images") @RequestParam("images") List<MultipartFile> images) {
         PetResponse pet = petService.addPet(petRequest, thumbnail, images);
@@ -94,7 +94,7 @@ public class PetController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<PetResponse>> updatePet(
             @Parameter(description = "Pet ID", required = true) @PathVariable Long id,
-            @Parameter(description = "Updated pet data") @RequestBody PetRequest petRequest,
+            @Parameter(description = "Updated pet data") @ModelAttribute PetRequest petRequest,
             @Parameter(description = "New pet thumbnail image (optional)") 
                 @RequestParam(value = "thumbnail", required = false) MultipartFile thumbnail,
             @Parameter(description = "New pet images (optional)") 
