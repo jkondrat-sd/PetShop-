@@ -11,7 +11,7 @@ import styles from "./Comment.module.scss";
 import { getCookie } from "~/helpers/cookie";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { showAlert } from "~/store/actions/alert";
+import { showAlert } from "~/redux/actions/alert";
 import moment from "moment";
 import "moment/locale/vi";
 

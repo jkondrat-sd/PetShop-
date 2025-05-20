@@ -15,47 +15,46 @@ const request = axios.create({
 // Response interceptor for handling common responses
 request.interceptors.response.use(
   (response) => response.data,
-  (error) => {
-    if (error.response) {
-      const { status } = error.response;
+  // (error) => {
+  //   if (error.response) {
+  //     const { status } = error.response;
 
-      switch (status) {
-        case 401:
-          message.error("Phiên đăng nhập đã hết hạn", 3);
-          break;
-        case 403:
-          message.error("Bạn không có quyền truy cập", 3);
-          break;
-        case 404:
-          message.error("Không tìm thấy tài nguyên", 3);
-          break;
-        case 500:
-          message.error("Lỗi hệ thống, vui lòng thử lại sau", 3);
-          break;
-        default:
-          message.error(error.response.data.message || "Có lỗi xảy ra", 3);
-          break;
-      }
-    }
-    return Promise.reject(error);
-  }
+  //     switch (status) {
+  //       case 401:
+  //         message.error("Phiên đăng nhập đã hết hạn", 3);
+  //         break;
+  //       case 403:
+  //         message.error("Bạn không có quyền truy cập", 3);
+  //         break;
+  //       case 404:
+  //         message.error("Không tìm thấy tài nguyên", 3);
+  //         break;
+  //       case 500:
+  //         message.error("Lỗi hệ thống, vui lòng thử lại sau", 3);
+  //         break;
+  //       default:
+  //         message.error(error.response.data.message || "Có lỗi xảy ra", 3);
+  //         break;
+  //     }
+  //   }
+  //   return Promise.reject(error);
+  // }
 );
 
 // Thêm interceptor để tự động gắn token vào mỗi request
 request.interceptors.request.use(
   (config) => {
-    const token = getCookie("token");
+    // Tìm token từ cookie hoặc localStorage
+    const token = getCookie("token") || localStorage.getItem('token');
+    
     if (token) {
       // Đảm bảo token được định dạng đúng
-      config.headers["Authorization"] = token.startsWith("Bearer ")
-        ? token
-        : `Bearer ${token}`;
-
-      // Log để debug (xóa sau khi fix)
-      console.log("Request with token:", config.headers["Authorization"]);
+      const formattedToken = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
+      config.headers["Authorization"] = formattedToken;
     } else {
-      console.warn("No token found in cookies!");
+      console.warn("No authentication token available");
     }
+    
     return config;
   },
   (error) => {

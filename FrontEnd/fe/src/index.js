@@ -6,7 +6,7 @@ import { createStore } from "redux";
 
 import App from "~/App";
 import reportWebVitals from "./reportWebVitals";
-import allReducers from "./store/reducers";
+import allReducers from "./redux/reducers";
 import "~/assets/scss/global.scss";
 
 const store = createStore(allReducers);

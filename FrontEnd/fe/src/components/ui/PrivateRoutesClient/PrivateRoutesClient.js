@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { Navigate, Outlet } from "react-router-dom";
 
 import { deleteCookie, getCookie } from "~/helpers/cookie";
-import { showAlert } from "~/store/actions/alert";
+import { showAlert } from "~/redux/actions/alert";
 import { getUserScopes, hasScope } from "~/utils/authUtils";
 
 function PrivateRoutesClient() {

@@ -1,13 +1,14 @@
 @import "normalize.css";
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap");
 
 :root {
-  --primary: #f47920;
-  --black: #222222;
-  --text-color-header: #fdeee3;
-  --text-color-hover: #f58432;
-  --text-color-body: #2f383d;
-  --white: #f9f9f9;
+   --color-one: #003459;
+  --color-two: #00171f;
+  --color-text: #667479;
+  --color-title: #99a2a5;
 
+  --color-bg: #fceed5;
+  --font: "Montsterat", sans-serif;
   --font-family: "TikTokFont", sans-serif;
 
   // _variables.scss or variables.scss

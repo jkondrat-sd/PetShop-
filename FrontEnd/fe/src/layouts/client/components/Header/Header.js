@@ -1,225 +1,118 @@
-import classNames from "classnames/bind";
-import { Col, Row, Avatar, Dropdown, Space, Badge } from "antd";
-import { Link, NavLink, useNavigate } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faInfoCircle,
-  faUser,
-  faSignOutAlt,
-  faUserCircle,
-  faBookmark,
-} from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { Input, Dropdown, Avatar, Space, Button, Menu } from 'antd';
+import { 
+  SearchOutlined, 
+  ShoppingCartOutlined, 
+  UserOutlined,
+  LogoutOutlined,
+  ProfileOutlined
+} from '@ant-design/icons';
+// import { deleteCookie } from '../../../../utils/cookie';
+// import { checkLogin } from '../../../../redux/actions/loginAction';
+import styles from './Header.module.scss';
+import logoImg from '../../../../assets/images/logoPOMPOM-removebg.png';
 
-import Search from "../Search";
-import CategoryModal from "~/pages/client/Category/CategoryModal";
-import styles from "./Header.module.scss";
-import logo from "~/assets/images/logo.png";
-import RegisterModal from "~/pages/client/Register";
-import LoginModal from "~/pages/client/Login/LoginModal";
-import ForgotPasswordModal from "~/pages/client/ForgotPassword";
-import config from "~/config";
-import { checkLogin } from "~/store/actions/login";
-import { deleteCookie } from "~/helpers/cookie";
-
-const cx = classNames.bind(styles);
+const { Search } = Input;
 
 function Header() {
   const { isLoggedIn, userData } = useSelector((state) => state.loginReducer);
-  // Thêm log để kiểm tra dữ liệu
-  // console.log("Header - isLoggedIn:", isLoggedIn);
-  // console.log("Header - userData:", userData);
-  
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [showRegisterModal, setShowRegisterModal] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
-  const [showCategoryModal, setShowCategoryModal] = useState(false);
-
-  const handleOpenRegister = () => {
-    setShowLoginModal(false);
-    setShowForgotPasswordModal(false);
-    setShowRegisterModal(true);
-  };
-
-  const handleOpenLogin = () => {
-    setShowRegisterModal(false);
-    setShowForgotPasswordModal(false);
-    setShowLoginModal(true);
-  };
-
-  const handleOpenForgotPassword = () => {
-    setShowRegisterModal(false);
-    setShowLoginModal(false);
-    setShowForgotPasswordModal(true);
-  };
-
-  const handleLogout = () => {
-    deleteCookie("token");
-    dispatch(checkLogin(false));
-    navigate("/");
-    window.location.reload();
-  };
-
-  const userMenuItems = [
-    {
-      key: "1",
-      label: "Trang cá nhân",
-      icon: <FontAwesomeIcon icon={faUserCircle} />,
-      onClick: () => navigate("/account/profile"),
-    },
-    // {
-    //   key: '2',
-    //   label: 'Tài liệu của tôi',
-    //   icon: <FontAwesomeIcon icon={faUser} />,
-    //   onClick: () => navigate('/account/documents'),
-    // },
-    {
-      key: "4",
-      label: "Thư viện",
-      icon: <FontAwesomeIcon icon={faBookmark} />,
-      onClick: () => navigate("/library"),
-    },
-    {
-      type: "divider",
-    },
-    {
-      key: "3",
-      label: "Đăng xuất",
-      icon: <FontAwesomeIcon icon={faSignOutAlt} />,
-      danger: true,
-      onClick: handleLogout,
-    },
-  ];
+  // const handleLogout = () => {
+  //   deleteCookie("token");
+  //   dispatch(checkLogin(false));
+  //   navigate("/");
+  //   window.location.reload();
+  // };
+  
+  const userMenu = (
+    <Menu
+      items={[
+        {
+          key: '1',
+          icon: <ProfileOutlined />,
+          label: <Link to="/profile">Profile</Link>,
+        },
+        {
+          key: '2',
+          icon: <LogoutOutlined />,
+          // label: <a onClick={handleLogout}>Logout</a>,
+        },
+      ]}
+    />
+  );
 
   return (
-    <>
-      <div className={cx("wrapper")}>
-        <div className={cx("container")}>
-          <Row justify="space-between" align="middle">
-            <Col span={3}>
-              <div className={cx("logo")}>
-                <Link to={config.routesClient.home} className={cx("logo-link")}>
-                  <img alt="logo" src={logo} />
-                </Link>
-              </div>
-            </Col>
-
-            <Col span={3}>
-              <button
-                className={cx("category-btn")}
-                onClick={() => setShowCategoryModal(true)}
-              >
-                Danh mục
-              </button>
-            </Col>
-
-            <Col span={8}>
-              <Search />
-            </Col>
-
-            <Col span={4}>
-              <div className={cx("actions")}>
-                <div className={cx("auth-buttons")}>
-                  <Link to={"/upload"}>
-                    <button className={cx("upload-btn")}>Tải lên</button>
-                  </Link>
+    <header className={styles.header}>
+      <div className="container-fluid">
+        <div className="row">
+          <div className={`${styles['main-header']} col-12`}>
+            <div className={styles['inner-logo']}>
+              <Link to="/">
+                <img src={logoImg} alt="logo" />
+              </Link>
+            </div>
+            
+            <div className={styles['main-menu']}>
+              <ul className={styles.nav}>
+                <li className={styles['nav-item']}>
+                  <Link to="/" className={styles['nav-link']}>Home</Link>
+                </li>
+                <li className={styles['nav-item']}>
+                  <Link to="/dogs" className={styles['nav-link']}>Dogs</Link>
+                </li>
+                <li className={styles['nav-item']}>
+                  <Link to="/accessories" className={styles['nav-link']}>Accessories</Link>
+                </li>
+                <li className={styles['nav-item']}>
+                  <Link to="/blog" className={styles['nav-link']}>Blog</Link>
+                </li>
+                <li className={styles['nav-item']}>
+                  <Link to="/contact" className={styles['nav-link']}>Contact</Link>
+                </li>
+              </ul>
+            </div>
+            
+            <div className={styles['header-right']}>
+              <div className={styles.item}>
+                <div className={styles['box-input']}>
+                  <Search
+                    placeholder="Search something here!"
+                    bordered={false}
+                    onSearch={value => console.log(value)}
+                  />
                 </div>
               </div>
-            </Col>
-
-            <Col span={2}>
-              <Link to="/introduce" className={cx("intro-section")}>
-                <div className={cx("divider")}></div>
-                <FontAwesomeIcon
-                  icon={faInfoCircle}
-                  className={cx("intro-icon")}
-                />
-                <div className={cx("divider")}></div>
-              </Link>
-            </Col>
-
-            <Col span={4}>
-              <div className={cx("actions")}>
+              <div className={styles.item}>
+                <Link to="/cart">
+                  <ShoppingCartOutlined style={{ fontSize: '24px' }} />
+                </Link>
+              </div>
+              <div className={styles.item}>
                 {isLoggedIn ? (
-                  <div className={cx("user-section")}>
-                    <Badge count={3}>
-                      <Dropdown
-                        menu={{ items: userMenuItems }}
-                        trigger={["click"]}
-                      >
-                        <Space className={cx("user-info")}>
-                          <Avatar
-                            src={userData?.avatarUrl}
-                            icon={
-                              !userData?.avatarUrl && (
-                                <FontAwesomeIcon icon={faUser} />
-                              )
-                            }
-                            className={cx("user-avatar")}
-                          />
-                          <span className={cx("username")}>
-                            {userData?.fullName || "Người dùng"}
-                          </span>
-                        </Space>
-                      </Dropdown>
-                    </Badge>
-                  </div>
+                  <Dropdown overlay={userMenu} placement="bottomRight">
+                    <Space>
+                      <Avatar 
+                        src={userData?.avatar} 
+                        icon={!userData?.avatar && <UserOutlined />}
+                      />
+                      <span className={styles.username}>{userData?.fullName || "User"}</span>
+                    </Space>
+                  </Dropdown>
                 ) : (
-                  <div className={cx("auth-buttons")}>
-                    <button
-                      onClick={handleOpenLogin}
-                      className={cx("login-btn")}
-                    >
-                      Đăng nhập
-                    </button>
-
-                    <button
-                      className={cx("register-btn")}
-                      onClick={handleOpenRegister}
-                    >
-                      Đăng ký
-                    </button>
-                  </div>
+                  <Link to="/login">
+                    <Button type="text" icon={<UserOutlined />}>Login</Button>
+                  </Link>
                 )}
               </div>
-            </Col>
-          </Row>
+            </div>
+          </div>
         </div>
       </div>
-
-      <CategoryModal
-        open={showCategoryModal}
-        onClose={() => setShowCategoryModal(false)}
-      />
-
-      {!isLoggedIn && (
-        <>
-          <LoginModal
-            open={showLoginModal}
-            onClose={() => setShowLoginModal(false)}
-            onForgotPassword={handleOpenForgotPassword}
-            onRegister={handleOpenRegister}
-          />
-
-          <RegisterModal
-            open={showRegisterModal}
-            onClose={() => setShowRegisterModal(false)}
-            onLogin={handleOpenLogin}
-          />
-
-          <ForgotPasswordModal
-            open={showForgotPasswordModal}
-            onClose={() => setShowForgotPasswordModal(false)}
-            onLogin={handleOpenLogin}
-            onRegister={handleOpenRegister}
-          />
-        </>
-      )}
-    </>
+    </header>
   );
 }
 

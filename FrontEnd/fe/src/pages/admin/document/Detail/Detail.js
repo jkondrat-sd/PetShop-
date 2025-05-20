@@ -21,9 +21,9 @@ import {
   getDocumentById,
   rejectedDocument,
 } from "~/services/documentService";
-import { hideLoading, showLoading } from "~/store/actions/loading";
+import { hideLoading, showLoading } from "~/redux/actions/loading";
 import styles from "./Detail.module.scss";
-import { showAlert } from "~/store/actions/alert";
+import { showAlert } from "~/redux/actions/alert";
 
 const cx = classNames.bind(styles);
 

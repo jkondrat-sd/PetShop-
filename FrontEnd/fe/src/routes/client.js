@@ -3,19 +3,15 @@ import config from "~/config";
 import LayoutDefault from "~/layouts/client/DefaultLayout";
 import Home from "~/pages/client/Home/Home";
 import Page404 from "~/pages/Page404";
-import CategoryPage from "~/pages/client/CategoryPage";
+
 import Introduce from "~/pages/client/Introduce";
 import TermOfUse from "~/pages/client/TermOfUse";
 import FrequentlyAskedQuestions from "~/pages/client/FrequentlyAskedQuestions";
 import AboutUs from "~/pages/client/AboutUs";
 import ConfirmAccount from "~/pages/client/ConfirmAccount";
-import Detail from "~/pages/client/Detail";
 import MyProfile from "~/pages/client/MyProfile";
-import FileUploadPage from "~/pages/Upload";
-import DocumentsSearch from "~/pages/client/DocumentsSearch";
-import Library from "~/pages/client/Library";
-import LibraryDetail from "~/pages/client/LibraryDetail";
-import DocumentEdit from "~/pages/client/DocumentEdit";
+
+
 
 const publicRoutesClient = [
   // Public routes
@@ -24,28 +20,19 @@ const publicRoutesClient = [
     element: <LayoutDefault />,
     children: [
       { path: config.routesClient.home, element: <Home /> },
-      {
-        path: "/category",
-        children: [
-          {
-            path: ":categoryId",
-            element: <CategoryPage />,
-          },
-        ],
-      },
-      {
-        path: "documents",
-        children: [
-          {
-            path: "search/:keyword",
-            element: <DocumentsSearch />,
-          },
-          {
-            path: "search",
-            element: <DocumentsSearch />,
-          },
-        ],
-      },
+      // {
+      //   path: "documents",
+      //   children: [
+      //     {
+      //       path: "search/:keyword",
+      //       element: <DocumentsSearch />,
+      //     },
+      //     {
+      //       path: "search",
+      //       element: <DocumentsSearch />,
+      //     },
+      //   ],
+      // },
     ],
   },
   {
@@ -87,36 +74,36 @@ const privateRoutesClient = [
       {
         element: <PrivateRoutesClient />,
         children: [
-          {
-            path: "/documents",
-            children: [
-              {
-                path: ":documentId",
-                element: <Detail />,
-              },
-              {
-                path: 'edit/:documentId',
-                element: <DocumentEdit />
-              }
-            ],
-          },
-          {
-            path: "upload",
-            element: <FileUploadPage />,
-          },
-          {
-            path: "library",
-            children: [
-              {
-                path: "",
-                element: <Library />,
-              },
-              {
-                path: 'detail/:libraryId',
-                element: <LibraryDetail />
-              }
-            ]
-          },
+          // {
+          //   path: "/documents",
+          //   children: [
+          //     {
+          //       path: ":documentId",
+          //       element: <Detail />,
+          //     },
+          //     {
+          //       path: 'edit/:documentId',
+          //       element: <DocumentEdit />
+          //     }
+          //   ],
+          // },
+          // {
+          //   path: "upload",
+          //   element: <FileUploadPage />,
+          // },
+          // {
+          //   path: "library",
+          //   children: [
+          //     {
+          //       path: "",
+          //       element: <Library />,
+          //     },
+          //     {
+          //       path: 'detail/:libraryId',
+          //       element: <LibraryDetail />
+          //     }
+          //   ]
+          // },
         ],
       },
     ],

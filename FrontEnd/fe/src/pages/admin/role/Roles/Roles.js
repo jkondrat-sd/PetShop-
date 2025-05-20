@@ -10,7 +10,7 @@ import {
   deleteRole,
   createRole,
 } from "~/services/roleService";
-import { showAlert } from "~/store/actions/alert";
+import { showAlert } from "~/redux/actions/alert";
 import styles from "./Roles.module.scss";
 
 const cx = classNames.bind(styles);

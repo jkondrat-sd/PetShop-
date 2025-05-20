@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import styles from "./Alert.module.scss";
 import { useEffect } from "react";
-import { hideAlert } from "~/store/actions/alert";
+import { hideAlert } from "~/redux/actions/alert";
 
 const cx = classNames.bind(styles);
 

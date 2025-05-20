@@ -7,15 +7,9 @@ import Login from "~/pages/admin/auth/Login";
 import Logout from "~/pages/admin/auth/Logout";
 import Users from "~/pages/admin/user/Users";
 import Page404 from "~/pages/Page404";
-import UserDetail from "~/pages/admin/user/Detail";
-import AllDocument from "~/pages/admin/document/Documents";
-import DocumentDetail from "~/pages/admin/document/Detail";
-import Categories from "~/pages/admin/category/Categories";
-import Library from "~/pages/admin/library/Libraries";
+
 import Roles from "~/pages/admin/role/Roles";
-import TopDocuments from "~/pages/admin/document/TopDocuments";
-import Tags from "~/pages/admin/document/Tags";
-import Upload from "~/pages/Upload";
+
 
 const RoutesAdmin = [
   //Public route
@@ -40,71 +34,63 @@ const RoutesAdmin = [
             path: config.routesAdmin.dashboard,
             element: <Dashboard />,
           },
-          {
-            path: "users",
-            children: [
-              { path: "", element: <Users /> },
-              {
-                path: "detail/:id",
-                element: <UserDetail />,
-              },
-            ],
-          },
-          {
-            path: "documents",
-            children: [
-              {
-                path: "",
-                element: <AllDocument />,
-              },
-              {
-                path: "search",
-                element: <AllDocument />,
-              },
-              {
-                path: "top-document",
-                element: <TopDocuments />,
-              },
-              {
-                path: "all-tag",
-                element: <Tags />,
-              },
-              {
-                path: "detail/:id",
-                element: <DocumentDetail />,
-              },
-              {
-                path: "upload",
-                element: <Upload />,
-              },
-            ],
-          },
-          {
-            path: "categories",
-            children: [
-              {
-                path: "",
-                element: <Categories />,
-              },
-              {
-                path: "search",
-                element: <Categories />,
-              },
-              {
-                path: "detail/:categoryId/documents",
-                element: <AllDocument />,
-              },
-            ],
-          },
-          {
-            path: "library",
-            children: [
-              {
-                path: "",
-                element: <Library />,
-              },
-            ],
-          },
+          // {
+          //   path: "users",
+          //   children: [
+          //     { path: "", element: <Users /> },
+          //     {
+          //       path: "detail/:id",
+          //       element: <UserDetail />,
+          //     },
+          //   ],
+          // },
+          // {
+          //   path: "documents",
+          //   children: [
+          //     {
+          //       path: "",
+          //       element: <AllDocument />,
+          //     },
+          //     {
+          //       path: "search",
+          //       element: <AllDocument />,
+          //     },
+          //     {
+          //       path: "top-document",
+          //       element: <TopDocuments />,
+          //     },
+          //     {
+          //       path: "all-tag",
+          //       element: <Tags />,
+          //     },
+          //     {
+          //       path: "detail/:id",
+          //       element: <DocumentDetail />,
+          //     },
+          //     {
+          //       path: "upload",
+          //       element: <Upload />,
+          //     },
+          //   ],
+          // },
+          // {
+          //   path: "categories",
+          //   children: [
+          //     {
+          //       path: "",
+          //       element: <Categories />,
+          //     },
+          //     {
+          //       path: "search",
+          //       element: <Categories />,
+          //     },
+          //     {
+          //       path: "detail/:categoryId/documents",
+          //       element: <AllDocument />,
+          //     },
+          //   ],
+          // },
+          
           {
             path: "roles",
             children: [
