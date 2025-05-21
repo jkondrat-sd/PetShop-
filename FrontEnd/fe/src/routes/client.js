@@ -10,7 +10,6 @@ import ConfirmAccount from "~/pages/client/ConfirmAccount";
 import MyProfile from "~/pages/client/MyProfile";
 import Pets from "~/pages/client/Pets/Pets";
 import Accessories from "~/pages/client/Accessories/Accessories";
-import Blog from "~/pages/client/Blog/Blog";
 import Contact from "~/pages/client/Contact/Contact";
 import Login from "~/pages/client/Login/Login";
 import Register from "~/pages/client/Register/Register";
@@ -35,10 +34,6 @@ const publicRoutesClient = [
         ],
       },
       {
-        path: "/blog",
-        element: <Blog />,
-      },
-      {
         path: "/contact",
         element: <Contact />,
       },
@@ -53,16 +48,8 @@ const publicRoutesClient = [
     ],
   },
   {
-    path: "cau-hoi-thuong-gap",
-    element: <FrequentlyAskedQuestions />,
-  },
-  {
     path: "dieu-khoan-su-dung",
     element: <TermOfUse />,
-  },
-  {
-    path: "gioi-thieu",
-    element: <AboutUs />,
   },
   {
     path: "confirm-account",

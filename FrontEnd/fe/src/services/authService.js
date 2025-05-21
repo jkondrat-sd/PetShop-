@@ -22,7 +22,23 @@ export const login = async (username, password) => {
   }
 };
 
-// Thêm hàm để lấy thông tin user sau khi đã đăng nhập thành công
+export const register = async (email, username, password, firstName, lastName, phone, address) => {
+  try {
+    const res = await request.post(`auth/register`, {
+      username: username,
+      password: password,
+      email: email,
+      firstName: firstName,
+      lastName: lastName,
+      phone: phone,
+      address: address
+    });
+    return res.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
 
 // Đảm bảo endpoint này đúng với backend
 export const getUserInfo = async () => {

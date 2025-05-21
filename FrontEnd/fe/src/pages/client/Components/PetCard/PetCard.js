@@ -4,7 +4,7 @@ import { ShoppingCartOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMars, faVenus, faClock } from '@fortawesome/free-solid-svg-icons';
 import 'animate.css';
-import styles from './PetCard.scss';
+import styles from './PetCard.module.scss';
 
 const PetCard = ({ 
   id, 

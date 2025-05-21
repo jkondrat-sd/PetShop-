@@ -1,0 +1,95 @@
+.contact-page {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #fcf8ef; // Cream/beige background as shown in image
+  padding: 0 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.contact-container {
+  width: 100%;
+  max-width: 1200px;
+  padding: 30px;
+  border-radius: 15px;
+}
+
+.contact-title {
+  text-align: center !important;
+  font-size: 42px !important;
+  font-weight: 700 !important;
+  margin-bottom: 40px !important;
+  color: #004080 !important; // Dark blue color for title
+}
+
+.contact-content {
+  display: flex;
+  flex-direction: row;
+  gap: 40px;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+}
+
+.contact-image {
+  flex: 1;
+  
+  img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    object-fit: cover;
+  }
+}
+
+.contact-form {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  
+  .ant-form {
+    width: 100%;
+  }
+  
+  .ant-input {
+    border-radius: 10px;
+    padding: 12px 15px;
+    border: 1px solid #e0e0e0;
+    background-color: rgba(255, 255, 255, 0.8);
+    
+    &:focus, &:hover {
+      border-color: #0074d9;
+      box-shadow: 0 0 0 2px rgba(0, 116, 217, 0.2);
+    }
+  }
+  
+  .ant-form-item {
+    margin-bottom: 20px;
+  }
+}
+
+.form-button {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.send-button {
+  background-color: #0074d9 !important; // Blue button as in image
+  border-color: #0074d9 !important;
+  border-radius: 25px !important;
+  height: 50px !important;
+  font-size: 18px !important;
+  font-weight: 500 !important;
+  padding: 0 40px !important;
+  box-shadow: 0 4px 8px rgba(0, 116, 217, 0.3);
+  
+  &:hover {
+    background-color: #0062b3 !important;
+    border-color: #0062b3 !important;
+  }
+}

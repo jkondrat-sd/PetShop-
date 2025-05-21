@@ -1,15 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button, Badge, Tooltip, Tag } from 'antd';
 import { ShoppingCartOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBox, faBoxOpen } from '@fortawesome/free-solid-svg-icons';
-import { WOW } from 'wowjs';
-import styles from './AccessoryCard.module.scss';
-
-// Initialize WOW.js animations
-if (typeof window !== 'undefined') {
-  new WOW().init();
-}
+import 'animate.css';
+import styles from './AccesssoryCard.module.scss';
 
 const AccessoryCard = ({ 
   id, 
@@ -22,6 +17,31 @@ const AccessoryCard = ({
   onAddToCart 
 }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const cardRef = useRef(null);
+
+  // Sử dụng Intersection Observer để phát hiện khi card xuất hiện trong viewport
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(entry.target);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (cardRef.current) {
+      observer.observe(cardRef.current);
+    }
+
+    return () => {
+      if (cardRef.current) {
+        observer.unobserve(cardRef.current);
+      }
+    };
+  }, []);
 
   const handleAddToCart = () => {
     if (onAddToCart) {
@@ -31,10 +51,10 @@ const AccessoryCard = ({
 
   return (
     <div 
-      className={`${styles['accessory-card']} wow fadeIn`}
+      ref={cardRef}
+      className={`${styles['accessory-card']} ${isVisible ? 'animate__animated animate__fadeIn' : ''}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      data-wow-duration="0.8s"
     >
       <div className={styles['accessory-card__inner']}>
         <div className={styles['accessory-card__image']}>
@@ -65,12 +85,12 @@ const AccessoryCard = ({
             {price} $
           </div>
           
-          <Tooltip title="Add to cart">
+          <Tooltip title={stockQuantity <= 0 ? 'Out of stock' : 'Add to cart'}>
             <Button 
               type="primary"
               shape="round"
               icon={<ShoppingCartOutlined />} 
-              className={styles['accessory-card__button']}
+              className={`${styles['accessory-card__button']} ${isVisible ? 'animate__animated animate__pulse animate__delay-1s' : ''}`}
               onClick={handleAddToCart}
               disabled={stockQuantity <= 0}
             >

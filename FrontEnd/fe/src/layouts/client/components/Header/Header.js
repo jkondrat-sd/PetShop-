@@ -101,7 +101,6 @@ function Header() {
           <NavLink to={config.routesClient.home} className={({isActive}) => cx("menu-item", {active: isActive})}>Home</NavLink>
           <NavLink to="/pets" className={({isActive}) => cx("menu-item", {active: isActive})}>Pets</NavLink>
           <NavLink to="/accessories" className={({isActive}) => cx("menu-item", {active: isActive})}>Accessories</NavLink>
-          <NavLink to="/blog" className={({isActive}) => cx("menu-item", {active: isActive})}>Blog</NavLink>
           <NavLink to="/contact" className={({isActive}) => cx("menu-item", {active: isActive})}>Contact</NavLink>
         </nav>
         <div className={cx("header-search-user")}>

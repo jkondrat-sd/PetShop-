@@ -1,0 +1,399 @@
+// Variables
+:root {
+  --color-one: #003459;
+  --color-two: #00171F;
+  --color-three: #F7DBA7;  
+  --color-text: #242B33;
+  --color-bg: #FCEED5;
+  --color-cat: #FF64B4;
+  --color-dog: #003459;
+}
+
+// Global styles for the Pets page
+.pets-page {
+  font-family: 'Inter', sans-serif;
+  background-color: #fff;
+  
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+  }
+  
+  h2 {
+    color: var(--color-two);
+    font-weight: 700;
+  }
+}
+
+/* BreadCrumb */
+.bread-crumb {
+  background-color: #fff;
+  padding: 0;
+  
+  .bread-crumb-list {
+    margin: 0;
+    font-size: 16px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    a {
+      color: var(--color-text);
+      text-decoration: none;
+      font-weight: 400;
+      display: flex;
+      align-items: center;
+      margin: 0 5px;
+      
+      &:hover {
+        color: var(--color-one);
+      }
+    }
+
+    i, .anticon {
+      color: var(--color-text);
+      font-size: 12px;
+    }
+  }
+}
+
+/* Banner */
+.banner-pets {
+  margin: 20px 0 40px 0;
+  
+  .inner-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    padding-top: 50px;
+    background-color: var(--color-bg);
+    border-radius: 20px;
+    overflow: hidden;
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+    }
+  }
+  
+  .inner-img {
+    position: relative;
+    z-index: 5;
+    
+    img {
+      height: auto;
+      max-width: 100%;
+      object-fit: cover;
+      transition: all 0.5s ease;
+    }
+  }
+
+  .content {
+    padding: 0px;
+    z-index: 1;
+    position: relative;
+    padding: 0 40px 45px 0;
+    
+    @media (max-width: 768px) {
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .inner-title {
+      font-size: 42px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 1rem;
+      z-index: 5;
+      text-align: right;
+      position: relative;
+      
+      @media (max-width: 768px) {
+        font-size: 36px;
+        text-align: center;
+      }
+      
+      &::before {
+        content: "";
+        position: absolute;
+        width: 65.87px;
+        height: 65.87px;
+        left: -13.99px;
+        top: -4px;
+        z-index: -1;
+        background: #f7dba7;
+        border-radius: 19.6314px;
+        transform: rotate(25.23deg);
+        overflow: hidden;
+        
+        @media (max-width: 768px) {
+          left: 10px;
+        }
+      }
+    }
+    
+    &::before {
+      content: "";
+      position: absolute;
+      width: 1060.11px;
+      height: 983.76px;
+      left: -119px;
+      top: -115px;
+      z-index: -1;
+      background: #003459;
+      border-radius: 97.1757px;
+      transform: rotate(-15.65deg);
+    }
+
+    .title-2 {
+      font-size: 30px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 20px;
+      text-align: right;
+      
+      @media (max-width: 768px) {
+        text-align: center;
+        font-size: 24px;
+      }
+    }
+    
+    .inner-desc {
+      font-size: 15px;
+      color: #fff;
+      margin-bottom: 1rem;
+      align-items: center;
+      text-align: right;
+      z-index: 5;
+      
+      @media (max-width: 768px) {
+        text-align: center;
+        font-size: 14px;
+      }
+    }
+
+    .inner-button {
+      margin-top: 20px;
+      text-align: right;
+      display: flex;
+      justify-content: flex-end;
+      gap: 15px;
+      
+      @media (max-width: 768px) {
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      
+      .btn {
+        border-radius: 28px;
+        font-weight: 500;
+        padding: 10px 20px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        
+        &.btn-secondary-reverse {
+          background-color: transparent;
+          border: 2px solid #ffffff;
+          color: #ffffff;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          
+          &:hover {
+            background-color: #ffffff;
+            color: var(--color-one);
+          }
+        }
+        
+        &.btn-primary-reverse {
+          background-color: var(--color-three);
+          border: 2px solid var(--color-three);
+          color: var(--color-one);
+          
+          &:hover {
+            background-color: darken(#F7DBA7, 10%);
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Tabs for Pets */
+.pets-tabs {
+  margin-bottom: 20px;
+  
+  .ant-tabs {
+    .ant-tabs-nav {
+      margin-bottom: 30px;
+      
+      &::before {
+        border-bottom: 2px solid #f0f0f0;
+      }
+      
+      .ant-tabs-nav-list {
+        .ant-tabs-tab {
+          padding: 12px 20px;
+          font-size: 18px;
+          font-weight: 600;
+          color: #607d8b;
+          
+          &:hover {
+            color: var(--color-one);
+          }
+          
+          &.ant-tabs-tab-active .ant-tabs-tab-btn {
+            color: var(--color-one);
+            font-weight: 700;
+          }
+        }
+        
+        .ant-tabs-ink-bar {
+          background: var(--color-one);
+          height: 3px;
+        }
+      }
+    }
+  }
+}
+
+/* Pets Section */
+.pets {
+  margin-bottom: 60px;
+  
+  h2 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #002a48;
+    margin-bottom: 20px;
+  }
+  
+  .filter-items {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    
+    .filter-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      
+      h2 {
+        margin-bottom: 0;
+      }
+      
+      .reset-btn {
+        color: #9e9e9e;
+        font-size: 14px;
+        padding: 0;
+        
+        &:hover {
+          color: #e74c3c;
+        }
+      }
+    }
+    
+    .filter-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--color-two);
+      margin: 20px 0 10px;
+      
+      &:first-of-type {
+        margin-top: 0;
+      }
+    }
+    
+    .filter-gender {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 5px;
+    }
+    
+    .price-range {
+      margin-bottom: 10px;
+    }
+    
+    .ant-input, .ant-select {
+      margin-bottom: 15px;
+    }
+    
+    .submit-filter {
+      width: 100%;
+      background-color: var(--color-one);
+      color: #fff;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      margin: 20px auto 0;
+      justify-content: center;
+      align-items: center;
+      
+      &:hover {
+        background-color: lighten(#003459, 10%);
+      }
+      
+      .anticon {
+        margin-right: 8px;
+      }
+    }
+  }
+  
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 300px;
+  }
+  
+  .no-results {
+    width: 100%;
+    text-align: center;
+    padding: 40px 0;
+    color: #607d8b;
+    
+    p {
+      margin-bottom: 20px;
+      font-size: 18px;
+    }
+    
+    button {
+      background-color: var(--color-one);
+      color: white;
+      border: none;
+      
+      &:hover {
+        background-color: lighten(#003459, 10%);
+      }
+    }
+  }
+  
+  .pagination-container {
+    margin-top: 40px;
+    display: flex;
+    justify-content: center;
+    
+    .ant-pagination-item-active {
+      border-color: var(--color-one);
+      
+      a {
+        color: var(--color-one);
+      }
+    }
+    
+    .ant-pagination-item:hover {
+      border-color: var(--color-one);
+      
+      a {
+        color: var(--color-one);
+      }
+    }
+  }
+}
