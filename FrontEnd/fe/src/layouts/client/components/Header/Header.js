@@ -28,10 +28,6 @@ const cx = classNames.bind(styles);
 
 function Header() {
   const { isLoggedIn, userData } = useSelector((state) => state.loginReducer);
-  // Thêm log để kiểm tra dữ liệu
-  // console.log("Header - isLoggedIn:", isLoggedIn);
-  // console.log("Header - userData:", userData);
-  
   const dispatch = useDispatch();
   const navigate = useNavigate();
 

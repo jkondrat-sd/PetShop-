@@ -23,7 +23,7 @@ import classNames from "classnames/bind";
 import { useDispatch } from "react-redux";
 
 import styles from "./Users.module.scss";
-import { showAlert } from "~/store/actions/alert";
+import { showAlert } from "~/redux/actions/alert";
 import { getUsers } from "~/services/usersService";
 import ShowFilters from "~/pages/admin/ShowFilters";
 

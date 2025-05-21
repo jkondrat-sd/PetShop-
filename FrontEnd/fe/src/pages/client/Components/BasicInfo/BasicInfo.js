@@ -31,7 +31,7 @@ import moment from "moment";
 
 // Import your project's API utilities
 import { getUserInfo } from "~/services/authService";
-import { updateUserData } from "~/store/actions/login";
+import { updateUserData } from "~/redux/actions/login";
 import { updateUser } from "~/services/usersService";
 
 import "./BasicInfo.scss";

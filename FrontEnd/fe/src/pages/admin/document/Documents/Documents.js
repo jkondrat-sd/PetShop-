@@ -30,7 +30,7 @@ import {
   rejectedDocument,
   searchDocument,
 } from "~/services/documentService";
-import { showAlert } from "~/store/actions/alert";
+import { showAlert } from "~/redux/actions/alert";
 import styles from "./Documents.module.scss";
 import ShowFilters from "~/pages/admin/ShowFilters";
 import SearchUi from "~/pages/admin/Search/Search";

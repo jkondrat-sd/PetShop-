@@ -3,7 +3,7 @@ import AllRoute from "./components/ui/AllRoute";
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { getCookie } from '~/helpers/cookie';
-import { checkLogin } from '~/store/actions/login';
+import { checkLogin } from '~/redux/actions/login';
 import { getUserInfo } from '~/services/usersService';
 
 function App() {

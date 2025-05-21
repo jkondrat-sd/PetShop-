@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '~/layouts/client/components/Header/Header';
 import Footer from '~/layouts/client/components/Footer/Footer';
 import BasicInfo from '../Components/BasicInfo/BasicInfo';
-import MyDocuments from '../Components/MyDocuments/MyDocuments';
+
 import ChangePassword from '../Components/ChangePassword/ChangePassword';
 
 import config from '~/config';
@@ -23,34 +23,34 @@ function MyProfile() {
   const [activeTab, setActiveTab] = useState('1');
   const [avatar, setAvatar] = useState(userData?.avatarUrl || null);
   
-  const items = [
-    {
-      key: '1',
-      label: 'Thông tin cá nhân',
-      children: <BasicInfo form={form} avatar={avatar} setAvatar={setAvatar} userData={userData} />
-    },
-    {
-      key: '2',
-      label: 'Tài liệu của tôi',
-      children: <MyDocuments userData={userData} />
-    },
-    {
-      key: '3',
-      label: 'Đổi mật khẩu',
-      children: <ChangePassword form={passwordForm} />
-    },
-  ];
+  // const items = [
+  //   {
+  //     key: '1',
+  //     label: 'Thông tin cá nhân',
+  //     children: <BasicInfo form={form} avatar={avatar} setAvatar={setAvatar} userData={userData} />
+  //   },
+  //   {
+  //     key: '2',
+  //     label: 'Tài liệu của tôi',
+  //     children: <MyDocuments userData={userData} />
+  //   },
+  //   {
+  //     key: '3',
+  //     label: 'Đổi mật khẩu',
+  //     children: <ChangePassword form={passwordForm} />
+  //   },
+  // ];
 
-  useEffect(() => {
-    if (userData) {
-      form.setFieldsValue({
-        fullName: userData.fullName,
-        email: userData.email,
-        phone: userData.phone,
-        description: userData.description,
-      });
-    }
-  }, [userData, form]);
+  // useEffect(() => {
+  //   if (userData) {
+  //     form.setFieldsValue({
+  //       fullName: userData.fullName,
+  //       email: userData.email,
+  //       phone: userData.phone,
+  //       description: userData.description,
+  //     });
+  //   }
+  // }, [userData, form]);
 
   return (
     <>
@@ -66,7 +66,7 @@ function MyProfile() {
             defaultActiveKey="1" 
             activeKey={activeTab}
             onChange={setActiveTab}
-            items={items}
+            // items={items}
             className="profile-tabs"
           />
         </Card>

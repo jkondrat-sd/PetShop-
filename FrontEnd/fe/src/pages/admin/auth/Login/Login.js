@@ -6,7 +6,7 @@ import styles from "./Login.module.scss";
 import { login } from "~/services/authService";
 import { getCookie, setCookie } from "~/helpers/cookie";
 import { useDispatch } from "react-redux";
-import { showAlert } from "~/store/actions/alert";
+import { showAlert } from "~/redux/actions/alert";
 import { getUserScopes, hasScope } from "~/utils/authUtils";
 
 const cx = classNames.bind(styles);

@@ -17,10 +17,10 @@ import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import classNames from "classnames/bind";
 
-import { showAlert } from "~/store/actions/alert";
+import { showAlert } from "~/redux/actions/alert";
 import { getUserById } from "~/services/usersService";
 import styles from "./Detail.module.scss";
-import { hideLoading, showLoading } from "~/store/actions/loading";
+import { hideLoading, showLoading } from "~/redux/actions/loading";
 
 const cx = classNames.bind(styles);
 

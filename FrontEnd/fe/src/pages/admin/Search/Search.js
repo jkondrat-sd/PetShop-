@@ -4,7 +4,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import styles from "./Search.module.scss";
 import { Col, Select, Input, Row } from "antd";
 import { useDispatch } from "react-redux";
-import { showAlert } from "~/store/actions/alert";
+import { showAlert } from "~/redux/actions/alert";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { getTags } from "~/services/documentService";
 

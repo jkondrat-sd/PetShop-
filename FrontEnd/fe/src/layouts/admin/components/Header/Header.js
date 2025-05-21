@@ -5,7 +5,7 @@ import { Button, Badge, Dropdown, Space, Avatar } from "antd";
 
 import styles from "./Header.module.scss";
 import config from "~/config";
-import logo from "~/assets/images/logo.png";
+
 
 const cx = classNames.bind(styles);
 
@@ -34,7 +34,7 @@ function Header() {
     <header className={cx("wrapper")}>
       <div className={cx("left")}>
         <Link to={config.routesAdmin.dashboard} className={cx("logo")}>
-          <img src={logo} alt="Logo" />
+          {/* <img src={logo} alt="Logo" /> */}
           <span>Tổng quan</span>
         </Link>
       </div>

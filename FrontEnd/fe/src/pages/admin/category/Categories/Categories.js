@@ -30,7 +30,7 @@ import {
   updateCategory,
 } from "~/services/categoryService";
 import { useDispatch } from "react-redux";
-import { showAlert } from "~/store/actions/alert";
+import { showAlert } from "~/redux/actions/alert";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import ShowFilters from "~/pages/admin/ShowFilters";
 import SearchUi from "~/pages/admin/Search";
