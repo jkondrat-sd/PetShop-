@@ -1,5 +1,5 @@
 import classNames from "classnames/bind";
-import { Col, Row, Avatar, Dropdown, Space, Badge } from "antd";
+import { Col, Row, Avatar, Dropdown, Space, Badge, Input } from "antd";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -8,6 +8,7 @@ import {
   faSignOutAlt,
   faUserCircle,
   faBookmark,
+  faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
@@ -15,9 +16,9 @@ import { useSelector, useDispatch } from "react-redux";
 import Search from "../Search";
 import CategoryModal from "~/pages/client/Category/CategoryModal";
 import styles from "./Header.module.scss";
-import logo from "~/assets/images/logo.png";
-import RegisterModal from "~/pages/client/Register";
-import LoginModal from "~/pages/client/Login/LoginModal";
+import logo from "~/assets/images/logoPOMPOM-removebg.png";
+import RegisterModal from "~/pages/client/Registercuu";
+import LoginModal from "~/pages/client/Logincuuu/LoginModal";
 import ForgotPasswordModal from "~/pages/client/ForgotPassword";
 import config from "~/config";
 import { checkLogin } from "~/store/actions/login";
@@ -96,106 +97,52 @@ function Header() {
   ];
 
   return (
-    <>
-      <div className={cx("wrapper")}>
-        <div className={cx("container")}>
-          <Row justify="space-between" align="middle">
-            <Col span={3}>
-              <div className={cx("logo")}>
-                <Link to={config.routesClient.home} className={cx("logo-link")}>
-                  <img alt="logo" src={logo} />
-                </Link>
+    <div className={cx("header-bg")}>
+      <div className={cx("header-container")}>
+        <div className={cx("header-logo")}>
+          <Link to={config.routesClient.home}>
+            <img src={logo} alt="logo" />
+          </Link>
+        </div>
+        <nav className={cx("header-menu")}>
+          <NavLink to={config.routesClient.home} className={({isActive}) => cx("menu-item", {active: isActive})}>Home</NavLink>
+          <NavLink to="/pets" className={({isActive}) => cx("menu-item", {active: isActive})}>Pets</NavLink>
+          <NavLink to="/accessories" className={({isActive}) => cx("menu-item", {active: isActive})}>Accessories</NavLink>
+          <NavLink to="/blog" className={({isActive}) => cx("menu-item", {active: isActive})}>Blog</NavLink>
+          <NavLink to="/contact" className={({isActive}) => cx("menu-item", {active: isActive})}>Contact</NavLink>
+        </nav>
+        <div className={cx("header-search-user")}>
+          <Input
+            className={cx("header-search")}
+            placeholder="Search something here!"
+            prefix={<FontAwesomeIcon icon={faSearch} style={{color: ' #003459'}} />}
+            allowClear
+          />
+          <div className={cx("header-user-section")}>
+            {isLoggedIn ? (
+              <Dropdown menu={{ items: userMenuItems }} trigger={["click"]}>
+                <Space className={cx("user-info")}>
+                  <Avatar
+                    src={userData?.avatarUrl}
+                    icon={!userData?.avatarUrl && <FontAwesomeIcon icon={faUser} />}
+                    className={cx("user-avatar")}
+                  />
+                  <span className={cx("username")}>{userData?.fullName || "Người dùng"}</span>
+                </Space>
+              </Dropdown>
+            ) : (
+              <div className={cx("auth-buttons")}>
+                <button onClick={ () => navigate("/login")} className={cx("login-btn")}>Login</button>
+                <button className={cx("register-btn")} onClick={ () => navigate("/register")}>Register</button>
               </div>
-            </Col>
-
-            <Col span={3}>
-              <button
-                className={cx("category-btn")}
-                onClick={() => setShowCategoryModal(true)}
-              >
-                Danh mục
-              </button>
-            </Col>
-
-            <Col span={8}>
-              <Search />
-            </Col>
-
-            <Col span={4}>
-              <div className={cx("actions")}>
-                <div className={cx("auth-buttons")}>
-                  <Link to={"/upload"}>
-                    <button className={cx("upload-btn")}>Tải lên</button>
-                  </Link>
-                </div>
-              </div>
-            </Col>
-
-            <Col span={2}>
-              <Link to="/introduce" className={cx("intro-section")}>
-                <div className={cx("divider")}></div>
-                <FontAwesomeIcon
-                  icon={faInfoCircle}
-                  className={cx("intro-icon")}
-                />
-                <div className={cx("divider")}></div>
-              </Link>
-            </Col>
-
-            <Col span={4}>
-              <div className={cx("actions")}>
-                {isLoggedIn ? (
-                  <div className={cx("user-section")}>
-                    <Badge count={3}>
-                      <Dropdown
-                        menu={{ items: userMenuItems }}
-                        trigger={["click"]}
-                      >
-                        <Space className={cx("user-info")}>
-                          <Avatar
-                            src={userData?.avatarUrl}
-                            icon={
-                              !userData?.avatarUrl && (
-                                <FontAwesomeIcon icon={faUser} />
-                              )
-                            }
-                            className={cx("user-avatar")}
-                          />
-                          <span className={cx("username")}>
-                            {userData?.fullName || "Người dùng"}
-                          </span>
-                        </Space>
-                      </Dropdown>
-                    </Badge>
-                  </div>
-                ) : (
-                  <div className={cx("auth-buttons")}>
-                    <button
-                      onClick={handleOpenLogin}
-                      className={cx("login-btn")}
-                    >
-                      Đăng nhập
-                    </button>
-
-                    <button
-                      className={cx("register-btn")}
-                      onClick={handleOpenRegister}
-                    >
-                      Đăng ký
-                    </button>
-                  </div>
-                )}
-              </div>
-            </Col>
-          </Row>
+            )}
+          </div>
         </div>
       </div>
-
       <CategoryModal
         open={showCategoryModal}
         onClose={() => setShowCategoryModal(false)}
       />
-
       {!isLoggedIn && (
         <>
           <LoginModal
@@ -204,13 +151,11 @@ function Header() {
             onForgotPassword={handleOpenForgotPassword}
             onRegister={handleOpenRegister}
           />
-
           <RegisterModal
             open={showRegisterModal}
             onClose={() => setShowRegisterModal(false)}
             onLogin={handleOpenLogin}
           />
-
           <ForgotPasswordModal
             open={showForgotPasswordModal}
             onClose={() => setShowForgotPasswordModal(false)}
@@ -219,8 +164,9 @@ function Header() {
           />
         </>
       )}
-    </>
+    </div>
   );
 }
 
 export default Header;
+

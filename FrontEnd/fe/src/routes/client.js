@@ -3,19 +3,21 @@ import config from "~/config";
 import LayoutDefault from "~/layouts/client/DefaultLayout";
 import Home from "~/pages/client/Home/Home";
 import Page404 from "~/pages/Page404";
-import CategoryPage from "~/pages/client/CategoryPage";
-import Introduce from "~/pages/client/Introduce";
 import TermOfUse from "~/pages/client/TermOfUse";
 import FrequentlyAskedQuestions from "~/pages/client/FrequentlyAskedQuestions";
 import AboutUs from "~/pages/client/AboutUs";
 import ConfirmAccount from "~/pages/client/ConfirmAccount";
-import Detail from "~/pages/client/Detail";
 import MyProfile from "~/pages/client/MyProfile";
 import FileUploadPage from "~/pages/Upload";
 import DocumentsSearch from "~/pages/client/DocumentsSearch";
-import Library from "~/pages/client/Library";
-import LibraryDetail from "~/pages/client/LibraryDetail";
 import DocumentEdit from "~/pages/client/DocumentEdit";
+import Pets from "~/pages/client/Pets/Pets";
+import Accessories from "~/pages/client/Accessories/Accessories";
+import Blog from "~/pages/client/Blog/Blog";
+import Contact from "~/pages/client/Contact/Contact";
+import Login from "~/pages/client/Login/Login";
+import Register from "~/pages/client/Register/Register";
+import Detail from "~/pages/client/Detail";
 
 const publicRoutesClient = [
   // Public routes
@@ -25,16 +27,12 @@ const publicRoutesClient = [
     children: [
       { path: config.routesClient.home, element: <Home /> },
       {
-        path: "/category",
-        children: [
-          {
-            path: ":categoryId",
-            element: <CategoryPage />,
-          },
-        ],
+        path: "/pets",
+        element: <Pets />,
       },
       {
-        path: "documents",
+        path: "/accessories",
+        element: <Accessories />,
         children: [
           {
             path: "search/:keyword",
@@ -46,13 +44,24 @@ const publicRoutesClient = [
           },
         ],
       },
+      {
+        path: "/blog",
+        element: <Blog />,
+      },
+      {
+        path: "/contact",
+        element: <Contact />,
+      },
+      {
+        path: "/login",
+        element: <Login/>,
+      },
+      {
+        path: "/register",
+        element: <Register/>,
+      },
     ],
   },
-  {
-    path: config.routesClient.introduce,
-    element: <Introduce />,
-  },
-
   {
     path: "cau-hoi-thuong-gap",
     element: <FrequentlyAskedQuestions />,
@@ -99,23 +108,6 @@ const privateRoutesClient = [
                 element: <DocumentEdit />
               }
             ],
-          },
-          {
-            path: "upload",
-            element: <FileUploadPage />,
-          },
-          {
-            path: "library",
-            children: [
-              {
-                path: "",
-                element: <Library />,
-              },
-              {
-                path: 'detail/:libraryId',
-                element: <LibraryDetail />
-              }
-            ]
           },
         ],
       },
