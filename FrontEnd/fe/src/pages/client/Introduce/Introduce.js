@@ -2,8 +2,8 @@ import classNames from 'classnames/bind';
 import styles from './Introduce.module.scss';
 import { Button } from 'antd';
 import { useState } from 'react';
-import RegisterModal from '~/pages/client/Register/RegisterModal';
-import LoginModal from '~/pages/client/Login/LoginModal';
+import RegisterModal from '~/pages/client/Registercuu/RegisterModal';
+import LoginModal from '~/pages/client/Logincuuu/LoginModal';
 import ForgotPasswordModal from '~/pages/client/ForgotPassword';
 
 const cx = classNames.bind(styles);

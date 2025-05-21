@@ -1,119 +1,168 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { Input, Dropdown, Avatar, Space, Button, Menu } from 'antd';
-import { 
-  SearchOutlined, 
-  ShoppingCartOutlined, 
-  UserOutlined,
-  LogoutOutlined,
-  ProfileOutlined
-} from '@ant-design/icons';
-// import { deleteCookie } from '../../../../utils/cookie';
-// import { checkLogin } from '../../../../redux/actions/loginAction';
-import styles from './Header.module.scss';
-import logoImg from '../../../../assets/images/logoPOMPOM-removebg.png';
+import classNames from "classnames/bind";
+import { Col, Row, Avatar, Dropdown, Space, Badge, Input } from "antd";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faInfoCircle,
+  faUser,
+  faSignOutAlt,
+  faUserCircle,
+  faBookmark,
+  faSearch,
+} from "@fortawesome/free-solid-svg-icons";
+import { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 
-const { Search } = Input;
+import Search from "../Search";
+import CategoryModal from "~/pages/client/Category/CategoryModal";
+import styles from "./Header.module.scss";
+import logo from "~/assets/images/logoPOMPOM-removebg.png";
+import RegisterModal from "~/pages/client/Registercuu";
+import LoginModal from "~/pages/client/Logincuuu/LoginModal";
+import ForgotPasswordModal from "~/pages/client/ForgotPassword";
+import config from "~/config";
+import { checkLogin } from "~/store/actions/login";
+import { deleteCookie } from "~/helpers/cookie";
+
+const cx = classNames.bind(styles);
 
 function Header() {
   const { isLoggedIn, userData } = useSelector((state) => state.loginReducer);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // const handleLogout = () => {
-  //   deleteCookie("token");
-  //   dispatch(checkLogin(false));
-  //   navigate("/");
-  //   window.location.reload();
-  // };
-  
-  const userMenu = (
-    <Menu
-      items={[
-        {
-          key: '1',
-          icon: <ProfileOutlined />,
-          label: <Link to="/profile">Profile</Link>,
-        },
-        {
-          key: '2',
-          icon: <LogoutOutlined />,
-          // label: <a onClick={handleLogout}>Logout</a>,
-        },
-      ]}
-    />
-  );
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+
+  const handleOpenRegister = () => {
+    setShowLoginModal(false);
+    setShowForgotPasswordModal(false);
+    setShowRegisterModal(true);
+  };
+
+  const handleOpenLogin = () => {
+    setShowRegisterModal(false);
+    setShowForgotPasswordModal(false);
+    setShowLoginModal(true);
+  };
+
+  const handleOpenForgotPassword = () => {
+    setShowRegisterModal(false);
+    setShowLoginModal(false);
+    setShowForgotPasswordModal(true);
+  };
+
+  const handleLogout = () => {
+    deleteCookie("token");
+    dispatch(checkLogin(false));
+    navigate("/");
+    window.location.reload();
+  };
+
+  const userMenuItems = [
+    {
+      key: "1",
+      label: "Trang cá nhân",
+      icon: <FontAwesomeIcon icon={faUserCircle} />,
+      onClick: () => navigate("/account/profile"),
+    },
+    // {
+    //   key: '2',
+    //   label: 'Tài liệu của tôi',
+    //   icon: <FontAwesomeIcon icon={faUser} />,
+    //   onClick: () => navigate('/account/documents'),
+    // },
+    {
+      key: "4",
+      label: "Thư viện",
+      icon: <FontAwesomeIcon icon={faBookmark} />,
+      onClick: () => navigate("/library"),
+    },
+    {
+      type: "divider",
+    },
+    {
+      key: "3",
+      label: "Đăng xuất",
+      icon: <FontAwesomeIcon icon={faSignOutAlt} />,
+      danger: true,
+      onClick: handleLogout,
+    },
+  ];
 
   return (
-    <header className={styles.header}>
-      <div className="container-fluid">
-        <div className="row">
-          <div className={`${styles['main-header']} col-12`}>
-            <div className={styles['inner-logo']}>
-              <Link to="/">
-                <img src={logoImg} alt="logo" />
-              </Link>
-            </div>
-            
-            <div className={styles['main-menu']}>
-              <ul className={styles.nav}>
-                <li className={styles['nav-item']}>
-                  <Link to="/" className={styles['nav-link']}>Home</Link>
-                </li>
-                <li className={styles['nav-item']}>
-                  <Link to="/dogs" className={styles['nav-link']}>Dogs</Link>
-                </li>
-                <li className={styles['nav-item']}>
-                  <Link to="/accessories" className={styles['nav-link']}>Accessories</Link>
-                </li>
-                <li className={styles['nav-item']}>
-                  <Link to="/blog" className={styles['nav-link']}>Blog</Link>
-                </li>
-                <li className={styles['nav-item']}>
-                  <Link to="/contact" className={styles['nav-link']}>Contact</Link>
-                </li>
-              </ul>
-            </div>
-            
-            <div className={styles['header-right']}>
-              <div className={styles.item}>
-                <div className={styles['box-input']}>
-                  <Search
-                    placeholder="Search something here!"
-                    bordered={false}
-                    onSearch={value => console.log(value)}
+    <div className={cx("header-bg")}>
+      <div className={cx("header-container")}>
+        <div className={cx("header-logo")}>
+          <Link to={config.routesClient.home}>
+            <img src={logo} alt="logo" />
+          </Link>
+        </div>
+        <nav className={cx("header-menu")}>
+          <NavLink to={config.routesClient.home} className={({isActive}) => cx("menu-item", {active: isActive})}>Home</NavLink>
+          <NavLink to="/pets" className={({isActive}) => cx("menu-item", {active: isActive})}>Pets</NavLink>
+          <NavLink to="/accessories" className={({isActive}) => cx("menu-item", {active: isActive})}>Accessories</NavLink>
+          <NavLink to="/blog" className={({isActive}) => cx("menu-item", {active: isActive})}>Blog</NavLink>
+          <NavLink to="/contact" className={({isActive}) => cx("menu-item", {active: isActive})}>Contact</NavLink>
+        </nav>
+        <div className={cx("header-search-user")}>
+          <Input
+            className={cx("header-search")}
+            placeholder="Search something here!"
+            prefix={<FontAwesomeIcon icon={faSearch} style={{color: ' #003459'}} />}
+            allowClear
+          />
+          <div className={cx("header-user-section")}>
+            {isLoggedIn ? (
+              <Dropdown menu={{ items: userMenuItems }} trigger={["click"]}>
+                <Space className={cx("user-info")}>
+                  <Avatar
+                    src={userData?.avatarUrl}
+                    icon={!userData?.avatarUrl && <FontAwesomeIcon icon={faUser} />}
+                    className={cx("user-avatar")}
                   />
-                </div>
+                  <span className={cx("username")}>{userData?.fullName || "Người dùng"}</span>
+                </Space>
+              </Dropdown>
+            ) : (
+              <div className={cx("auth-buttons")}>
+                <button onClick={ () => navigate("/login")} className={cx("login-btn")}>Login</button>
+                <button className={cx("register-btn")} onClick={ () => navigate("/register")}>Register</button>
               </div>
-              <div className={styles.item}>
-                <Link to="/cart">
-                  <ShoppingCartOutlined style={{ fontSize: '24px' }} />
-                </Link>
-              </div>
-              <div className={styles.item}>
-                {isLoggedIn ? (
-                  <Dropdown overlay={userMenu} placement="bottomRight">
-                    <Space>
-                      <Avatar 
-                        src={userData?.avatar} 
-                        icon={!userData?.avatar && <UserOutlined />}
-                      />
-                      <span className={styles.username}>{userData?.fullName || "User"}</span>
-                    </Space>
-                  </Dropdown>
-                ) : (
-                  <Link to="/login">
-                    <Button type="text" icon={<UserOutlined />}>Login</Button>
-                  </Link>
-                )}
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
-    </header>
+      <CategoryModal
+        open={showCategoryModal}
+        onClose={() => setShowCategoryModal(false)}
+      />
+      {!isLoggedIn && (
+        <>
+          <LoginModal
+            open={showLoginModal}
+            onClose={() => setShowLoginModal(false)}
+            onForgotPassword={handleOpenForgotPassword}
+            onRegister={handleOpenRegister}
+          />
+          <RegisterModal
+            open={showRegisterModal}
+            onClose={() => setShowRegisterModal(false)}
+            onLogin={handleOpenLogin}
+          />
+          <ForgotPasswordModal
+            open={showForgotPasswordModal}
+            onClose={() => setShowForgotPasswordModal(false)}
+            onLogin={handleOpenLogin}
+            onRegister={handleOpenRegister}
+          />
+        </>
+      )}
+    </div>
   );
 }
 
 export default Header;
+

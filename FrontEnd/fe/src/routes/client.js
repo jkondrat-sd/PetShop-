@@ -3,15 +3,21 @@ import config from "~/config";
 import LayoutDefault from "~/layouts/client/DefaultLayout";
 import Home from "~/pages/client/Home/Home";
 import Page404 from "~/pages/Page404";
-
-import Introduce from "~/pages/client/Introduce";
 import TermOfUse from "~/pages/client/TermOfUse";
 import FrequentlyAskedQuestions from "~/pages/client/FrequentlyAskedQuestions";
 import AboutUs from "~/pages/client/AboutUs";
 import ConfirmAccount from "~/pages/client/ConfirmAccount";
 import MyProfile from "~/pages/client/MyProfile";
-
-
+import FileUploadPage from "~/pages/Upload";
+import DocumentsSearch from "~/pages/client/DocumentsSearch";
+import DocumentEdit from "~/pages/client/DocumentEdit";
+import Pets from "~/pages/client/Pets/Pets";
+import Accessories from "~/pages/client/Accessories/Accessories";
+import Blog from "~/pages/client/Blog/Blog";
+import Contact from "~/pages/client/Contact/Contact";
+import Login from "~/pages/client/Login/Login";
+import Register from "~/pages/client/Register/Register";
+import Detail from "~/pages/client/Detail";
 
 const publicRoutesClient = [
   // Public routes
@@ -20,26 +26,42 @@ const publicRoutesClient = [
     element: <LayoutDefault />,
     children: [
       { path: config.routesClient.home, element: <Home /> },
-      // {
-      //   path: "documents",
-      //   children: [
-      //     {
-      //       path: "search/:keyword",
-      //       element: <DocumentsSearch />,
-      //     },
-      //     {
-      //       path: "search",
-      //       element: <DocumentsSearch />,
-      //     },
-      //   ],
-      // },
+      {
+        path: "/pets",
+        element: <Pets />,
+      },
+      {
+        path: "/accessories",
+        element: <Accessories />,
+        children: [
+          {
+            path: "search/:keyword",
+            element: <DocumentsSearch />,
+          },
+          {
+            path: "search",
+            element: <DocumentsSearch />,
+          },
+        ],
+      },
+      {
+        path: "/blog",
+        element: <Blog />,
+      },
+      {
+        path: "/contact",
+        element: <Contact />,
+      },
+      {
+        path: "/login",
+        element: <Login/>,
+      },
+      {
+        path: "/register",
+        element: <Register/>,
+      },
     ],
   },
-  {
-    path: config.routesClient.introduce,
-    element: <Introduce />,
-  },
-
   {
     path: "cau-hoi-thuong-gap",
     element: <FrequentlyAskedQuestions />,
@@ -74,36 +96,19 @@ const privateRoutesClient = [
       {
         element: <PrivateRoutesClient />,
         children: [
-          // {
-          //   path: "/documents",
-          //   children: [
-          //     {
-          //       path: ":documentId",
-          //       element: <Detail />,
-          //     },
-          //     {
-          //       path: 'edit/:documentId',
-          //       element: <DocumentEdit />
-          //     }
-          //   ],
-          // },
-          // {
-          //   path: "upload",
-          //   element: <FileUploadPage />,
-          // },
-          // {
-          //   path: "library",
-          //   children: [
-          //     {
-          //       path: "",
-          //       element: <Library />,
-          //     },
-          //     {
-          //       path: 'detail/:libraryId',
-          //       element: <LibraryDetail />
-          //     }
-          //   ]
-          // },
+          {
+            path: "/documents",
+            children: [
+              {
+                path: ":documentId",
+                element: <Detail />,
+              },
+              {
+                path: 'edit/:documentId',
+                element: <DocumentEdit />
+              }
+            ],
+          },
         ],
       },
     ],
