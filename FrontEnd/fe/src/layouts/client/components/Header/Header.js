@@ -14,14 +14,11 @@ import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 import Search from "../Search";
-import CategoryModal from "~/pages/client/Category/CategoryModal";
 import styles from "./Header.module.scss";
 import logo from "~/assets/images/logoPOMPOM-removebg.png";
-import RegisterModal from "~/pages/client/Registercuu";
-import LoginModal from "~/pages/client/Logincuuu/LoginModal";
 import ForgotPasswordModal from "~/pages/client/ForgotPassword";
 import config from "~/config";
-import { checkLogin } from "~/store/actions/login";
+// import { checkLogin } from "~/store/actions/login";
 import { deleteCookie } from "~/helpers/cookie";
 
 const cx = classNames.bind(styles);
@@ -56,7 +53,7 @@ function Header() {
 
   const handleLogout = () => {
     deleteCookie("token");
-    dispatch(checkLogin(false));
+    // dispatch(checkLogin(false));
     navigate("/");
     window.location.reload();
   };
@@ -135,31 +132,8 @@ function Header() {
           </div>
         </div>
       </div>
-      <CategoryModal
-        open={showCategoryModal}
-        onClose={() => setShowCategoryModal(false)}
-      />
-      {!isLoggedIn && (
-        <>
-          <LoginModal
-            open={showLoginModal}
-            onClose={() => setShowLoginModal(false)}
-            onForgotPassword={handleOpenForgotPassword}
-            onRegister={handleOpenRegister}
-          />
-          <RegisterModal
-            open={showRegisterModal}
-            onClose={() => setShowRegisterModal(false)}
-            onLogin={handleOpenLogin}
-          />
-          <ForgotPasswordModal
-            open={showForgotPasswordModal}
-            onClose={() => setShowForgotPasswordModal(false)}
-            onLogin={handleOpenLogin}
-            onRegister={handleOpenRegister}
-          />
-        </>
-      )}
+
+
     </div>
   );
 }

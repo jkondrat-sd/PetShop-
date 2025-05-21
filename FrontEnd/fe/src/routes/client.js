@@ -8,9 +8,6 @@ import FrequentlyAskedQuestions from "~/pages/client/FrequentlyAskedQuestions";
 import AboutUs from "~/pages/client/AboutUs";
 import ConfirmAccount from "~/pages/client/ConfirmAccount";
 import MyProfile from "~/pages/client/MyProfile";
-import FileUploadPage from "~/pages/Upload";
-import DocumentsSearch from "~/pages/client/DocumentsSearch";
-import DocumentEdit from "~/pages/client/DocumentEdit";
 import Pets from "~/pages/client/Pets/Pets";
 import Accessories from "~/pages/client/Accessories/Accessories";
 import Blog from "~/pages/client/Blog/Blog";
@@ -34,14 +31,7 @@ const publicRoutesClient = [
         path: "/accessories",
         element: <Accessories />,
         children: [
-          {
-            path: "search/:keyword",
-            element: <DocumentsSearch />,
-          },
-          {
-            path: "search",
-            element: <DocumentsSearch />,
-          },
+          
         ],
       },
       {
@@ -103,10 +93,7 @@ const privateRoutesClient = [
                 path: ":documentId",
                 element: <Detail />,
               },
-              {
-                path: 'edit/:documentId',
-                element: <DocumentEdit />
-              }
+              
             ],
           },
         ],

@@ -1,0 +1,161 @@
+.sellersSection {
+  width: 100%;
+  background: #FBFEFF;
+  padding: 60px 0 50px 0;
+  overflow: hidden; // Ngăn animation gây thanh cuộn ngang
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 40px;
+  opacity: 0; // Bắt đầu ẩn và hiện khi có animation
+  
+  &:global(.animate__fadeInDown) {
+    opacity: 1;
+  }
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+  }
+}
+
+.headerContent {
+  h3 {
+    color: #207ea7;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+  
+  h2 {
+    color: #003459;
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin: 0;
+  }
+}
+
+.btn {
+  border-radius: 28px;
+  font-weight: 500;
+  background: transparent;
+  color: #207ea7;
+  border: 1.5px solid #207ea7;
+  padding: 8px 24px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  
+  &:hover {
+    background: #207ea7;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(32, 126, 167, 0.2);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  &:focus {
+    outline: none;
+  }
+}
+
+.slick-next{
+    background-color: #003459;
+  }
+
+.slider {
+  margin: 0 -12px;
+  
+  
+  :global(.slick-slide) {
+    padding: 0 12px;
+  }
+  
+  :global(.slick-track) {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.sellerWrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  padding: 10px;
+  opacity: 0; // Bắt đầu ẩn và hiện khi có animation
+  
+  &:global(.animate__fadeInUp) {
+    opacity: 1;
+  }
+}
+
+.sellerImg {
+  max-height: 60px;
+  max-width: 100%;
+  object-fit: contain;
+  filter: grayscale(0.3);
+  transition: all 0.4s ease;
+  
+  &:hover {
+    filter: grayscale(0) brightness(1.05);
+    transform: scale(1.12);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 992px) {
+  .sellersSection {
+    padding: 40px 0;
+  }
+  
+  .headerContent {
+    h2 {
+      font-size: 1.8rem;
+    }
+    
+    h3 {
+      font-size: 1rem;
+    }
+  }
+  
+  .sellerImg {
+    max-height: 50px;
+  }
+}
+
+@media (max-width: 576px) {
+  .headerContent {
+    h2 {
+      font-size: 1.5rem;
+    }
+  }
+  
+  .btn {
+    padding: 6px 18px;
+    font-size: 0.9rem;
+  }
+  
+  .sellerWrap {
+    height: 80px;
+  }
+  
+  .sellerImg {
+    max-height: 40px;
+  }
+}

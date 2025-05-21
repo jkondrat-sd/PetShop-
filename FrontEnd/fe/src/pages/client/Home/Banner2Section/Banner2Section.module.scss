@@ -1,0 +1,123 @@
+.banner2Section {
+  width: 100%;
+  background: #003459;
+  padding: 0;
+  height: 420px;
+  border-radius: 15px;
+  overflow: hidden;
+  @media (max-width: 900px) {
+    padding: 30px 0;
+  }
+}
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+  height: 450px;
+}
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  height: 100%;
+}
+.content {
+  flex: 1 1 420px;
+  max-width: 540px;
+  padding-left: 32px;
+  color: #fff;
+  @media (max-width: 900px) {
+    max-width: 100%;
+    padding-left: 0;
+    margin-top: 32px;
+  }
+}
+.title {
+  font-size: 40px;
+  font-weight: 700;
+  color: #003459;
+  margin-bottom: 0.5rem;
+}
+.subtitle {
+  font-size: 35px;
+  font-weight: 700;
+  color: #003459;
+  margin-bottom: 1.2rem;
+}
+.desc {
+  font-size: 14px;
+  color: #003459;
+  margin-bottom: 2rem;
+}
+.buttonGroup {
+  display: flex;
+  gap: 16px;
+}
+.imageWrap {
+  flex: 1 1 320px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.bannerImg {
+  max-width: 600px;
+  width: 150%;
+  border-radius: 32px;
+  @media (max-width: 900px) {
+    max-width: 320px;
+  }
+} 
+
+.btn {
+  border-radius: 24px;
+  font-weight: 500;
+  transition: all 0.2s;
+  &:hover {
+    background: #003459;
+    color: #fff;
+    border-color: #003459;
+  }
+}
+.btnPrimary {
+  background: #003459;
+  color: #fff;
+  border-radius: 24px;
+  font-weight: 500;
+  border: none;
+  transition: all 0.2s;
+  &:hover {
+    background: #007ea7;
+    color: #fff;
+  }
+}
+
+.imageWrap::before {
+  /* Rectangle 9 */
+  content: "";
+  position: absolute;
+  width: 767.88px;
+  height: 623.3px;
+  left: 500px;
+  top: -270px;
+  z-index: -1;
+  background: #fceed5;
+  border-radius: 97.1757px;
+  transform: rotate(25.23deg);
+  overflow: hidden;
+}
+
+.imageWrap::after {
+  /* Rectangle 1 */
+  content: "";
+  position: absolute;
+  width: 700px;
+  height: 700px;
+  left: -187px;
+  top: 144px;
+  z-index: -1;
+  /* Primary Color/Dark Blue 80 */
+  background: #002a48;
+  border-radius: 97.1757px;
+  transform: rotate(28.25deg);
+}
