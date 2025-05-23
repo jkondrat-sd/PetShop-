@@ -1,31 +1,62 @@
-import React from 'react';
-import { Form, Input, Button } from 'antd';
-import { MailOutlined, LockOutlined } from '@ant-design/icons';
+import React, { useState } from 'react';
+import { Form, Input, Button, message } from 'antd';
+import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { checkLogin } from '../../../redux/actions/login';
 import 'animate.css';
 import './Login.scss';
 import logoImg from '../../../assets/images/logoPOMPOM-removebg.png';
-import { login } from '../../../services/authService';
+import { getUserInfo, login } from '../../../services/authService';
 
 function Login() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
   
-  const onFinish = async (values) => {
-    try {
-      const response = await login(values.email, values.password);
-      console.log('Login response:', response);
-      
-      // Store token in localStorage
-      if (response && response.data && response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data));
-        // Navigate to home page
+const onFinish = async (values) => {
+  setLoading(true);
+  try {
+    const userData = await login(values.username, values.password);
+
+    if (userData) {
+      try {
+        // Gọi API để lấy thông tin profile đầy đủ
+        const profileResponse = await getUserInfo();
+        // Kiểm tra cấu trúc response và lưu đúng dữ liệu
+        let fullUserData;
+        if (profileResponse.data) {
+          // Lấy dữ liệu từ response.data (cấu trúc thực tế API)
+          fullUserData = profileResponse.data;
+        } else if (profileResponse.result) {
+          // Phòng trường hợp API có cấu trúc khác
+          fullUserData = profileResponse.result;
+        } else {
+          fullUserData = userData;
+        }
+        
+        // Lưu dữ liệu vào Redux store
+        dispatch(checkLogin(true, fullUserData));
+        localStorage.setItem('userData', JSON.stringify(fullUserData));
+        
+        message.success('Đăng nhập thành công!');
+        navigate('/');
+      } catch (profileError) {
+        // Xử lý nếu không lấy được profile
+        console.error('Error fetching profile:', profileError);
+        dispatch(checkLogin(true, userData));
+        localStorage.setItem('userData', JSON.stringify(userData));
+        message.warning('Đăng nhập thành công nhưng không lấy được đầy đủ thông tin');
         navigate('/');
       }
-    } catch (error) {
-      console.error('Login error:', error);
     }
-  };
+  } catch (error) {
+    console.error('Login error:', error);
+    message.error(error.message || 'Đăng nhập thất bại!');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="auth-container">
@@ -54,15 +85,14 @@ function Login() {
             layout="vertical"
           >
             <Form.Item
-              name="email"
+              name="username"
               rules={[
-                { required: true, message: 'Please enter your email' },
-                { type: 'email', message: 'Please enter a valid email' }
+                { required: true, message: 'Please enter your username' }
               ]}
             >
               <Input 
-                prefix={<MailOutlined />} 
-                placeholder="Email" 
+                prefix={<UserOutlined />} 
+                placeholder="Username" 
                 className="auth-input"
               />
             </Form.Item>
@@ -83,7 +113,12 @@ function Login() {
             </div>
             
             <Form.Item>
-              <Button type="primary" htmlType="submit" className="auth-button">
+              <Button 
+                type="primary" 
+                htmlType="submit" 
+                className="auth-button" 
+                loading={loading}
+              >
                 Log In
               </Button>
             </Form.Item>

@@ -291,7 +291,16 @@
 		}
 	}
 }
-
+.cart-icon {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-right: 15px;
+  
+  &:hover {
+    opacity: 0.8;
+  }
+}
 // Responsive
 @media (max-width: 900px) {
 	.header-container {

@@ -4,7 +4,7 @@ import { message } from "antd";
 import { getCookie } from "~/helpers/cookie";
 
 const request = axios.create({
-  baseURL: "http://localhost:8089",
+  baseURL: "http://localhost:8089/api",
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -15,30 +15,31 @@ const request = axios.create({
 // Response interceptor for handling common responses
 request.interceptors.response.use(
   (response) => response.data,
-  // (error) => {
-  //   if (error.response) {
-  //     const { status } = error.response;
-
-  //     switch (status) {
-  //       case 401:
-  //         message.error("Phiên đăng nhập đã hết hạn", 3);
-  //         break;
-  //       case 403:
-  //         message.error("Bạn không có quyền truy cập", 3);
-  //         break;
-  //       case 404:
-  //         message.error("Không tìm thấy tài nguyên", 3);
-  //         break;
-  //       case 500:
-  //         message.error("Lỗi hệ thống, vui lòng thử lại sau", 3);
-  //         break;
-  //       default:
-  //         message.error(error.response.data.message || "Có lỗi xảy ra", 3);
-  //         break;
-  //     }
-  //   }
-  //   return Promise.reject(error);
-  // }
+  (error) => {
+    if (error.response) {
+      // Xử lý lỗi 401 hoặc 403
+      if (error.response.status === 401 || error.response.status === 403) {
+        console.log('Authentication error:', error.response.status);
+        
+        // Xóa token và userData
+        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        localStorage.removeItem('userData');
+        
+        // Dispatch action để cập nhật Redux state (cần import store)
+        // store.dispatch(checkLogin(false, null));
+        
+        // Hiển thị thông báo
+        message.error('Your session has expired. Please log in again.');
+        
+        // Redirect đến trang login sau 1 giây
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 1000);
+      }
+    }
+    console.error("API Error:", error.response?.data || error.message);
+    throw error;
+  }
 );
 
 // Thêm interceptor để tự động gắn token vào mỗi request
@@ -49,8 +50,8 @@ request.interceptors.request.use(
     
     if (token) {
       // Đảm bảo token được định dạng đúng
-      const formattedToken = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
-      config.headers["Authorization"] = formattedToken;
+      // console.log("Using token:", token.substring());
+      config.headers.Authorization = `Bearer ${token}`;
     } else {
       console.warn("No authentication token available");
     }

@@ -1,34 +1,36 @@
 import React from 'react';
 import 'animate.css';
-import Slider from 'react-slick';
-import { Button, Badge, Tag } from 'antd';
+import { Button, Row, Col } from 'antd';
+import { Link } from 'react-router-dom';
 import styles from './ProductsSection.module.scss';
+import AccessoryCard from '../../Components/AccesssoryCard/AccesssoryCard';
+
+// Import hình ảnh phụ kiện
+import dogFood from '../../../../assets/images/img-accessories/image 2-3.png';
+import catFood from '../../../../assets/images/img-accessories/image 2-3.png';
+import scratchingToy from '../../../../assets/images/img-accessories/image 2-3.png';
+import catNest from '../../../../assets/images/img-accessories/image 2-3.png';
+import omegaGold from '../../../../assets/images/img-accessories/image 2-3.png';
+import cowboyRider from '../../../../assets/images/img-accessories/image 2-3.png';
+import chickenHeadband from '../../../../assets/images/img-accessories/image 2-3.png';
+import plushToy from '../../../../assets/images/img-accessories/image 2-3.png';
 
 const products = [
-  { id: 1, name: 'Reflex Plus Adult Dog Food Salmon', image: '/assets/images/img-accessories/image 2-6.png', category: 'Dog Food', size: '385g', price: '30' },
-  { id: 2, name: 'Reflex Plus Adult Cat Food Salmon', image: '/assets/images/img-accessories/image 2-3.png', category: 'Cat Food', size: '700g', price: '20' },
-  { id: 3, name: 'Cat scratching ball toy kitten sisal rope ball', image: '/assets/images/img-accessories/image 2-4.png', category: 'Toy', size: 'small', price: '90' },
-  { id: 4, name: 'Cute Pet Cat Warm Nest', image: '/assets/images/img-accessories/image 2-5.png', category: 'Toy', size: 'small', price: '50' },
-  { id: 5, name: 'NaturVet Dogs - Omega-Gold Plus Salmon Oil', image: '/assets/images/img-accessories/Frame 7.png', category: 'Dog Food', size: '385g', price: '50' },
-  { id: 6, name: 'Costumes Fashion Pet Clother Cowboy Rider', image: '/assets/images/img-accessories/Frame 7 (1).png', category: 'Costume', size: '1.5kg', price: '80' },
-  { id: 7, name: 'Costumes Chicken Drumsti ck Headband', image: '/assets/images/img-accessories/image 2.png', category: 'Costume', size: 'small', price: '75' },
-  { id: 8, name: 'Plush Pet Toy', image: '/assets/images/img-accessories/image 2 (1).png', category: 'Toy', size: 'small', price: '25' },
+  { id: 1, name: 'Reflex Plus Adult Dog Food Salmon', image: dogFood, category: 'Dog Food', size: '385g', price: '30', stockQuantity: 15 },
+  { id: 2, name: 'Reflex Plus Adult Cat Food Salmon', image: catFood, category: 'Cat Food', size: '700g', price: '20', stockQuantity: 20 },
+  { id: 3, name: 'Cat scratching ball toy kitten sisal rope ball', image: scratchingToy, category: 'Toy', size: 'small', price: '50', stockQuantity: 8 },
+  { id: 4, name: 'Cute Pet Cat Warm Nest', image: catNest, category: 'Toy', size: 'small', price: '20', stockQuantity: 12 },
+  { id: 5, name: 'NaturVet Dogs - Omega-Gold Plus Salmon Oil', image: omegaGold, category: 'Dog Food', size: '385g', price: '25', stockQuantity: 17 },
+  { id: 6, name: 'Costumes Fashion Pet Clother Cowboy Rider', image: cowboyRider, category: 'Costume', size: '1.5kg', price: '30', stockQuantity: 5 },
+  { id: 7, name: 'Costumes Chicken Drumstick Headband', image: chickenHeadband, category: 'Costume', size: 'small', price: '30', stockQuantity: 0 },
+  { id: 8, name: 'Plush Pet Toy', image: plushToy, category: 'Toy', size: 'small', price: '25', stockQuantity: 10 },
 ];
 
-const sliderSettings = {
-  dots: true,
-  infinite: true,
-  speed: 500,
-  slidesToShow: 4,
-  slidesToScroll: 1,
-  responsive: [
-    { breakpoint: 1200, settings: { slidesToShow: 3 } },
-    { breakpoint: 900, settings: { slidesToShow: 2 } },
-    { breakpoint: 600, settings: { slidesToShow: 1 } },
-  ],
-};
-
 function ProductsSection() {
+  const handleAddToCart = (product) => {
+    console.log(`Added ${product.name} to cart`);
+  };
+
   return (
     <section className={styles.productsSection}>
       <div className={styles.container}>
@@ -38,29 +40,35 @@ function ProductsSection() {
             <h2>Our Products</h2>
           </div>
           <div>
-            <Button type="default" size="large" className={styles.btn}>View more</Button>
+            <Link to="/accessories">
+              <Button type="default" size="large" className={styles.btn}>
+                View more
+              </Button>
+            </Link>
           </div>
         </div>
-        <Slider {...sliderSettings} className={styles.slider}>
-          {products.map((product) => (
-            <div key={product.id} className={`animate__animated animate__fadeInUp ${styles.cardWrap}`} data-wow-delay="0.1s">
-              <div className={styles.productCard}>
-                <Badge.Ribbon text={product.category} color="#007ea7">
-                  <img src={product.image} alt={product.name} className={styles.productImg} />
-                </Badge.Ribbon>
-                <div className={styles.productInfo}>
-                  <div className={styles.productName}>{product.name}</div>
-                  <div className={styles.productDesc}><Tag color="#108ee9">{product.category}</Tag> Size: {product.size}</div>
-                  <div className={styles.productPrice}>{product.price} $</div>
-                  <Button type="primary" size="small" className={styles.btnATC}>Add to cart</Button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </Slider>
+        
+        <div className={styles.petsGrid}>
+          <Row gutter={[24, 30]}>
+            {products.map((product) => (
+              <Col xs={24} sm={12} md={8} lg={6} key={product.id} className={styles.productCardCol}>
+                <AccessoryCard
+                  id={product.id}
+                  name={product.name}
+                  image={product.image}
+                  categoryName={product.category}
+                  size={product.size}
+                  price={product.price}
+                  stockQuantity={product.stockQuantity}
+                  onAddToCart={() => handleAddToCart(product)}
+                />
+              </Col>
+            ))}
+          </Row>
+        </div>
       </div>
     </section>
   );
 }
 
-export default ProductsSection; 
+export default ProductsSection;

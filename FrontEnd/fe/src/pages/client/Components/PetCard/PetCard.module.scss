@@ -7,6 +7,7 @@
   transition: all 0.3s ease;
   margin-bottom: 30px;
   opacity: 0; /* Start with zero opacity */
+  cursor: pointer;
   
   &:hover {
     transform: translateY(-6px);
@@ -99,6 +100,40 @@
     &:hover {
       background-color: #00a7e7 !important;
       border-color: #00a7e7 !important;
+    }
+  }
+  &__content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    
+    &:hover {
+      text-decoration: none;
+      color: inherit;
+    }
+  }
+
+  &__footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    position: relative; // Ensure z-index works
+    z-index: 2; // Higher than the link
+  }
+
+  &__button {
+    z-index: 3; // Ensure button is on top
+    position: relative;
+    
+    &:focus {
+      outline: none;
     }
   }
 }

@@ -31,9 +31,9 @@ function Login() {
     try {
       const response = await login(username, password);
 
-      if (response.code === 200) {
+      if (response && response.token) {
         // Set token
-        setCookie("token", response.result.token);
+        setCookie("token", response.token);
 
         // Lấy scopes sau khi có token mới
         const newScopes = getUserScopes();
@@ -46,7 +46,7 @@ function Login() {
           navigate("/admin/auth/login");
         }
       } else {
-        throw new Error(response?.message || "Đăng nhập thất bại");
+        throw new Error("Đăng nhập thất bại");
       }
     } catch (error) {
       console.error("Lỗi đăng nhập:", error);

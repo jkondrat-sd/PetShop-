@@ -4,16 +4,17 @@ import LayoutDefault from "~/layouts/client/DefaultLayout";
 import Home from "~/pages/client/Home/Home";
 import Page404 from "~/pages/Page404";
 import TermOfUse from "~/pages/client/TermOfUse";
-import FrequentlyAskedQuestions from "~/pages/client/FrequentlyAskedQuestions";
-import AboutUs from "~/pages/client/AboutUs";
 import ConfirmAccount from "~/pages/client/ConfirmAccount";
-import MyProfile from "~/pages/client/MyProfile";
 import Pets from "~/pages/client/Pets/Pets";
 import Accessories from "~/pages/client/Accessories/Accessories";
 import Contact from "~/pages/client/Contact/Contact";
 import Login from "~/pages/client/Login/Login";
 import Register from "~/pages/client/Register/Register";
-import Detail from "~/pages/client/Detail";
+import ForgotPasswordModal from "~/pages/client/ForgotPassword";
+import PetDetail from "~/pages/client/Pets/PetDetail/PetDetail";
+import AccessoryDetail from "~/pages/client/Accessories/AccessoryDetail/AccessoryDetail";
+import CheckOutPage from "~/pages/client/CheckOutPage/CheckOutPage";
+import Profile from "~/pages/client/Profile/Profile";
 
 const publicRoutesClient = [
   // Public routes
@@ -25,6 +26,17 @@ const publicRoutesClient = [
       {
         path: "/pets",
         element: <Pets />,
+        // children: [
+        //       {
+        //         path: ":/pets/:id",
+        //         element: <PetDetail />,
+        //       },
+              
+        //     ],
+      },
+      {
+        path: "/pets/:id",  // Add route for pet detail
+        element: <PetDetail />,
       },
       {
         path: "/accessories",
@@ -32,6 +44,11 @@ const publicRoutesClient = [
         children: [
           
         ],
+      },
+
+      {
+        path: "/accessories/:id",  // Add route for pet detail
+        element: <AccessoryDetail />,
       },
       {
         path: "/contact",
@@ -45,6 +62,19 @@ const publicRoutesClient = [
         path: "/register",
         element: <Register/>,
       },
+      {
+        path: "/forgot-password",
+        element: <ForgotPasswordModal/>,
+      },
+      {
+        path: "/check-out",
+        element: <CheckOutPage/>,
+      },
+      {
+        path: "/users/profile",
+        element: <Profile />,
+      },
+      
     ],
   },
   {
@@ -58,10 +88,6 @@ const publicRoutesClient = [
       { path: ":code", element: <ConfirmAccount /> }, // Handles /confirm-account/xyz
     ],
   },
-  {
-    path: "/account/profile",
-    element: <MyProfile />,
-  },
   { path: "*", element: <Page404 /> },
 ];
 
@@ -72,18 +98,18 @@ const privateRoutesClient = [
     children: [
       {
         element: <PrivateRoutesClient />,
-        children: [
-          {
-            path: "/documents",
-            children: [
-              {
-                path: ":documentId",
-                element: <Detail />,
-              },
+        // children: [
+        //   {
+        //     path: "/documents",
+        //     children: [
+        //       {
+        //         path: ":documentId",
+        //         element: < />,
+        //       },
               
-            ],
-          },
-        ],
+        //     ],
+        //   },
+        // ],
       },
     ],
   },

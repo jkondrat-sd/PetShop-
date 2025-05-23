@@ -36,7 +36,7 @@ const ConfirmAccount = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const params = useParams();
-	const API_DOMAIN = "http://localhost:8088";
+	const API_DOMAIN = "http://localhost:8089";
 
 	useEffect(() => {
 		// Extract token from URL path or query parameter

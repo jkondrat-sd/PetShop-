@@ -1,33 +1,27 @@
 import React from 'react';
 import 'animate.css';
-import Slider from 'react-slick';
-import { Button, Badge } from 'antd';
+import { Button, Row, Col } from 'antd';
+import { Link } from 'react-router-dom';
 import styles from './PetsSection.module.scss';
 import PetCard from '../../Components/PetCard/PetCard';
 
-const pets = [
-  { id: 1, name: 'Pomeranian White', image: '../../../../assets/images/img-dogs/MO231.png', gender: 'Male', age: '2 months', price: '3,000' },
-  { id: 2, name: 'Poodle Tiny Yellow', image: '/assets/images/img-dogs/MO502.png', gender: 'Female', age: '2 months', price: '2,500' },
-  { id: 3, name: 'Poodle Tiny Sepia', image: '/assets/images/img-dogs/MO102.png', gender: 'Male', age: '2 months', price: '3,000' },
-  { id: 4, name: 'Alaskan Malamute Grey', image: '/assets/images/img-dogs/MO512.png', gender: 'Male', age: '2 months', price: '5,000' },
-  { id: 5, name: 'Pembroke Corgi Cream', image: '/assets/images/img-dogs/MO504.png', gender: 'Male', age: '2 months', price: '3,200' },
-  { id: 6, name: 'Pembroke Corgi Tricolor', image: '/assets/images/img-dogs/MO502.png', gender: 'Female', age: '2 months', price: '3,000' },
-  { id: 7, name: 'Pomeranian White', image: '/assets/images/img-dogs/MO231.png', gender: 'Male', age: '2 months', price: '3,000' },
-  { id: 8, name: 'Poodle Tiny Dairy Cow', image: '/assets/images/img-dogs/MO512.png', gender: 'Male', age: '2 months', price: '2,000' },
-];
+// Import hình ảnh thú cưng
+import MO231 from '../../../../assets/images/img-dogs/MO231.png';
+import MO502 from '../../../../assets/images/img-dogs/MO502.png';
+import MO102 from '../../../../assets/images/img-dogs/MO102.png';
+import MO512 from '../../../../assets/images/img-dogs/MO512.png';
+import MO504 from '../../../../assets/images/img-dogs/MO504.png';
 
-const sliderSettings = {
-  dots: true,
-  infinite: true,
-  speed: 500,
-  slidesToShow: 4,
-  slidesToScroll: 1,
-  responsive: [
-    { breakpoint: 1200, settings: { slidesToShow: 3 } },
-    { breakpoint: 900, settings: { slidesToShow: 2 } },
-    { breakpoint: 600, settings: { slidesToShow: 1 } },
-  ],
-};
+const pets = [
+  { id: 1, name: 'MO231 - Pomeranian White', image: MO231, gender: 'Male', age: '2 months', price: '3,000' },
+  { id: 2, name: 'MO502 - Poodle Tiny Yellow', image: MO502, gender: 'Female', age: '2 months', price: '2,500' },
+  { id: 3, name: 'MO102 - Poodle Tiny Sepia', image: MO102, gender: 'Male', age: '2 months', price: '3,000' },
+  { id: 4, name: 'MO512 - Alaskan Malamute Grey', image: MO512, gender: 'Male', age: '2 months', price: '5,000' },
+  { id: 5, name: 'MO504 - Pembroke Corgi Cream', image: MO504, gender: 'Male', age: '2 months', price: '3,200' },
+  { id: 6, name: 'MO502 - Pembroke Corgi Tricolor', image: MO502, gender: 'Female', age: '2 months', price: '3,000' },
+  { id: 7, name: 'MO231 - Pomeranian White', image: MO231, gender: 'Male', age: '2 months', price: '3,000' },
+  { id: 8, name: 'MO512 - Poodle Tiny Dairy Cow', image: MO512, gender: 'Male', age: '2 months', price: '2,000' },
+];
 
 function PetsSection() {
   return (
@@ -35,31 +29,38 @@ function PetsSection() {
       <div className={styles.container}>
         <div className={styles.headerRow}>
           <div className={styles.headerContent}>
-            <h3>Whats new?</h3>
+            <h3>What's new?</h3>
             <h2>Take A Look At Some Of Our Pets</h2>
           </div>
           <div>
-            <Button type="default" size="large" className={styles.btn}>View more</Button>
+            <Link to="/pets">
+              <Button type="primary" size="large" className={styles.viewMoreBtn}>
+                View more
+              </Button>
+            </Link>
           </div>
         </div>
-        <Slider {...sliderSettings} className={styles.slider}>
-          {pets.map((pet) => (
-            <div key={pet.id} className={styles.cardWrap}>
-              <PetCard
-                id={pet.id}
-                name={pet.name}
-                image={pet.image}
-                gender={pet.gender}
-                age={pet.age}
-                price={pet.price}
-                onAddToCart={() => console.log(`Added ${pet.name} to cart`)}
-              />
-            </div>
-          ))}
-        </Slider>
+        
+        <div className={styles.petsGrid}>
+          <Row gutter={[24, 30]}>
+            {pets.map((pet) => (
+              <Col xs={24} sm={12} md={8} lg={6} key={pet.id} className={styles.petCardCol}>
+                <PetCard
+                  id={pet.id}
+                  name={pet.name}
+                  image={pet.image}
+                  gender={pet.gender}
+                  age={pet.age}
+                  price={pet.price}
+                  onAddToCart={() => console.log(`Added ${pet.name} to cart`)}
+                />
+              </Col>
+            ))}
+          </Row>
+        </div>
       </div>
     </section>
   );
 }
 
-export default PetsSection; 
+export default PetsSection;

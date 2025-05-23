@@ -69,7 +69,7 @@ export const toggleUserStatus = async (id, status) => {
 
 export const getUserInfo = async () => {
   try {
-    const response = await request.get('/users/my-info');
+    const response = await request.get('/users/profile');
     return response;
   } catch (error) {
     console.error('Lỗi khi lấy thông tin người dùng:', error);
@@ -90,6 +90,36 @@ export const changePassword = async (data) => {
     return response;
   } catch (error) {
     console.error('Error changing password:', error);
+    throw error;
+  }
+};
+
+// Thêm hàm để upload avatar
+export const uploadAvatar = async (file) => {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const response = await request.post('/users/avatar', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    
+    return response;
+  } catch (error) {
+    console.error('Error uploading avatar:', error);
+    throw error;
+  }
+};
+
+// Thêm hàm để cập nhật thông tin profile (bao gồm avatarUrl)
+export const updateProfile = async (profileData) => {
+  try {
+    const response = await request.put('/users/profile', profileData);
+    return response;
+  } catch (error) {
+    console.error('Error updating profile:', error);
     throw error;
   }
 };

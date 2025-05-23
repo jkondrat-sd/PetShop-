@@ -17,7 +17,7 @@ public class UserResponse {
     private String lastName;
     private String phone;
     private String address;
-    private String avatar;
+    private String avatarUrl; // Đổi tên từ avatar thành avatarUrl
     private String role;
     private boolean enabled;
 }

@@ -5,22 +5,16 @@ const initialState = {
   userData: null
 };
 
-const loginReducer = (state = initialState, action) => {
+export default function loginReducer(state = initialState, action) {
   switch (action.type) {
     case 'CHECK_LOGIN':
       return {
         ...state,
         isLoggedIn: action.payload.isLoggedIn,
-        userData: action.payload.userData || state.userData
-      };
-    case 'UPDATE_USER_DATA':
-      return {
-        ...state,
-        userData: action.payload
+        userData: action.payload.userData
       };
     default:
       return state;
   }
-};
+}
 
-export default loginReducer;

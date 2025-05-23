@@ -129,7 +129,7 @@ public class UserService {
                 .lastName(user.getLastName())
                 .phone(user.getPhone())
                 .address(user.getAddress())
-                .avatar(user.getAvatar())
+                .avatarUrl(user.getAvatar())
                 .role(user.getRole().getName())
                 .enabled(user.isEnabled())
                 .build();

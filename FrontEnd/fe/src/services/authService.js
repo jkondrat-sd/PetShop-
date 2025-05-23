@@ -1,54 +1,89 @@
-import { setCookie } from "~/helpers/cookie";
-import * as request from "~/utils/request";
+import * as request from '~/utils/request';
+import { setCookie, getCookie } from '~/helpers/cookie';
 
 export const login = async (username, password) => {
   try {
-    // Kiểm tra đường dẫn này có đúng với backend không
-    const response = await request.post(`/auth/login`, {
-      username: username,
-      password: password,
+    const response = await request.post('/auth/login', {
+      username,
+      password
     });
-
-    // Log ra để kiểm tra cấu trúc dữ liệu trả về
-    // console.log("Login response:", response);
-    if (response && response.accessToken) {
-      setCookie("token", response.accessToken, 1); // Lưu trong 1 ngày
+    
+    if (response && response.success) {
+      const userData = response.data;
+      
+      // Lưu token vào cookie
+      setCookie('token', userData.token);
+      
+      // Lưu thông tin user vào localStorage
+      localStorage.setItem('userData', JSON.stringify({
+        id: userData.id,
+        username: userData.username,
+        email: userData.email,
+        roles: userData.roles,
+        fullName: userData.fullName || userData.username,
+        avatarUrl: userData.avatarUrl || ''
+      }));
+      
+      return userData;
+    } else {
+      throw new Error(response?.message || 'Login failed');
     }
-
-    return response;
   } catch (error) {
-    console.error("Login service error:", error);
+    console.error('Login error:', error);
     throw error;
   }
 };
 
-export const register = async (email, username, password, firstName, lastName, phone, address) => {
-  try {
-    const res = await request.post(`auth/register`, {
-      username: username,
-      password: password,
-      email: email,
-      firstName: firstName,
-      lastName: lastName,
-      phone: phone,
-      address: address
-    });
-    return res.data;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
-};
-
-// Đảm bảo endpoint này đúng với backend
 export const getUserInfo = async () => {
   try {
-    // Sửa endpoint này theo đúng API của backend
-    const response = await request.get('/users/my-info');
-    // console.log('API Response:', response);
+    const response = await request.get('/users/profile');
+    
+    // Trả về toàn bộ response để xử lý ở component
     return response;
   } catch (error) {
-    console.error('Lỗi khi lấy thông tin người dùng:', error);
+    console.error('Error getting user info:', error);
+    throw error;
+  }
+};
+
+export const register = async (userData) => {
+  try {
+    const response = await request.post('/auth/register', userData);
+    
+    if (!response || response.success === false) {
+      throw new Error(response?.message || 'Registration failed');
+    }
+    
+    return response.data;
+  } catch (error) {
+    console.error('Register error:', error);
+    throw error;
+  }
+};
+
+export const uploadAvatar = async (formData) => {
+  try {
+    const response = await request.post('/users/avatar', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    
+    console.log('Upload avatar response:', response);
+    return response;
+  } catch (error) {
+    console.error('Upload avatar error:', error);
+    throw error;
+  }
+};
+
+export const updateUserInfo = async (userData) => {
+  try {
+    const response = await request.put('/users/profile', userData);
+    console.log('Update user info response:', response);
+    return response;
+  } catch (error) {
+    console.error('Update user info error:', error);
     throw error;
   }
 };

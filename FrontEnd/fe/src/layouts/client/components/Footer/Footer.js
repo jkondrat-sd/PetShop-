@@ -64,9 +64,6 @@ const Footer = () => {
                   <Link to="/accessories" className={styles['footer__navigation-link']}>Accessories</Link>
                 </li>
                 <li className={styles['footer__navigation-item']}>
-                  <Link to="/blog" className={styles['footer__navigation-link']}>Blog</Link>
-                </li>
-                <li className={styles['footer__navigation-item']}>
                   <Link to="/contact" className={styles['footer__navigation-link']}>Contact</Link>
                 </li>
               </ul>

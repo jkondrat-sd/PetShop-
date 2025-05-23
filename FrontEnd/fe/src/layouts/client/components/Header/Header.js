@@ -3,139 +3,213 @@ import { Col, Row, Avatar, Dropdown, Space, Badge, Input } from "antd";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faInfoCircle,
-  faUser,
-  faSignOutAlt,
-  faUserCircle,
-  faBookmark,
-  faSearch,
+	faInfoCircle,
+	faUser,
+	faSignOutAlt,
+	faUserCircle,
+	faShoppingCart,
+	faBookmark,
+	faSearch,
 } from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-
+import { checkLogin } from "~/redux/actions/login";
 import Search from "../Search";
 import styles from "./Header.module.scss";
 import logo from "~/assets/images/logoPOMPOM-removebg.png";
-import ForgotPasswordModal from "~/pages/client/ForgotPassword";
 import config from "~/config";
+import CartModal from "~/pages/client/CartModal/CartModal";
 // import { checkLogin } from "~/store/actions/login";
 import { deleteCookie } from "~/helpers/cookie";
+import { getUserInfo } from "~/services/usersService";
+import { getCart } from '~/services/cartService';
 
 const cx = classNames.bind(styles);
 
 function Header() {
-  const { isLoggedIn, userData } = useSelector((state) => state.loginReducer);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+	const { isLoggedIn, userData } = useSelector((state) => state.loginReducer);
+	const dispatch = useDispatch();
+	const navigate = useNavigate();
+	const [cartModalVisible, setCartModalVisible] = useState(false);
+	const [cartItemCount, setCartItemCount] = useState(0);
 
-  const [showRegisterModal, setShowRegisterModal] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
-  const [showCategoryModal, setShowCategoryModal] = useState(false);
+	const handleLogout = () => {
+		// Clear authentication token
+		deleteCookie("token");
 
-  const handleOpenRegister = () => {
-    setShowLoginModal(false);
-    setShowForgotPasswordModal(false);
-    setShowRegisterModal(true);
-  };
+		// Clear user data from localStorage
+		localStorage.removeItem("userData");
 
-  const handleOpenLogin = () => {
-    setShowRegisterModal(false);
-    setShowForgotPasswordModal(false);
-    setShowLoginModal(true);
-  };
+		// Clear any other user-related data
+		localStorage.removeItem("userEmail");
 
-  const handleOpenForgotPassword = () => {
-    setShowRegisterModal(false);
-    setShowLoginModal(false);
-    setShowForgotPasswordModal(true);
-  };
+		// Update Redux state
+		dispatch(checkLogin(false, null));
 
-  const handleLogout = () => {
-    deleteCookie("token");
-    // dispatch(checkLogin(false));
-    navigate("/");
-    window.location.reload();
-  };
+		// Navigate to home page
+		navigate("/");
+	};
 
-  const userMenuItems = [
-    {
-      key: "1",
-      label: "Trang cá nhân",
-      icon: <FontAwesomeIcon icon={faUserCircle} />,
-      onClick: () => navigate("/account/profile"),
-    },
-    // {
-    //   key: '2',
-    //   label: 'Tài liệu của tôi',
-    //   icon: <FontAwesomeIcon icon={faUser} />,
-    //   onClick: () => navigate('/account/documents'),
-    // },
-    {
-      key: "4",
-      label: "Thư viện",
-      icon: <FontAwesomeIcon icon={faBookmark} />,
-      onClick: () => navigate("/library"),
-    },
-    {
-      type: "divider",
-    },
-    {
-      key: "3",
-      label: "Đăng xuất",
-      icon: <FontAwesomeIcon icon={faSignOutAlt} />,
-      danger: true,
-      onClick: handleLogout,
-    },
-  ];
+	useEffect(() => {
+		const updateCartCount = async () => {
+			try {
+				const res = await getCart();
+				const cart = res.data?.items || [];
+				const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+				setCartItemCount(count);
+			} catch (err) {
+				setCartItemCount(0);
+			}
+		};
 
-  return (
-    <div className={cx("header-bg")}>
-      <div className={cx("header-container")}>
-        <div className={cx("header-logo")}>
-          <Link to={config.routesClient.home}>
-            <img src={logo} alt="logo" />
-          </Link>
-        </div>
-        <nav className={cx("header-menu")}>
-          <NavLink to={config.routesClient.home} className={({isActive}) => cx("menu-item", {active: isActive})}>Home</NavLink>
-          <NavLink to="/pets" className={({isActive}) => cx("menu-item", {active: isActive})}>Pets</NavLink>
-          <NavLink to="/accessories" className={({isActive}) => cx("menu-item", {active: isActive})}>Accessories</NavLink>
-          <NavLink to="/contact" className={({isActive}) => cx("menu-item", {active: isActive})}>Contact</NavLink>
-        </nav>
-        <div className={cx("header-search-user")}>
-          <Input
-            className={cx("header-search")}
-            placeholder="Search something here!"
-            prefix={<FontAwesomeIcon icon={faSearch} style={{color: ' #003459'}} />}
-            allowClear
-          />
-          <div className={cx("header-user-section")}>
-            {isLoggedIn ? (
-              <Dropdown menu={{ items: userMenuItems }} trigger={["click"]}>
-                <Space className={cx("user-info")}>
-                  <Avatar
-                    src={userData?.avatarUrl}
-                    icon={!userData?.avatarUrl && <FontAwesomeIcon icon={faUser} />}
-                    className={cx("user-avatar")}
-                  />
-                  <span className={cx("username")}>{userData?.fullName || "Người dùng"}</span>
-                </Space>
-              </Dropdown>
-            ) : (
-              <div className={cx("auth-buttons")}>
-                <button onClick={ () => navigate("/login")} className={cx("login-btn")}>Login</button>
-                <button className={cx("register-btn")} onClick={ () => navigate("/register")}>Register</button>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+		updateCartCount();
+		window.addEventListener("cartUpdated", updateCartCount);
 
+		return () => {
+			window.removeEventListener("cartUpdated", updateCartCount);
+		};
+	}, []);
 
-    </div>
-  );
+	// useEffect(() => {
+	// 	// Kiểm tra dữ liệu từ localStorage
+	// 	const localUserData = JSON.parse(localStorage.getItem("userData") || "{}");
+	// 	console.log("Local Storage userData:", localUserData);
+	// 	console.log("Local Storage avatarUrl:", localUserData?.avatarUrl);
+	// }, [userData]);
+
+	const showCartModal = () => {
+		setCartModalVisible(true);
+	};
+
+	const hideCartModal = () => {
+		setCartModalVisible(false);
+	};
+
+	const userMenuItems = [
+		{
+			key: "1",
+			label: "My Profile",
+			icon: <FontAwesomeIcon icon={faUserCircle} />,
+			onClick: () => navigate("/users/profile"),
+		},
+		{
+			type: "divider",
+		},
+		{
+			key: "3",
+			label: "Logout",
+			icon: <FontAwesomeIcon icon={faSignOutAlt} />,
+			danger: true,
+			onClick: handleLogout,
+		},
+	];
+
+	// console.log("User data:", userData);
+	// console.log("Is logged in:", isLoggedIn);
+
+	return (
+		<div className={cx("header-bg")}>
+			<div className={cx("header-container")}>
+				<div className={cx("header-logo")}>
+					<Link to={config.routesClient.home}>
+						<img src={logo} alt="logo" />
+					</Link>
+				</div>
+				<nav className={cx("header-menu")}>
+					<NavLink
+						to={config.routesClient.home}
+						className={({ isActive }) => cx("menu-item", { active: isActive })}
+					>
+						Home
+					</NavLink>
+					<NavLink
+						to="/pets"
+						className={({ isActive }) => cx("menu-item", { active: isActive })}
+					>
+						Pets
+					</NavLink>
+					<NavLink
+						to="/accessories"
+						className={({ isActive }) => cx("menu-item", { active: isActive })}
+					>
+						Accessories
+					</NavLink>
+					<NavLink
+						to="/contact"
+						className={({ isActive }) => cx("menu-item", { active: isActive })}
+					>
+						Contact
+					</NavLink>
+				</nav>
+				<div className={cx("header-search-user")}>
+					<Input
+						className={cx("header-search")}
+						placeholder="Search something here!"
+						prefix={
+							<FontAwesomeIcon icon={faSearch} style={{ color: " #003459" }} />
+						}
+						allowClear
+					/>
+					<div className={cx("header-user-section")}>
+						{isLoggedIn ? (
+							<>
+								{/* Thêm icon giỏ hàng */}
+								<div className={cx("cart-icon")} onClick={showCartModal}>
+									<Badge count={cartItemCount} size="small">
+										<FontAwesomeIcon
+											icon={faShoppingCart}
+											style={{
+												fontSize: "26px",
+												color: "#003459",
+												marginRight: "15px",
+												cursor: "pointer",
+											}}
+										/>
+									</Badge>
+								</div>
+								<Dropdown menu={{ items: userMenuItems }} trigger={["click"]}>
+									<Space className={cx("user-info")}>
+										<Avatar
+											src={
+												userData && userData.avatarUrl
+													? userData.avatarUrl
+													: null
+											}
+											icon={
+												!userData?.avatarUrl && (
+													<FontAwesomeIcon icon={faUser} />
+												)
+											}
+											className={cx("user-avatar")}
+										/>
+										<span className={cx("username")}>
+											{userData?.username || "Người dùng"}
+										</span>
+									</Space>
+								</Dropdown>
+							</>
+						) : (
+							<div className={cx("auth-buttons")}>
+								<button
+									onClick={() => navigate("/login")}
+									className={cx("login-btn")}
+								>
+									Login
+								</button>
+								<button
+									className={cx("register-btn")}
+									onClick={() => navigate("/register")}
+								>
+									Register
+								</button>
+							</div>
+						)}
+					</div>
+				</div>
+			</div>
+			<CartModal visible={cartModalVisible} onClose={hideCartModal} />
+		</div>
+	);
 }
 
 export default Header;
-
