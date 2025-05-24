@@ -51,24 +51,33 @@ function Header() {
 	};
 
 	useEffect(() => {
-		const updateCartCount = async () => {
-			try {
-				const res = await getCart();
-				const cart = res.data?.items || [];
-				const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-				setCartItemCount(count);
-			} catch (err) {
-				setCartItemCount(0);
-			}
-		};
-
-		updateCartCount();
-		window.addEventListener("cartUpdated", updateCartCount);
-
-		return () => {
-			window.removeEventListener("cartUpdated", updateCartCount);
-		};
-	}, []);
+  const handleCartUpdate = async () => {
+    try {
+      console.log("Header: Handling cart update event");
+      const response = await getCart();
+      if (response && response.success && response.data) {
+        console.log("Header: Updated cart count:", response.data.totalItems);
+        setCartItemCount(response.data.totalItems || 0);
+      } else {
+        console.log("Header: Cart response empty or invalid");
+        setCartItemCount(0);
+      }
+    } catch (error) {
+      console.error("Error updating cart count:", error);
+      setCartItemCount(0);
+    }
+  };
+  
+  // Lắng nghe sự kiện cartUpdated
+  window.addEventListener("cartUpdated", handleCartUpdate);
+  
+  // Fetch cart ngay khi component mount
+  handleCartUpdate();
+  
+  return () => {
+    window.removeEventListener("cartUpdated", handleCartUpdate);
+  };
+}, []);
 
 	// useEffect(() => {
 	// 	// Kiểm tra dữ liệu từ localStorage

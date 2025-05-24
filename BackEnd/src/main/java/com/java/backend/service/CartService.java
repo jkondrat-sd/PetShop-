@@ -18,11 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 import java.util.concurrent.TimeUnit;
-import com.fasterxml.jackson.core.type.TypeReference;
 
 @Service
 @Slf4j
@@ -33,143 +29,216 @@ public class CartService {
     private final PetRepository petRepository;
     private final AccessoryRepository accessoryRepository;
     private final BaseRedisService baseRedisService;
-    
-    // Process cart items (add to cart)
+
     public CartResponse processCart(CartRequest request) {
-        try {
-            UserEntity user = userService.getCurrentUser();
-            log.info("CartService.processCart userId={}, username={}", user.getUserId(), user.getUsername());
-            String cartKey = "cart:" + user.getUserId();
-            log.info("CartService.processCart cartKey={}", cartKey);
-            
-            List<CartItemResponse> cartItems = new ArrayList<>();
-            Double totalAmount = 0.0;
-            Integer totalItems = 0;
-            
-            // Process each item in the cart request
-            for (CartItemRequest item : request.getItems()) {
-                log.info("CartService.processCart processing item: type={}, id={}, quantity={}", 
-                    item.getItemType(), item.getItemId(), item.getQuantity());
-                CartItemResponse cartItem = processCartItem(item);
-                if (cartItem != null) {
-                    cartItems.add(cartItem);
-                    totalAmount += cartItem.getSubtotal();
-                    totalItems += cartItem.getQuantity();
-                }
-            }
-            
-            // Create cart response
-            CartResponse cartResponse = new CartResponse();
-            cartResponse.setItems(cartItems);
-            cartResponse.setTotalAmount(totalAmount);
-            cartResponse.setTotalItems(totalItems);
-            
-            // Save to Redis
-            log.info("CartService.processCart saving to Redis: key={}, items={}", cartKey, cartItems.size());
-            boolean saved = baseRedisService.set(cartKey, cartResponse, 60 * 24, TimeUnit.MINUTES);
-            if (!saved) {
-                log.error("CartService.processCart: Failed to save cart to Redis for user {}", user.getUserId());
-                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR, "Failed to save cart");
-            }
-            
-            return cartResponse;
-        } catch (Exception e) {
-            log.error("Error processing cart: {}", e.getMessage(), e);
-            throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
-        }
-    }
+      try {
+          UserEntity user = userService.getCurrentUser();
+          String cartKey = "cart:" + user.getUserId();
+          log.info("Processing cart for user ID: {}, cartKey: {}", user.getUserId(), cartKey);
+          
+          // Lấy giỏ hàng hiện tại
+          CartResponse currentCart = null;
+          try {
+              currentCart = baseRedisService.get(cartKey, CartResponse.class);
+              log.info("Current cart from Redis: {}", currentCart != null ? 
+                     (currentCart.getItems() != null ? currentCart.getItems().size() + " items" : "null items") 
+                     : "null");
+          } catch (Exception e) {
+              log.error("Error getting cart from Redis", e);
+          }
+          
+          if (currentCart == null) {
+              log.info("Creating new cart");
+              currentCart = new CartResponse(new ArrayList<>(), 0.0, 0);
+          }
+          
+          // Đảm bảo items không null
+          if (currentCart.getItems() == null) {
+              currentCart.setItems(new ArrayList<>());
+          }
+          
+          // Xử lý items từ request
+          if (request.getItems() != null && !request.getItems().isEmpty()) {
+              for (CartItemRequest itemRequest : request.getItems()) {
+                  log.info("Processing item: type={}, id={}, quantity={}", 
+                           itemRequest.getItemType(), itemRequest.getItemId(), itemRequest.getQuantity());
+                  
+                  // Tìm item trong giỏ hiện tại
+                  CartItemResponse existingItem = null;
+                  for (CartItemResponse item : currentCart.getItems()) {
+                      if (itemRequest.getItemType().equalsIgnoreCase(item.getItemType()) &&
+                          itemRequest.getItemId().equals(item.getItemId())) {
+                          existingItem = item;
+                          break;
+                      }
+                  }
+                  
+                  // Xử lý theo quantity
+                  if (itemRequest.getQuantity() <= 0) {
+                      // Xóa item
+                      if (existingItem != null) {
+                          currentCart.getItems().remove(existingItem);
+                          log.info("Removed item from cart: {}", existingItem.getName());
+                      }
+                  } else if (existingItem != null) {
+                      // Cập nhật số lượng
+                      if ("accessory".equalsIgnoreCase(itemRequest.getItemType())) {
+                          existingItem.setQuantity(itemRequest.getQuantity());
+                          existingItem.setSubtotal(existingItem.getPrice() * itemRequest.getQuantity());
+                          log.info("Updated item quantity: {} = {}", existingItem.getName(), existingItem.getQuantity());
+                      }
+                  } else {
+                      // Thêm item mới
+                      CartItemResponse newItem = createCartItem(itemRequest);
+                      if (newItem != null) {
+                          currentCart.getItems().add(newItem);
+                          log.info("Added new item to cart: {}", newItem.getName());
+                      }
+                  }
+              }
+          }
+          
+          // Tính lại tổng
+          double totalAmount = 0.0;
+          int totalItems = 0;
+          for (CartItemResponse item : currentCart.getItems()) {
+              totalAmount += item.getSubtotal();
+              totalItems += item.getQuantity();
+          }
+          currentCart.setTotalAmount(totalAmount);
+          currentCart.setTotalItems(totalItems);
+          
+          // Lưu giỏ hàng
+          log.info("Saving cart to Redis: {} items, total: {}", 
+                  currentCart.getItems().size(), currentCart.getTotalAmount());
+          
+          // In ra từng item trong giỏ hàng (để debug)
+          for (CartItemResponse item : currentCart.getItems()) {
+              log.info("Item in cart: type={}, id={}, name={}, price={}, quantity={}, subtotal={}",
+                      item.getItemType(), item.getItemId(), item.getName(), 
+                      item.getPrice(), item.getQuantity(), item.getSubtotal());
+          }
+          
+          baseRedisService.set(cartKey, currentCart, 24 * 60, TimeUnit.MINUTES);
+          
+          // Kiểm tra lưu trữ thành công
+          CartResponse savedCart = baseRedisService.get(cartKey, CartResponse.class);
+          if (savedCart != null) {
+              log.info("Verified cart saved in Redis: {} items", 
+                      savedCart.getItems() != null ? savedCart.getItems().size() : 0);
+          } else {
+              log.error("Failed to save cart to Redis");
+          }
+          
+          return currentCart;
+      } catch (Exception e) {
+          log.error("Error processing cart", e);
+          throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+      }
+  }
     
-    // Get cart from Redis
+    // Sửa lại phương thức getCart
     public CartResponse getCart() {
         try {
             UserEntity user = userService.getCurrentUser();
-            if (user == null) {
-                log.error("CartService.getCart: User not found");
-                throw new AppException(ErrorCode.UNAUTHORIZED);
-            }
+            log.info("Getting cart for user ID: {}, username: {}", user.getUserId(), user.getUsername());
             
-            log.info("CartService.getCart userId={}, username={}", user.getUserId(), user.getUsername());
             String cartKey = "cart:" + user.getUserId();
-            log.info("CartService.getCart cartKey={}", cartKey);
             
-            CartResponse cart = baseRedisService.get(cartKey, new TypeReference<CartResponse>() {});
-            log.info("CartService.getCart result from Redis: {}", cart != null ? "found" : "not found");
+            // QUAN TRỌNG: Luôn sử dụng Class<T> chứ không dùng TypeReference<T>
+            CartResponse cart = baseRedisService.get(cartKey, CartResponse.class);
             
             if (cart == null) {
-                log.info("CartService.getCart: No cart found for user {}, returning empty cart", user.getUserId());
+                log.info("No cart found in Redis for user {}", user.getUserId());
                 return new CartResponse(new ArrayList<>(), 0.0, 0);
             }
             
-            // Validate cart data
+            log.info("Retrieved cart from Redis: {} items, total: {}", 
+                cart.getItems() != null ? cart.getItems().size() : 0, 
+                cart.getTotalAmount());
+            
+            // Đảm bảo các trường không null
             if (cart.getItems() == null) {
-                log.warn("CartService.getCart: Cart items is null for user {}, returning empty cart", user.getUserId());
-                return new CartResponse(new ArrayList<>(), 0.0, 0);
+                cart.setItems(new ArrayList<>());
             }
             
             return cart;
-        } catch (AppException e) {
-            log.error("CartService.getCart: AppException occurred", e);
-            throw e;
+            
         } catch (Exception e) {
-            log.error("CartService.getCart: Unexpected error occurred", e);
+            log.error("Error getting cart", e);
+            return new CartResponse(new ArrayList<>(), 0.0, 0);
+        }
+    }
+    
+    // Sửa lại phương thức clearCart
+    public void clearCart() {
+        try {
+            UserEntity user = userService.getCurrentUser();
+            String cartKey = "cart:" + user.getUserId();
+            
+            baseRedisService.deleteKey(cartKey);
+            log.info("Cleared cart for user ID: {}", user.getUserId());
+            
+        } catch (Exception e) {
+            log.error("Error clearing cart", e);
             throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
     
-    // Clear cart
-    public void clearCart() {
-        UserEntity user = userService.getCurrentUser();
-        String cartKey = "cart:" + user.getUserId();
-        baseRedisService.deleteKey(cartKey);
-    }
-    
-    // Process individual cart item
-    private CartItemResponse processCartItem(CartItemRequest item) {
-        if ("pet".equals(item.getItemType())) {
-            PetEntity pet = petRepository.findById(item.getItemId())
-                    .orElseThrow(() -> new AppException(ErrorCode.PET_NOT_FOUND));
-            
-            if (!"available".equals(pet.getStatus())) {
-                throw new AppException(ErrorCode.BAD_REQUEST, "Pet is not available");
-            }
-            
-            double subtotal = pet.getUnitPrice();
-            
-            return CartItemResponse.builder()
-                    .itemType("pet")
-                    .itemId(pet.getPetId())
-                    .name(pet.getPetName())
-                    .thumbnail(pet.getThumbnail())
-                    .price(pet.getUnitPrice())
-                    .quantity(1) // Only can buy 1 pet at a time
-                    .subtotal(subtotal)
-                    .build();
-                    
-        } else if ("accessory".equals(item.getItemType())) {
-            AccessoryEntity accessory = accessoryRepository.findById(item.getItemId())
-                    .orElseThrow(() -> new AppException(ErrorCode.ACCESSORY_NOT_FOUND));
-            
-            if (!"active".equals(accessory.getStatus())) {
-                throw new AppException(ErrorCode.BAD_REQUEST, "Accessory is not active");
-            }
-            
-            if (accessory.getStockQuantity() < item.getQuantity()) {
-                throw new AppException(ErrorCode.OUT_OF_STOCK, "Insufficient stock for " + accessory.getAccessoryName());
-            }
-            
-            double subtotal = accessory.getUnitPrice() * item.getQuantity();
-            
-            return CartItemResponse.builder()
-                    .itemType("accessory")
-                    .itemId(accessory.getAccessoryId())
-                    .name(accessory.getAccessoryName())
-                    .thumbnail(accessory.getThumbnail())
-                    .price(accessory.getUnitPrice())
-                    .quantity(item.getQuantity())
-                    .subtotal(subtotal)
-                    .build();
-        }
-        
-        return null;
-    }
+    // Phương thức trợ giúp để tạo CartItemResponse từ CartItemRequest
+    private CartItemResponse createCartItem(CartItemRequest request) {
+      try {
+          log.info("Creating cart item with type={}, id={}, quantity={}", 
+                  request.getItemType(), request.getItemId(), request.getQuantity());
+          
+          if ("pet".equalsIgnoreCase(request.getItemType())) {
+              PetEntity pet = petRepository.findById(request.getItemId())
+                  .orElseThrow(() -> {
+                      log.error("Pet not found with ID: {}", request.getItemId());
+                      return new AppException(ErrorCode.PET_NOT_FOUND);
+                  });
+              
+              CartItemResponse item = CartItemResponse.builder()
+                  .itemId(pet.getPetId())
+                  .itemType("pet")
+                  .name(pet.getPetName())
+                  .price(pet.getUnitPrice())
+                  .quantity(1) // Pet luôn có số lượng 1
+                  .subtotal(pet.getUnitPrice())
+                  .thumbnail(pet.getThumbnail())
+                  .build();
+                  
+              log.info("Created pet cart item: {}", item.getName());
+              return item;
+              
+          } else if ("accessory".equalsIgnoreCase(request.getItemType())) {
+              AccessoryEntity accessory = accessoryRepository.findById(request.getItemId())
+                  .orElseThrow(() -> {
+                      log.error("Accessory not found with ID: {}", request.getItemId());
+                      return new AppException(ErrorCode.ACCESSORY_NOT_FOUND);
+                  });
+              
+              CartItemResponse item = CartItemResponse.builder()
+                  .itemId(accessory.getAccessoryId())
+                  .itemType("accessory")
+                  .name(accessory.getAccessoryName())
+                  .price(accessory.getUnitPrice())
+                  .quantity(request.getQuantity())
+                  .subtotal(accessory.getUnitPrice() * request.getQuantity())
+                  .thumbnail(accessory.getThumbnail())
+                  .build();
+                  
+              log.info("Created accessory cart item: {}", item.getName());
+              return item;
+          } else {
+              log.warn("Invalid item type: {}", request.getItemType());
+              throw new AppException(ErrorCode.BAD_REQUEST);
+          }
+      } catch (AppException e) {
+          throw e; // Rethrow AppException
+      } catch (Exception e) {
+          log.error("Unexpected error creating cart item", e);
+          throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+      }
+  }
 }

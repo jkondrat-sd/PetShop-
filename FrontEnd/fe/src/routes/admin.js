@@ -2,7 +2,7 @@ import { Navigate } from "react-router-dom";
 import PrivateRoutesAdmin from "~/components/ui/PrivateRoutesAdmin";
 import config from "~/config";
 import DefaultLayout from "~/layouts/admin/DefaultLayout";
-import Dashboard from "~/pages/admin/dashboard/Dashboard";
+// import Dashboard from "~/pages/admin/dashboard/Dashboard";
 import Login from "~/pages/admin/auth/Login";
 import Logout from "~/pages/admin/auth/Logout";
 import Users from "~/pages/admin/user/Users";
@@ -32,7 +32,7 @@ const RoutesAdmin = [
           },
           {
             path: config.routesAdmin.dashboard,
-            element: <Dashboard />,
+            // element: <Dashboard />,
           },
           // {
           //   path: "users",

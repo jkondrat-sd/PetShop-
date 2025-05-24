@@ -12,48 +12,21 @@ const request = axios.create({
   // timeout: 10000, // 10 seconds timeout
 });
 
-// Response interceptor for handling common responses
-request.interceptors.response.use(
-  (response) => response.data,
-  (error) => {
-    if (error.response) {
-      // Xử lý lỗi 401 hoặc 403
-      if (error.response.status === 401 || error.response.status === 403) {
-        console.log('Authentication error:', error.response.status);
-        
-        // Xóa token và userData
-        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        localStorage.removeItem('userData');
-        
-        // Dispatch action để cập nhật Redux state (cần import store)
-        // store.dispatch(checkLogin(false, null));
-        
-        // Hiển thị thông báo
-        message.error('Your session has expired. Please log in again.');
-        
-        // Redirect đến trang login sau 1 giây
-        setTimeout(() => {
-          window.location.href = '/login';
-        }, 1000);
-      }
-    }
-    console.error("API Error:", error.response?.data || error.message);
-    throw error;
-  }
-);
-
-// Thêm interceptor để tự động gắn token vào mỗi request
+// Đảm bảo request.interceptors.request.use đang xử lý token đúng cách
 request.interceptors.request.use(
   (config) => {
-    // Tìm token từ cookie hoặc localStorage
-    const token = getCookie("token") || localStorage.getItem('token');
+    // Kiểm tra token một cách chắc chắn hơn
+    const token = getCookie('token'); // Sử dụng helper function thay vì parse trực tiếp
     
     if (token) {
-      // Đảm bảo token được định dạng đúng
-      // console.log("Using token:", token.substring());
+      console.log('Using token: Valid token present');
       config.headers.Authorization = `Bearer ${token}`;
     } else {
-      console.warn("No authentication token available");
+      console.log('No authentication token found');
+      // Nếu là API cần authentication, có thể redirect đến trang login
+      if (config.url.includes('/cart') || config.url.includes('/orders')) {
+        // Có thể xử lý chuyển hướng hoặc thông báo ở đây
+      }
     }
     
     return config;
@@ -62,6 +35,40 @@ request.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
+// Cập nhật interceptor response để xử lý chi tiết lỗi từ server
+request.interceptors.response.use(
+  (response) => response.data,
+  (error) => {
+    if (error.response) {
+      // Lấy thông tin chi tiết về lỗi
+      const statusCode = error.response.status;
+      const responseData = error.response.data;
+      
+      console.error('API Error:', {
+        status: statusCode,
+        url: error.config.url,
+        method: error.config.method,
+        data: responseData
+      });
+      
+      // Xử lý các loại lỗi cụ thể
+      if (statusCode === 401) {
+        console.log('Authentication error - redirecting to login');
+        // Có thể redirect đến trang đăng nhập hoặc refresh token ở đây
+      } else if (statusCode === 500) {
+        console.error('Server error:', responseData);
+      }
+    } else if (error.request) {
+      console.error('No response received:', error.request);
+    } else {
+      console.error('Request configuration error:', error.message);
+    }
+    
+    return Promise.reject(error);
+  }
+);
+
 
 export const get = async (path, params = {}) => {
   try {
