@@ -1,0 +1,31 @@
+.order-list-page {
+  padding: 24px;
+  background: #fff;
+  border-radius: 8px;
+  min-height: 80vh;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  .order-list-title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: #1890ff;
+    letter-spacing: 1px;
+    text-align: left;
+  }
+  .ant-table {
+    background: #fafcff;
+    border-radius: 8px;
+    .ant-table-thead > tr > th {
+      background: #e6f7ff;
+      font-weight: 600;
+      color: #1890ff;
+    }
+    .ant-table-tbody > tr:hover > td {
+      background: #f0f5ff;
+      transition: background 0.2s;
+    }
+  }
+  .ant-btn {
+    border-radius: 4px;
+  }
+} 

@@ -15,6 +15,10 @@ import AccessoryList from "~/pages/admin/accessories/AccessoryList";
 import CreateAccessory from "~/pages/admin/accessories/CreateAccessory";
 import EditAccessory from "~/pages/admin/accessories/EditAccessory";
 import AccessoryDetails from "~/pages/admin/accessories/AccessoryDetails";
+import OrderList from '~/pages/admin/Orders/OrderList';
+import OrderDetails from '~/pages/admin/Orders/OrderDetails';
+import UserList from '~/pages/admin/users/UserList';
+import UserDetails from '~/pages/admin/users/UserDetails';
 
 const RoutesAdmin = [
   //Public route
@@ -98,6 +102,22 @@ const RoutesAdmin = [
               },
             ],
           },
+          {
+            path: "orders",
+            children: [
+              { path: "", element: <Navigate to="list" replace /> },
+              { path: "list", element: <OrderList /> },
+              { path: ":id", element: <OrderDetails /> },
+            ],
+          },
+          {
+            path: "users",
+            children: [
+              { path: "", element: <Navigate to="list" replace /> },
+              { path: "list", element: <UserList /> },
+              { path: ":id", element: <UserDetails /> },
+            ],
+          }, 
           // Thêm các route khác tại đây
         ],
       },

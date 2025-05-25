@@ -83,3 +83,33 @@ export const processPayment = async (orderId, paymentData) => {
     throw error;
   }
 };
+
+export const getAllOrders = async (params = {}) => {
+  try {
+    const response = await request.get('/orders/admin/all', {
+      params: {
+        status: params.status,
+        page: params.page || 0,
+        size: params.size || 10,
+      }
+    });
+    if (!response || !response.success) {
+      throw new Error(response?.message || 'Failed to get orders');
+    }
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateOrderStatus = async (orderId, status) => {
+  try {
+    const response = await request.put(`/orders/admin/${orderId}/status?status=${status}`);
+    if (!response || !response.success) {
+      throw new Error(response?.message || 'Failed to update order status');
+    }
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
