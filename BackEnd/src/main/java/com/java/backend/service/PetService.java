@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -112,7 +113,7 @@ public class PetService {
     }
 
     try {
-      Pageable pageable = PageRequest.of(page, size);
+      Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
       Page<PetEntity> petPage;
 
       if (type != null && breedId != null) {

@@ -1,31 +1,121 @@
 .sidebar {
-  height: 100%;
+  overflow: auto;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 100;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+  background: linear-gradient(180deg, #ffffff 0%, #f9f9f9 100%);
+  
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+  }
+  
+  .logoContainer {
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 24px;
+    margin-bottom: 16px;
+    background: white;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+    transition: all 0.3s;
+    
+    &.collapsed {
+      padding: 0 24px;
+      justify-content: center;
+    }
+  }
   
   .menu {
-    border-right: none;
+    border: none;
+    padding: 12px 8px;
     
     :global {
-      .ant-menu-item {
-        height: 50px;
-        line-height: 50px;
-        margin: 4px 8px;
+      .ant-menu-item, 
+      .ant-menu-submenu-title {
+        height: 46px;
+        line-height: 46px;
+        margin: 4px 0;
         border-radius: 8px;
-        transition: all 0.3s ease;
+        transition: all 0.3s;
+        font-weight: 500;
         
+        .anticon {
+          font-size: 16px;
+        }
+      }
+      
+      .ant-menu-item {        
         &:hover {
-          background-color: #f0f2f5;
+          background-color: rgba(24, 144, 255, 0.08);
+          color: #1890ff;
+          transform: translateX(5px);
         }
 
         &.ant-menu-item-selected {
-          background-color: #e6f4ff;
-          color: #1890ff;
-          font-weight: 500;
+          background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%);
+          color: white;
+          font-weight: 600;
+          box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+          
+          &:hover {
+            transform: translateX(0);
+          }
         }
+      }
 
-        .anticon {
-          font-size: 18px;
+      .ant-menu-submenu {
+        .ant-menu-submenu-title {
+          &:hover {
+            background-color: rgba(24, 144, 255, 0.08);
+            color: #1890ff;
+          }
         }
       }
     }
+  }
+}
+
+// Add smooth motion for menu items
+@for $i from 1 through 10 {
+  .menu :global(.ant-menu-item:nth-child(#{$i})),
+  .menu :global(.ant-menu-submenu:nth-child(#{$i})) {
+    animation: fadeInItem 0.3s ease-out;
+    animation-delay: #{$i * 0.05}s;
+    animation-fill-mode: both;
+  }
+}
+
+@keyframes fadeInItem {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    z-index: 999;
+    box-shadow: 0 0 28px rgba(0, 0, 0, 0.1);
   }
 }

@@ -41,7 +41,7 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/api/auth/**").permitAll()
-                    .requestMatchers("/api/pets/**", "/api/accessories/**", "/api/categories/**").permitAll()
+                    .requestMatchers("/api/pets/**", "/api/accessories/**", "/api/categories/**", "/api/breeds/**").permitAll()
                     .requestMatchers("/api/suppliers/**", "/api/customers/register").permitAll()
                     .requestMatchers("/api/reviews/public/**").permitAll()
                     // Add these lines for Swagger UI access

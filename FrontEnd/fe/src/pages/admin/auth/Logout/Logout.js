@@ -1,15 +1,19 @@
 import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 import { deleteCookie } from "~/helpers/cookie";
+import { checkLogin } from "~/redux/actions/login";
 
 function Logout() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   useEffect(() => {
     deleteCookie("token");
-    navigate("/admin/auth/login", { replace: true });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    dispatch(checkLogin(false));
+    navigate("/");
+  }, [dispatch, navigate]);
 
   return <></>;
 }

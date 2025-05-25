@@ -2,14 +2,19 @@ import { Navigate } from "react-router-dom";
 import PrivateRoutesAdmin from "~/components/ui/PrivateRoutesAdmin";
 import config from "~/config";
 import DefaultLayout from "~/layouts/admin/DefaultLayout";
-// import Dashboard from "~/pages/admin/dashboard/Dashboard";
+import Dashboard from "~/pages/admin/Dashboard/Dashboard";
+import PetsList from "~/pages/admin/pets/PetList";
+import CreatePet from "~/pages/admin/pets/CreatePet";
+import EditPet from "~/pages/admin/pets/EditPet";
+import PetDetails from "~/pages/admin/pets/PetDetails";
 import Login from "~/pages/admin/auth/Login";
-import Logout from "~/pages/admin/auth/Logout";
-import Users from "~/pages/admin/user/Users";
+import Logout from "~/pages/admin/auth/Logout/Logout";
 import Page404 from "~/pages/Page404";
-
 import Roles from "~/pages/admin/role/Roles";
-
+import AccessoryList from "~/pages/admin/accessories/AccessoryList";
+import CreateAccessory from "~/pages/admin/accessories/CreateAccessory";
+import EditAccessory from "~/pages/admin/accessories/EditAccessory";
+import AccessoryDetails from "~/pages/admin/accessories/AccessoryDetails";
 
 const RoutesAdmin = [
   //Public route
@@ -32,65 +37,33 @@ const RoutesAdmin = [
           },
           {
             path: config.routesAdmin.dashboard,
-            // element: <Dashboard />,
+            element: <Dashboard />,
           },
-          // {
-          //   path: "users",
-          //   children: [
-          //     { path: "", element: <Users /> },
-          //     {
-          //       path: "detail/:id",
-          //       element: <UserDetail />,
-          //     },
-          //   ],
-          // },
-          // {
-          //   path: "documents",
-          //   children: [
-          //     {
-          //       path: "",
-          //       element: <AllDocument />,
-          //     },
-          //     {
-          //       path: "search",
-          //       element: <AllDocument />,
-          //     },
-          //     {
-          //       path: "top-document",
-          //       element: <TopDocuments />,
-          //     },
-          //     {
-          //       path: "all-tag",
-          //       element: <Tags />,
-          //     },
-          //     {
-          //       path: "detail/:id",
-          //       element: <DocumentDetail />,
-          //     },
-          //     {
-          //       path: "upload",
-          //       element: <Upload />,
-          //     },
-          //   ],
-          // },
-          // {
-          //   path: "categories",
-          //   children: [
-          //     {
-          //       path: "",
-          //       element: <Categories />,
-          //     },
-          //     {
-          //       path: "search",
-          //       element: <Categories />,
-          //     },
-          //     {
-          //       path: "detail/:categoryId/documents",
-          //       element: <AllDocument />,
-          //     },
-          //   ],
-          // },
-          
+          {
+            path: "pets",
+            children: [
+              {
+                path: "",
+                element: <Navigate to="list" replace />,
+              },
+              {
+                path: "list",
+                element: <PetsList />,
+              },
+              {
+                path: "create",
+                element: <CreatePet />,
+              },
+              {
+                path: "edit/:id",
+                element: <EditPet />,
+              },
+              {
+                path: ":id",
+                element: <PetDetails />,
+              },
+            ],
+          },
           {
             path: "roles",
             children: [
@@ -100,6 +73,32 @@ const RoutesAdmin = [
               },
             ],
           },
+          {
+            path: "accessories",
+            children: [
+              {
+                path: "",
+                element: <Navigate to="list" replace />,
+              },
+              {
+                path: "list",
+                element: <AccessoryList />,
+              },
+              {
+                path: "create",
+                element: <CreateAccessory />,
+              },
+              {
+                path: "edit/:id",
+                element: <EditAccessory />,
+              },
+              {
+                path: ":id",
+                element: <AccessoryDetails />,
+              },
+            ],
+          },
+          // Thêm các route khác tại đây
         ],
       },
     ],

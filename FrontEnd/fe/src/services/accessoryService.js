@@ -113,10 +113,6 @@ export const uploadAccessoryImages = async (accessoryId, files) => {
       }
     });
     
-    if (!response || !response.success) {
-      throw new Error(response?.message || 'Failed to upload accessory images');
-    }
-    
     return response.data;
   } catch (error) {
     console.error('Upload accessory images error:', error);
@@ -134,10 +130,6 @@ export const uploadAccessoryThumbnail = async (accessoryId, file) => {
         'Content-Type': 'multipart/form-data'
       }
     });
-    
-    if (!response || !response.success) {
-      throw new Error(response?.message || 'Failed to upload accessory thumbnail');
-    }
     
     return response.data;
   } catch (error) {

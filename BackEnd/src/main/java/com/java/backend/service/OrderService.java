@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -104,7 +105,7 @@ public class OrderService {
     
     public Pagination<OrderResponse> getUserOrders(int page, int size) {
         UserEntity currentUser = userService.getCurrentUser();
-        Page<OrderEntity> orderPage = orderRepository.findByUser_UserId(currentUser.getUserId(), PageRequest.of(page, size));
+        Page<OrderEntity> orderPage = orderRepository.findByUser_UserId(currentUser.getUserId(), PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "orderDate")));
         
         List<OrderResponse> orders = orderPage.getContent()
                 .stream()
@@ -169,9 +170,9 @@ public class OrderService {
         Page<OrderEntity> orderPage;
         
         if (status != null && !status.isEmpty()) {
-            orderPage = orderRepository.findByStatus(status, PageRequest.of(page, size));
+            orderPage = orderRepository.findByStatus(status, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "orderDate")));
         } else {
-            orderPage = orderRepository.findAll(PageRequest.of(page, size));
+            orderPage = orderRepository.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "orderDate")));
         }
         
         List<OrderResponse> orders = orderPage.getContent()

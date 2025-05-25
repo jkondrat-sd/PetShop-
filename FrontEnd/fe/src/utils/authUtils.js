@@ -1,20 +1,29 @@
 import { getCookie } from "~/helpers/cookie";
 
+// Phân tích JWT token để lấy quyền người dùng
 export const getUserScopes = () => {
   const token = getCookie("token");
-  if (token) {
-    try {
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      return payload.scope ? payload.scope.split(" ") : [];
-    } catch (error) {
-      console.error("Error decoding token:", error);
-      return [];
+  if (!token) return [];
+  
+  try {
+    const tokenPayload = token.split('.')[1];
+    const decodedPayload = JSON.parse(atob(tokenPayload));
+    
+    // Đảm bảo luôn trả về mảng
+    if (Array.isArray(decodedPayload.roles)) {
+      return decodedPayload.roles;
     }
+    if (typeof decodedPayload.roles === "string") {
+      return [decodedPayload.roles];
+    }
+    return [];
+  } catch (error) {
+    console.error("Không thể giải mã token:", error);
+    return [];
   }
-  return [];
 };
 
-// Kiểm tra ít nhất một scope trong danh sách requiredScopes
-export const hasScope = (scopes, ...requiredScopes) => {
-  return requiredScopes.some((scope) => scopes.includes(scope));
+// Kiểm tra xem người dùng có quyền cụ thể không
+export const hasScope = (scopes, requiredScope) => {
+  return scopes.includes(requiredScope);
 };

@@ -1,120 +1,142 @@
+import React, { useState, useEffect } from "react";
+import { Layout, Menu } from "antd";
 import {
-  HomeOutlined,
-  UserOutlined,
-  FileTextOutlined,
-  FolderOutlined,
-  SafetyOutlined,
-  BookOutlined,
+	DashboardOutlined,
+	ShopOutlined,
+	TagsOutlined,
+	ShoppingCartOutlined,
+	UserOutlined,
+	CommentOutlined,
+	AppstoreOutlined,
+	FileTextOutlined,
+	PieChartOutlined,
+	TeamOutlined,
+	LockOutlined,
 } from "@ant-design/icons";
-import { useNavigate, useLocation } from "react-router-dom";
-import { Menu } from "antd";
-import classNames from "classnames/bind";
-
+import { useLocation, useNavigate } from "react-router-dom";
+import Logo from "../Logo";
 import styles from "./SideBar.module.scss";
-import config from "~/config";
 
-const cx = classNames.bind(styles);
+const { Sider } = Layout;
 
-function Sidebar() {
-  const navigate = useNavigate();
-  const location = useLocation();
+const Sidebar = ({ collapsed }) => {
+	const navigate = useNavigate();
+	const location = useLocation();
+	const [selectedKeys, setSelectedKeys] = useState([]);
 
-  const menuItems = [
-    {
-      key: config.routesAdmin.dashboard,
-      icon: <HomeOutlined />,
-      label: "Tổng quan",
-      onClick: () => navigate(config.routesAdmin.dashboard),
-    },
-    {
-      key: "users",
-      icon: <UserOutlined />,
-      label: "Người dùng",
-      children: [
-        {
-          key: config.routesAdmin.users.list,
-          label: "Danh sách người dùng",
-          onClick: () => navigate(config.routesAdmin.users.list),
-        },
-      ],
-    },
-    {
-      key: "documents",
-      icon: <FileTextOutlined />,
-      label: "Tài liệu",
-      children: [
-        {
-          key: "/admin/documents",
-          label: "Tất cả tài liệu",
-          onClick: () => navigate("/admin/documents"),
-        },
-        {
-          key: "/admin/documents/top-document",
-          label: "Tài liệu nổi bật",
-          onClick: () => navigate("/admin/documents/top-document"),
-        },
-        {
-          key: "/admin/documents/upload",
-          label: "Tải lên tài liệu",
-          onClick: () => navigate("/admin/documents/upload"),
-        },
-        {
-          key: '/admin/documents/all-tag',
-          label: "Tất cả thẻ tag",
-          onClick: () => navigate('/admin/documents/all-tag'),
-        }
-      ],
-    },
-    {
-      key: "categories",
-      icon: <BookOutlined />,
-      label: "Danh mục",
-      children: [
-        {
-          key: "/admin/categories",
-          label: "Danh sách danh mục",
-          onClick: () => navigate("/admin/categories"),
-        },
-      ],
-    },
-    {
-      key: "libraries",
-      icon: <FolderOutlined />,
-      label: "Thư viện",
-      children: [
-        {
-          key: "/admin/library",
-          label: "Danh sách thư viện",
-          onClick: () => navigate("/admin/library"),
-        },
-      ],
-    },
-    {
-      key: "roles",
-      icon: <SafetyOutlined />,
-      label: "Phân quyền",
-      children: [
-        {
-          key: "/admin/roles",
-          label: "Vai trò",
-          onClick: () => navigate("/admin/roles"),
-        },
-      ],
-    },
-  ];
+	useEffect(() => {
+		const pathName = location.pathname;
+		const key = pathName.split("/").slice(0, 3).join("/");
+		setSelectedKeys([key]);
+	}, [location.pathname]);
 
-  return (
-    <div className={cx("sidebar")}>
-      <Menu
-        mode="inline"
-        theme="light"
-        selectedKeys={[location.pathname]}
-        defaultOpenKeys={[location.pathname.split("/")[2]]}
-        items={menuItems}
-        className={cx("menu")}
-      />
-    </div>
-  );
-}
+	const menuItems = [
+		{
+			key: "/admin/dashboard",
+			icon: <DashboardOutlined />,
+			label: "Dashboard",
+		},
+		{
+			key: "/admin/pets",
+			icon: <ShopOutlined />,
+			label: "Pets",
+			children: [
+				{
+					key: "/admin/pets",
+					label: "Pet List",
+				},
+				{
+					key: "/admin/pets/create",
+					label: "Add New Pet",
+				},
+				{
+					key: "/admin/breeds",
+					label: "Breed Management",
+				},
+			],
+		},
+		// Update other menu items similarly
+		{
+			key: "/admin/accessories",
+			icon: <AppstoreOutlined />,
+			label: "Accessories",
+			children: [
+				{
+					key: "/admin/accessories/list",
+					label: "Accessories List",
+				},
+				{
+					key: "/admin/accessories/create",
+					label: "Add New Accessory",
+				},
+			],
+		},
+		{
+			key: "/admin/categories",
+			icon: <TagsOutlined />,
+			label: "Categories",
+		},
+		{
+			key: "/admin/orders",
+			icon: <ShoppingCartOutlined />,
+			label: "Orders",
+		},
+		{
+			key: "/admin/users",
+			icon: <UserOutlined />,
+			label: "Users",
+		},
+		{
+			key: "/admin/roles",
+			icon: <LockOutlined />,
+			label: "Roles",
+		},
+		{
+			key: "/admin/reviews",
+			icon: <CommentOutlined />,
+			label: "Reviews",
+		},
+		{
+			key: "/admin/reports",
+			icon: <PieChartOutlined />,
+			label: "Reports",
+			children: [
+				{
+					key: "/admin/reports/sales",
+					label: "Sales Report",
+				},
+				{
+					key: "/admin/reports/inventory",
+					label: "Inventory Report",
+				},
+			],
+		},
+	];
+
+	return (
+		<Sider
+			width={256}
+			collapsible
+			collapsed={collapsed}
+			trigger={null}
+			theme="light"
+			className={styles.sidebar}
+			breakpoint="lg"
+			collapsedWidth="80"
+		>
+			<div className={styles.logoContainer}>
+				<Logo collapsed={collapsed} />
+			</div>
+
+			<Menu
+				mode="inline"
+				selectedKeys={selectedKeys}
+				className={styles.menu}
+				onClick={({ key }) => navigate(key)}
+				items={menuItems}
+			/>
+		</Sider>
+	);
+};
 
 export default Sidebar;

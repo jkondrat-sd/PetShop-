@@ -5,9 +5,10 @@ import { useEffect, useState } from "react";
 import styles from "./Login.module.scss";
 import { login } from "~/services/authService";
 import { getCookie, setCookie } from "~/helpers/cookie";
-import { useDispatch } from "react-redux";
-import { showAlert } from "~/redux/actions/alert";
+import { useDispatch, useSelector } from "react-redux";
+import { showAlert } from "../../../../redux/actions/alert";
 import { getUserScopes, hasScope } from "~/utils/authUtils";
+import { checkLogin } from "../../../../redux/actions/login";
 
 const cx = classNames.bind(styles);
 
@@ -32,19 +33,23 @@ function Login() {
       const response = await login(username, password);
 
       if (response && response.token) {
-        // Set token
         setCookie("token", response.token);
-
-        // Lấy scopes sau khi có token mới
+        const userData = {
+          username: username,
+          fullName: username,
+        };
+        localStorage.setItem("userData", JSON.stringify(userData));
+        dispatch(checkLogin(true, userData));
         const newScopes = getUserScopes();
+        console.log("newScopes:", newScopes);
+        console.log("isAdmin:", hasScope(newScopes, "ROLE_ADMIN"));
 
         if (hasScope(newScopes, "ROLE_ADMIN")) {
-          dispatch(showAlert("Đăng nhập thành công!", "success"));
-          await navigate("/admin");
+          await navigate("/admin/dashboard");
         } else {
-          dispatch(showAlert("Bạn không có quyền truy cập", "error"));
-          navigate("/admin/auth/login");
+          await navigate("/");
         }
+        dispatch(showAlert("Đăng nhập thành công!", "success"));
       } else {
         throw new Error("Đăng nhập thất bại");
       }
@@ -63,29 +68,29 @@ function Login() {
           <h2 className={cx("text")}>Đăng nhập</h2>
           <div className={cx("email")}>
             <label htmlFor="email">Tài khoản: </label>
-            <input 
-              type="text" 
-              id="email" 
+            <input
+              type="text"
+              id="email"
               placeholder="Nhập email"
               disabled={loading}
             />
           </div>
           <div className={cx("password")}>
             <label htmlFor="password">Mật khẩu: </label>
-            <input 
-              type="password" 
-              id="password" 
+            <input
+              type="password"
+              id="password"
               placeholder="Nhập mật khẩu"
               disabled={loading}
             />
           </div>
           <div>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className={cx("buttonSubmit")}
               disabled={loading}
             >
-              {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+              {loading ? "Đang đăng nhập..." : "Đăng nhập"}
             </button>
           </div>
         </form>

@@ -1,0 +1,195 @@
+.pets-list-page {
+  padding: 32px 0;
+  
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    
+    .page-title {
+      margin-bottom: 0;
+      position: relative;
+      font-weight: 600;
+      color: #2c3e50;
+      display: inline-block;
+      
+      &:after {
+        content: "";
+        position: absolute;
+        width: 60%;
+        height: 3px;
+        background: linear-gradient(to right, #3498db, transparent);
+        bottom: -8px;
+        left: 0;
+        border-radius: 2px;
+      }
+    }
+    
+    .add-button {
+      border-radius: 8px;
+      height: 42px;
+      font-weight: 500;
+      box-shadow: 0 4px 8px rgba(52, 152, 219, 0.25);
+      transition: all 0.3s;
+      
+      &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(52, 152, 219, 0.35);
+      }
+    }
+  }
+  
+  .list-card {
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    
+    .filter-row {
+      margin-bottom: 24px;
+      
+      .ant-select, .ant-input-affix-wrapper {
+        border-radius: 6px;
+        
+        &:hover, &:focus {
+          border-color: #3498db;
+        }
+      }
+      
+      .search-input {
+        .ant-input-prefix {
+          color: #bfbfbf;
+        }
+        
+        .ant-input {
+          padding-left: 12px;
+        }
+      }
+      
+      .action-col {
+        display: flex;
+        justify-content: flex-end;
+        
+        .filter-actions {
+          button {
+            border-radius: 6px;
+            height: 32px;
+            transition: all 0.25s;
+            
+            &:hover {
+              transform: translateY(-2px);
+            }
+          }
+        }
+      }
+    }
+    
+    .data-table {
+      .ant-table {
+        border-radius: 10px;
+        overflow: hidden;
+        
+        .ant-table-content {
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+      }
+      
+      .ant-table-thead > tr > th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        color: #2c3e50;
+        padding: 14px 16px;
+      }
+      
+      .ant-table-tbody > tr {
+        transition: all 0.3s;
+        
+        &:hover {
+          background-color: #f0f7ff !important;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+          z-index: 1;
+        }
+        
+        td {
+          vertical-align: middle;
+          padding: 12px 16px;
+        }
+      }
+      
+      .pet-name {
+        font-weight: 500;
+        color: #34495e;
+      }
+      
+      .pet-price {
+        font-weight: 600;
+        color: #e67e22;
+      }
+      
+      .action-buttons {
+        display: flex;
+        justify-content: flex-start;
+        
+        button {
+          border-radius: 6px;
+          transition: all 0.2s;
+          margin-right: 6px;
+          
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+          }
+          
+          &.view-button {
+            color: #3498db;
+            border-color: #3498db;
+            
+            &:hover {
+              background-color: #ebf5fb;
+            }
+          }
+          
+          &.edit-button {
+            box-shadow: 0 2px 5px rgba(52, 152, 219, 0.25);
+            
+            &:hover {
+              box-shadow: 0 4px 8px rgba(52, 152, 219, 0.35);
+            }
+          }
+          
+          &.delete-button {
+            box-shadow: 0 2px 5px rgba(231, 76, 60, 0.15);
+            
+            &:hover {
+              box-shadow: 0 4px 8px rgba(231, 76, 60, 0.25);
+            }
+          }
+        }
+      }
+    }
+    
+    .ant-pagination {
+      margin: 16px 0;
+      
+      .ant-pagination-item {
+        border-radius: 6px;
+        
+        &-active {
+          border-color: #3498db;
+          
+          a {
+            color: #3498db;
+          }
+        }
+      }
+    }
+    
+    .image-placeholder {
+      background-color: #f5f5f5;
+      border-radius: 8px;
+      width: 80px;
+      height: 60px;
+    }
+  }
+}

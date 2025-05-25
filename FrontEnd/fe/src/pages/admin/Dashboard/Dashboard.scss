@@ -1,0 +1,120 @@
+.admin-dashboard {
+  padding: 24px 0;
+
+  .page-title {
+    margin-bottom: 24px;
+    position: relative;
+    display: inline-block;
+    
+    &:after {
+      content: "";
+      position: absolute;
+      width: 60%;
+      height: 3px;
+      background: linear-gradient(to right, #1890ff, transparent);
+      bottom: -6px;
+      left: 0;
+      border-radius: 2px;
+    }
+  }
+
+  .stats-cards {
+    margin-bottom: 24px;
+
+    .stat-card {
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .ant-statistic-title {
+        color: rgba(0, 0, 0, 0.45);
+        font-weight: 500;
+        margin-bottom: 8px;
+      }
+
+      .ant-statistic-content {
+        color: rgba(0, 0, 0, 0.85);
+        font-weight: 600;
+      }
+
+      .growth-indicator {
+        margin-top: 8px;
+        font-size: 14px;
+        
+        &.positive {
+          color: #3f8600;
+        }
+        
+        &.negative {
+          color: #cf1322;
+        }
+      }
+    }
+  }
+
+  .chart-section {
+    margin-bottom: 24px;
+    
+    .chart-card {
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+      min-height: 380px;
+      
+      .ant-card-head-title {
+        font-weight: 500;
+      }
+    }
+  }
+
+  .recent-orders-card {
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    
+    .ant-card-head-title {
+      font-weight: 500;
+    }
+
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      
+      &.status-completed {
+        background-color: rgba(82, 196, 26, 0.1);
+        color: #52c41a;
+        border: 1px solid rgba(82, 196, 26, 0.2);
+      }
+      
+      &.status-processing {
+        background-color: rgba(24, 144, 255, 0.1);
+        color: #1890ff;
+        border: 1px solid rgba(24, 144, 255, 0.2);
+      }
+      
+      &.status-cancelled {
+        background-color: rgba(245, 34, 45, 0.1);
+        color: #f5222d;
+        border: 1px solid rgba(245, 34, 45, 0.2);
+      }
+    }
+  }
+  
+  // Animation delay utility classes
+  .delay-1 {
+    animation-delay: 0.2s;
+  }
+  
+  .delay-2 {
+    animation-delay: 0.4s;
+  }
+  
+  .delay-3 {
+    animation-delay: 0.6s;
+  }
+}
