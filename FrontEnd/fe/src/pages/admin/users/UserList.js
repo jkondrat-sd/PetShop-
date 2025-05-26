@@ -6,6 +6,7 @@ import { fetchUsers } from '~/redux/actions/userActions';
 import * as usersService from '~/services/usersService';
 import { useNavigate } from 'react-router-dom';
 import './UserList.scss';
+import { blockUser, unblockUser } from '~/services/usersService';
 
 const UserList = () => {
   const dispatch = useDispatch();
@@ -20,11 +21,22 @@ const UserList = () => {
   const handleBlock = async (user) => {
     Modal.confirm({
       title: user.enabled ? 'Block this user?' : 'Unblock this user?',
+      content: user.enabled
+        ? 'Are you sure you want to block this user?'
+        : 'Do you want to unblock this user?',
+      okText: user.enabled ? 'Block' : 'Unblock',
+      okType: user.enabled ? 'danger' : 'primary',
+      cancelText: 'Cancel',
       onOk: async () => {
         setBlockLoading(true);
         try {
-          await usersService.toggleUserStatus(user.id, user.enabled ? 'block' : 'unblock');
-          message.success(user.enabled ? 'User blocked' : 'User unblocked');
+          if (user.enabled) {
+            await blockUser(user.id);
+            message.success('User blocked');
+          } else {
+            await unblockUser(user.id);
+            message.success('User unblocked');
+          }
           dispatch(fetchUsers({ page: pagination.page, size: pagination.size }));
         } catch (err) {
           message.error('Failed to update user status');

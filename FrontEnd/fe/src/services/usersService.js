@@ -4,7 +4,7 @@ import { getCookie } from "~/helpers/cookie";
 // Get Users list with pagination
 export const getUsers = async (page = 0, size = 10) => {
   try {
-    const response = await request.get(`users`, {
+    const response = await request.get(`users/admin/all`, {
       params: {
         page,
         size,
@@ -19,7 +19,7 @@ export const getUsers = async (page = 0, size = 10) => {
 // Get user details by ID
 export const getUserById = async (userId) => {
   try {
-    const response = await request.get(`users/${userId}`);
+    const response = await request.get(`users/admin/${userId}`);
     return response;
   } catch (error) {
     throw error;
@@ -51,16 +51,6 @@ export const updateUser = async (id, data) => {
 export const deleteUser = async (id) => {
   try {
     const response = await request.del(`users/${id}`);
-    return response;
-  } catch (error) {
-    throw error;
-  }
-};
-
-// Lock/Unlock user
-export const toggleUserStatus = async (id, status) => {
-  try {
-    const response = await request.patch(`users/${id}/status`, { status });
     return response;
   } catch (error) {
     throw error;
@@ -122,4 +112,12 @@ export const updateProfile = async (profileData) => {
     console.error('Error updating profile:', error);
     throw error;
   }
+};
+
+export const blockUser = async (userId) => {
+  return await request.put(`users/admin/${userId}/block`);
+};
+
+export const unblockUser = async (userId) => {
+  return await request.put(`users/admin/${userId}/unblock`);
 };

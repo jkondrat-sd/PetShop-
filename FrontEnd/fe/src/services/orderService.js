@@ -54,19 +54,7 @@ export const getUserOrders = async (page = 0, size = 10) => {
 };
 
 export const cancelOrder = async (orderId) => {
-  try {
-    // Changed from request.delete to request.del
-    const response = await request.del(`/orders/${orderId}`);
-    
-    if (!response || !response.success) {
-      throw new Error(response?.message || 'Error cancelling order');
-    }
-    
-    return response;
-  } catch (error) {
-    console.error('Cancel order error:', error);
-    throw error;
-  }
+  return await request.put(`/orders/${orderId}/cancel`);
 };
 
 export const processPayment = async (orderId, paymentData) => {

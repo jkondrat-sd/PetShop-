@@ -15,6 +15,9 @@ import PetDetail from "~/pages/client/Pets/PetDetail/PetDetail";
 import AccessoryDetail from "~/pages/client/Accessories/AccessoryDetail/AccessoryDetail";
 import CheckOutPage from "~/pages/client/CheckOutPage/CheckOutPage";
 import Profile from "~/pages/client/Profile/Profile";
+import OrderConfirmation from "~/pages/client/OrderConfirmation/OrderConfirmation";
+import OrderDetail from "~/pages/client/OrderDetail/OrderDetail";
+import SearchResults from '~/pages/client/SearchResult/SearchResults';
 
 const publicRoutesClient = [
   // Public routes
@@ -74,7 +77,18 @@ const publicRoutesClient = [
         path: "/users/profile",
         element: <Profile />,
       },
-      
+      {
+        path: "/order-confirmation",
+        element: <OrderConfirmation />,
+      },
+      {
+        path: "/order/:id",
+        element: <OrderDetail />,
+      },
+      {
+        path: '/search',
+        element: <SearchResults />
+      },
     ],
   },
   {

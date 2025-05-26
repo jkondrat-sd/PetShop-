@@ -4,7 +4,7 @@ export const addToCart = async (item) => {
   try {
     // Convert values to appropriate types
     const itemData = {
-      type: item.type,
+      itemType: item.type,
       itemId: Number(item.itemId) || item.itemId,
       quantity: Number(item.quantity)
     };
@@ -27,7 +27,7 @@ export const addToCart = async (item) => {
       
       // Tìm xem item đã có trong giỏ chưa
       const existingItem = cart.items.find(i => 
-        i.itemType === itemData.type && i.itemId === itemData.itemId
+        i.itemType === itemData.itemType && i.itemId === itemData.itemId
       );
       
       if (existingItem && itemData.quantity > 0) {
@@ -38,7 +38,7 @@ export const addToCart = async (item) => {
         // Thêm item mới
         cart.items.push({
           itemId: itemData.itemId,
-          itemType: itemData.type,
+          itemType: itemData.itemType,
           name: `Item ${itemData.itemId}`,
           price: 0, // Sẽ được cập nhật sau
           quantity: itemData.quantity,
@@ -47,7 +47,7 @@ export const addToCart = async (item) => {
       } else if (existingItem) {
         // Xóa item nếu quantity = 0
         cart.items = cart.items.filter(i => 
-          !(i.itemType === itemData.type && i.itemId === itemData.itemId)
+          !(i.itemType === itemData.itemType && i.itemId === itemData.itemId)
         );
       }
       
@@ -168,12 +168,12 @@ function updateLocalStorageCartItem(cart, itemData) {
   // Xóa item nếu quantity = 0
   if (itemData.quantity <= 0) {
     cart.items = cart.items.filter(i => 
-      !(i.itemType === itemData.type && i.itemId === itemData.itemId)
+      !(i.itemType === itemData.itemType && i.itemId === itemData.itemId)
     );
   } else {
     // Tìm item đã tồn tại
     const existingItem = cart.items.find(i => 
-      i.itemType === itemData.type && i.itemId === itemData.itemId
+      i.itemType === itemData.itemType && i.itemId === itemData.itemId
     );
     
     if (existingItem) {
@@ -184,7 +184,7 @@ function updateLocalStorageCartItem(cart, itemData) {
       // Thêm item mới (với giá tạm thời)
       cart.items.push({
         itemId: itemData.itemId,
-        itemType: itemData.type,
+        itemType: itemData.itemType,
         name: `Item ${itemData.itemId}`,
         price: 0, // Sẽ được cập nhật khi loadProductDetails
         quantity: itemData.quantity,
@@ -192,12 +192,12 @@ function updateLocalStorageCartItem(cart, itemData) {
       });
       
       // Thử tải thông tin chi tiết sản phẩm
-      loadProductDetails(itemData.type, itemData.itemId)
+      loadProductDetails(itemData.itemType, itemData.itemId)
         .then(details => {
           if (details) {
             const updatedCart = getLocalStorageCart();
             const itemToUpdate = updatedCart.items.find(i => 
-              i.itemType === itemData.type && i.itemId === itemData.itemId
+              i.itemType === itemData.itemType && i.itemId === itemData.itemId
             );
             
             if (itemToUpdate) {

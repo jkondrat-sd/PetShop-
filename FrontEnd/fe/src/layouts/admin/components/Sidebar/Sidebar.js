@@ -49,10 +49,10 @@ const Sidebar = ({ collapsed }) => {
 					key: "/admin/pets/create",
 					label: "Add New Pet",
 				},
-				{
-					key: "/admin/breeds",
-					label: "Breed Management",
-				},
+				// {
+				// 	key: "/admin/breeds",
+				// 	label: "Breed Management",
+				// },
 			],
 		},
 		// Update other menu items similarly
@@ -86,16 +86,16 @@ const Sidebar = ({ collapsed }) => {
 			icon: <UserOutlined />,
 			label: "Users",
 		},
-		{
-			key: "/admin/roles",
-			icon: <LockOutlined />,
-			label: "Roles",
-		},
-		{
-			key: "/admin/reviews",
-			icon: <CommentOutlined />,
-			label: "Reviews",
-		},
+		// {
+		// 	key: "/admin/roles",
+		// 	icon: <LockOutlined />,
+		// 	label: "Roles",
+		// },
+		// {
+		// 	key: "/admin/reviews",
+		// 	icon: <CommentOutlined />,
+		// 	label: "Reviews",
+		// },
 		{
 			key: "/admin/reports",
 			icon: <PieChartOutlined />,

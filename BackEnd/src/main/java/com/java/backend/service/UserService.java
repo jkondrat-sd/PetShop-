@@ -85,7 +85,7 @@ public class UserService {
     
     // Get all users (for admin)
     public Pagination<UserResponse> getAllUsers(int page, int size) {
-        Page<UserEntity> userPage = userRepository.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt")));
+        Page<UserEntity> userPage = userRepository.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "userId")));
         
         List<UserResponse> users = userPage.getContent()
                 .stream()
@@ -120,8 +120,14 @@ public class UserService {
         userRepository.save(user);
     }
     
+    // Get user by ID (for admin)
+    public UserEntity getUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+    }
+    
     // Map UserEntity to UserResponse
-    private UserResponse mapUserToResponse(UserEntity user) {
+    public UserResponse mapUserToResponse(UserEntity user) {
         return UserResponse.builder()
                 .id(user.getUserId())
                 .username(user.getUsername())

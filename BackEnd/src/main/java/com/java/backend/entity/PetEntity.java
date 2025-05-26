@@ -47,6 +47,9 @@ public class PetEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "stock_quantity")
+    private Integer stockQuantity;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

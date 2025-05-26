@@ -14,7 +14,6 @@ import {
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { checkLogin } from "~/redux/actions/login";
-import Search from "../Search";
 import styles from "./Header.module.scss";
 import logo from "~/assets/images/logoPOMPOM-removebg.png";
 import config from "~/config";
@@ -22,7 +21,8 @@ import CartModal from "~/pages/client/CartModal/CartModal";
 // import { checkLogin } from "~/store/actions/login";
 import { deleteCookie } from "~/helpers/cookie";
 import { getUserInfo } from "~/services/usersService";
-import { getCart } from '~/services/cartService';
+import { getCart } from "~/services/cartService";
+// import Search from "../Search/Search";
 
 const cx = classNames.bind(styles);
 
@@ -51,33 +51,33 @@ function Header() {
 	};
 
 	useEffect(() => {
-  const handleCartUpdate = async () => {
-    try {
-      console.log("Header: Handling cart update event");
-      const response = await getCart();
-      if (response && response.success && response.data) {
-        console.log("Header: Updated cart count:", response.data.totalItems);
-        setCartItemCount(response.data.totalItems || 0);
-      } else {
-        console.log("Header: Cart response empty or invalid");
-        setCartItemCount(0);
-      }
-    } catch (error) {
-      console.error("Error updating cart count:", error);
-      setCartItemCount(0);
-    }
-  };
-  
-  // Lắng nghe sự kiện cartUpdated
-  window.addEventListener("cartUpdated", handleCartUpdate);
-  
-  // Fetch cart ngay khi component mount
-  handleCartUpdate();
-  
-  return () => {
-    window.removeEventListener("cartUpdated", handleCartUpdate);
-  };
-}, []);
+		const handleCartUpdate = async () => {
+			try {
+				console.log("Header: Handling cart update event");
+				const response = await getCart();
+				if (response && response.success && response.data) {
+					console.log("Header: Updated cart count:", response.data.totalItems);
+					setCartItemCount(response.data.totalItems || 0);
+				} else {
+					console.log("Header: Cart response empty or invalid");
+					setCartItemCount(0);
+				}
+			} catch (error) {
+				console.error("Error updating cart count:", error);
+				setCartItemCount(0);
+			}
+		};
+
+		// Lắng nghe sự kiện cartUpdated
+		window.addEventListener("cartUpdated", handleCartUpdate);
+
+		// Fetch cart ngay khi component mount
+		handleCartUpdate();
+
+		return () => {
+			window.removeEventListener("cartUpdated", handleCartUpdate);
+		};
+	}, []);
 
 	// useEffect(() => {
 	// 	// Kiểm tra dữ liệu từ localStorage
@@ -150,7 +150,11 @@ function Header() {
 						Contact
 					</NavLink>
 				</nav>
+
 				<div className={cx("header-search-user")}>
+					{/* <div className={cx("header-search-wrapper")}>
+						<Search />
+					</div> */}
 					<Input
 						className={cx("header-search")}
 						placeholder="Search something here!"
@@ -159,6 +163,7 @@ function Header() {
 						}
 						allowClear
 					/>
+
 					<div className={cx("header-user-section")}>
 						{isLoggedIn ? (
 							<>

@@ -28,12 +28,10 @@ import Slider from 'react-slick';
 import PetCard from '../../Components/PetCard/PetCard';
 import 'animate.css';
 import 'slick-carousel/slick/slick.css';
-
 import 'slick-carousel/slick/slick-theme.css';
 import './PetDetail.scss';
-import { addToCart } from "../../../../services/cartService"
-
-
+import { addToCart } from "../../../../services/cartService";
+import { getPetById, getPets } from "../../../../services/petService";
 
 import imgDog from '../../../../assets/images/img-dogs/MO231.png';
 import imgDog2 from '../../../../assets/images/img-dogs/MO326.png';
@@ -41,7 +39,6 @@ import profile1 from '../../../../assets/images/img-dogs/Frame 118.png';
 import profile2 from '../../../../assets/images/img-dogs/Frame 119.png';
 import profile3 from '../../../../assets/images/img-dogs/Frame 120.png';
 import profile4 from '../../../../assets/images/img-dogs/Frame 121.png';
-
 
 const { Title, Text } = Typography;
 
@@ -51,7 +48,13 @@ const PetDetail = () => {
   const [loading, setLoading] = useState(true);
   const [mainImage, setMainImage] = useState('');
   const [relatedPets, setRelatedPets] = useState([]);
-  const [customerImages, setCustomerImages] = useState([]);
+  const [customerImages, setCustomerImages] = useState([
+    // Có thể để ảnh khách hàng thật hoặc giữ mock nếu chưa có
+    require('../../../../assets/images/img-dogs/Frame 118.png'),
+    require('../../../../assets/images/img-dogs/Frame 119.png'),
+    require('../../../../assets/images/img-dogs/Frame 120.png'),
+    require('../../../../assets/images/img-dogs/Frame 121.png'),
+  ]);
 
   // Settings for the customer carousel
   const customerSliderSettings = {
@@ -63,113 +66,21 @@ const PetDetail = () => {
     autoplay: true,
     autoplaySpeed: 3000,
     responsive: [
-      {
-        breakpoint: 1200,
-        settings: {
-          slidesToShow: 3,
-          slidesToScroll: 1
-        }
-      },
-      {
-        breakpoint: 992,
-        settings: {
-          slidesToShow: 2,
-          slidesToScroll: 1
-        }
-      },
-      {
-        breakpoint: 576,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1
-        }
-      }
+      { breakpoint: 1200, settings: { slidesToShow: 3, slidesToScroll: 1 } },
+      { breakpoint: 992, settings: { slidesToShow: 2, slidesToScroll: 1 } },
+      { breakpoint: 576, settings: { slidesToShow: 1, slidesToScroll: 1 } }
     ]
   };
 
   useEffect(() => {
-    // Fetch pet details
     const fetchPetDetails = async () => {
       setLoading(true);
       try {
-        // Replace with your actual API call
-        // const response = await fetch(`/api/pets/${id}`);
-        // const data = await response.json();
-        
-        // Simulating API response for this example
-        const data = {
-          petId: id || 'MO228',
-          petName: 'Pomeranian White',
-          type: 'DOG',
-          breed: 'Pomeranian',
-          breedId: 1,
-          gender: 'Male',
-          unitPrice: 1500.00,
-          age: 2,
-          status: 'available',
-          character: 'Friendly, Active, Playful',
-          weight: '1.5 kg',
-          height: '20 cm',
-          thumbnail: imgDog,
-          images: [
-            imgDog,
-            imgDog2,
-            imgDog,
-            imgDog2,
-            imgDog,
-          ]
-        };
-        
+        const data = await getPetById(id);
         setPet(data);
-        setMainImage(data.images[0]);
-        
-        // Fetch customer images
-        setCustomerImages([
-          profile1,
-          profile2,
-          profile3,
-          profile4,
-          profile3,
-          profile2,
-        ]);
-        
-        // Fetch related pets
-        setRelatedPets([
-          {
-            id: 'MO102',
-            name: 'Poodle Tiny Sepia',
-            image: 'assets/images/img-dogs/MO102.png',
-            gender: 'Male',
-            age: '2 months',
-            price: '3,000'
-          },
-          {
-            id: 'MO512',
-            name: 'Alaskan Malamute Grey',
-            image: 'assets/images/img-dogs/MO512.png',
-            gender: 'Male',
-            age: '2 months',
-            price: '5,000'
-          },
-          {
-            id: 'MO504',
-            name: 'Pembroke Corgi Cream',
-            image: 'assets/images/img-dogs/MO504.png',
-            gender: 'Male',
-            age: '2 months',
-            price: '3,200'
-          },
-          {
-            id: 'MO502',
-            name: 'Pembroke Corgi Tricolor',
-            image: 'assets/images/img-dogs/MO502.png',
-            gender: 'Female',
-            age: '2 months',
-            price: '3,000'
-          }
-        ]);
+        setMainImage(data.thumbnail || (data.images && data.images[0]));
       } catch (error) {
-        console.error("Error fetching pet details:", error);
+        setPet(null);
         message.error("Could not load pet details. Please try again later.");
       } finally {
         setLoading(false);
@@ -178,6 +89,21 @@ const PetDetail = () => {
 
     fetchPetDetails();
   }, [id]);
+
+  // Lấy danh sách thú cưng liên quan (ví dụ: cùng loại, cùng giống, hoặc random)
+  useEffect(() => {
+    const fetchRelatedPets = async () => {
+      try {
+        const response = await getPets({ page: 0, size: 4, type: pet?.type });
+        // Loại bỏ chính pet hiện tại khỏi danh sách liên quan
+        const filtered = (response.content || []).filter(p => p.petId !== pet?.petId);
+        setRelatedPets(filtered);
+      } catch (error) {
+        setRelatedPets([]);
+      }
+    };
+    if (pet && pet.type) fetchRelatedPets();
+  }, [pet]);
 
   const handleAddToCart = async () => {
     if (!pet) return;
@@ -203,7 +129,7 @@ const PetDetail = () => {
     setMainImage(image);
   };
 
-  if (loading) {
+  if (loading || !pet) {
     return (
       <div className="product-detail">
         <div className="container">
@@ -244,7 +170,7 @@ const PetDetail = () => {
                   />
                 </div>
                 <Row className="image-wrapper">
-                  {pet?.images.map((image, index) => (
+                  {pet?.images?.map((image, index) => (
                     <Col key={index}>
                       <img
                         className={`imgCarousel ${mainImage === image ? 'active' : ''}`}
@@ -261,7 +187,7 @@ const PetDetail = () => {
             <Col xs={24} sm={24} md={12} className="animate__animated animate__fadeInRight">
               <Text className="id-product">#{pet?.petId}</Text>
               <Title level={2} className="product-name">{pet?.petName}</Title>
-              <div className="price">${pet?.unitPrice.toLocaleString()}</div>
+              <div className="price">${pet?.unitPrice?.toLocaleString()}</div>
 
               <div className="inner-button">
                 <Button 
@@ -288,10 +214,12 @@ const PetDetail = () => {
               <div className="product-info">
                 <Descriptions column={1} bordered>
                   <Descriptions.Item label="Age">{pet?.age} months</Descriptions.Item>
-                  <Descriptions.Item label="Weight">{pet?.weight}</Descriptions.Item>
-                  <Descriptions.Item label="Height">{pet?.height}</Descriptions.Item>
+                  <Descriptions.Item label="Weight">{pet?.weight || '-'}</Descriptions.Item>
+                  <Descriptions.Item label="Height">{pet?.height || '-'}</Descriptions.Item>
                   <Descriptions.Item label="Gender">{pet?.gender}</Descriptions.Item>
-                  <Descriptions.Item label="Character">{pet?.character}</Descriptions.Item>
+                  <Descriptions.Item label="Breed">{pet?.breed}</Descriptions.Item>
+                  <Descriptions.Item label="Status">{pet?.status}</Descriptions.Item>
+                  <Descriptions.Item label="Character">{pet?.character || '-'}</Descriptions.Item>
                 </Descriptions>
               </div>
 
@@ -320,7 +248,6 @@ const PetDetail = () => {
               </div>
             </Col>
           </Row>
-          
           <Row>
             <Col span={24}>
               <Slider {...customerSliderSettings} className="clients-carousel">
@@ -353,26 +280,25 @@ const PetDetail = () => {
               </Row>
             </Col>
           </Row>
-          
           <Row gutter={[16, 24]}>
             {relatedPets.map((relatedPet) => (
-              <Col key={relatedPet.id} xs={24} sm={12} md={8} lg={6}>
+              <Col key={relatedPet.petId} xs={24} sm={12} md={8} lg={6}>
                 <PetCard 
-                  id={relatedPet.id}
-                  name={relatedPet.name}
-                  image={relatedPet.image}
+                  id={relatedPet.petId}
+                  name={relatedPet.petName}
+                  image={relatedPet.thumbnail}
                   gender={relatedPet.gender}
                   age={relatedPet.age}
-                  price={relatedPet.price}
+                  price={relatedPet.unitPrice}
                   onAddToCart={async () => {
                     try {
                       await addToCart({
                         type: "pet",
-                        itemId: relatedPet.id,
+                        itemId: relatedPet.petId,
                         quantity: 1,
                       });
                       window.dispatchEvent(new Event("cartUpdated"));
-                      message.success(`${relatedPet.name} has been added to your cart!`);
+                      message.success(`${relatedPet.petName} has been added to your cart!`);
                     } catch (error) {
                       message.error("Failed to add to cart. Please try again.");
                     }

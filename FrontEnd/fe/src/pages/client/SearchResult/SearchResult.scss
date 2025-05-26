@@ -1,0 +1,129 @@
+.search-results-page {
+  background-color: #fafafa;
+  
+  .bread-crumb {
+    padding: 20px 0;
+    background-color: #f5f7f9;
+    
+    &-list {
+      font-size: 14px;
+    }
+  }
+  
+  .search-header {
+    padding: 30px 0;
+    background-color: #fff;
+    border-bottom: 1px solid #eee;
+    
+    h1 {
+      font-size: 22px;
+      margin-bottom: 20px;
+      
+      .search-query {
+        color: #003459;
+        font-weight: 600;
+      }
+    }
+    
+    .search-form {
+      margin-top: 15px;
+      
+      @media (min-width: 768px) {
+        text-align: right;
+        margin-top: 0;
+      }
+    }
+    
+    .ant-input-search {
+      max-width: 400px;
+      
+      .ant-input {
+        border-right: 0;
+      }
+    }
+  }
+  
+  .search-content {
+    padding: 30px 0 60px;
+    
+    .filter-sidebar {
+      .filter-section {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        
+        h3 {
+          font-size: 18px;
+          margin-bottom: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          
+          .anticon {
+            color: #003459;
+          }
+        }
+        
+        .filter-group {
+          margin-bottom: 25px;
+          
+          h4 {
+            font-size: 15px;
+            margin-bottom: 12px;
+          }
+        }
+        
+        .reset-btn {
+          width: 100%;
+          margin-top: 10px;
+        }
+      }
+    }
+    
+    .product-tabs {
+      margin-bottom: 20px;
+      
+      .ant-tabs-nav {
+        margin-bottom: 20px;
+      }
+    }
+    
+    .search-results-list {
+      min-height: 400px;
+      
+      .loading-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 0;
+        
+        p {
+          margin-top: 15px;
+          font-size: 16px;
+          color: #666;
+        }
+      }
+      
+      .no-results {
+        padding: 60px 0;
+      }
+      
+      .pagination-container {
+        margin-top: 40px;
+        display: flex;
+        justify-content: center;
+      }
+    }
+  }
+}
+
+@media (max-width: 991px) {
+  .search-results-page {
+    .filter-sidebar {
+      margin-bottom: 30px;
+    }
+  }
+}

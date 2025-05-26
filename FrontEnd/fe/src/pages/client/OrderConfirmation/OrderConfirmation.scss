@@ -1,0 +1,30 @@
+.order-confirmation-page {
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f6ffed;
+
+  .ant-result {
+    background: #fff;
+    border-radius: 16px;
+    padding: 48px 32px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+
+    .ant-result-title {
+      color: #003459;
+      font-weight: 700;
+    }
+    .ant-result-subtitle {
+      font-size: 18px;
+      color: #555;
+    }
+    .order-confirmation-note {
+      color: #52c41a;
+      font-weight: 500;
+    }
+    .ant-btn {
+      margin: 0 8px;
+    }
+  }
+}

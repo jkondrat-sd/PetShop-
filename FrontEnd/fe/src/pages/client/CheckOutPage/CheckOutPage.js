@@ -95,15 +95,13 @@ const CheckOutPage = () => {
 		window.dispatchEvent(new Event("cartUpdated"));
 	};
 
-	const calculateItemTotal = (price, quantity) => {
-		return parseFloat(
-			(parseFloat(price.replace(/,/g, "")) * quantity).toFixed(2)
-		);
+	const calculateItemTotal = (item) => {
+		return Number(item.price) * item.quantity;
 	};
 
 	const calculateSubtotal = () => {
 		return cartItems.reduce((total, item) => {
-			return total + calculateItemTotal(item.price, item.quantity);
+			return total + calculateItemTotal(item);
 		}, 0);
 	};
 

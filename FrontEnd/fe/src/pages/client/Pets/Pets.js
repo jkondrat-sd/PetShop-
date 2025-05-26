@@ -23,6 +23,7 @@ import { Link } from 'react-router-dom';
 import PetCard from '../Components/PetCard/PetCard';
 import 'animate.css';
 import './Pets.scss';
+import { getPets } from '~/services/petService';
 
 // Import banner images
 import puppiesDog from '../../../assets/images/img-dogs/puppies-dog.png';
@@ -201,62 +202,26 @@ function Pets() {
   // Fetch pets data
   useEffect(() => {
     setLoading(true);
-    
-    setTimeout(() => {
-      let filteredPets = mockAllPets;
-      
-      // Lọc theo tab đang active
-      if (activeTab === 'dogs') {
-        filteredPets = mockDogs;
-      } else if (activeTab === 'cats') {
-        filteredPets = mockCats;
+    async function fetchPets() {
+      try {
+        // Gọi API, truyền filter nếu muốn
+        const response = await getPets({
+          page: currentPage - 1, // API backend thường dùng 0-based
+          size: pageSize,
+          type: filters.type !== 'all' ? filters.type : undefined,
+          // Có thể truyền thêm breedId, gender, price... nếu backend hỗ trợ
+        });
+        // response.content hoặc response.data.content tùy API
+        setPets(response.content || []);
+        setTotalItems(response.totalElements || 0);
+      } catch (error) {
+        setPets([]);
+        setTotalItems(0);
+      } finally {
+        setLoading(false);
       }
-      
-      // Lọc theo bộ lọc
-      if (filters.gender.length > 0) {
-        filteredPets = filteredPets.filter(pet => filters.gender.includes(pet.gender));
-      }
-      
-      if (filters.minPrice) {
-        filteredPets = filteredPets.filter(
-          pet => parseFloat(pet.price.replace(',', '')) >= parseFloat(filters.minPrice)
-        );
-      }
-      
-      if (filters.maxPrice) {
-        filteredPets = filteredPets.filter(
-          pet => parseFloat(pet.price.replace(',', '')) <= parseFloat(filters.maxPrice)
-        );
-      }
-      
-      if (filters.age) {
-        filteredPets = filteredPets.filter(
-          pet => parseInt(pet.age) === parseInt(filters.age)
-        );
-      }
-      
-      // Lọc theo breed nếu không phải "All"
-      if (filters.breedType && filters.breedType !== 'all') {
-        filteredPets = filteredPets.filter(pet => pet.breed === filters.breedType);
-      }
-      
-      // Sắp xếp
-      if (filters.sortBy === 'price-low') {
-        filteredPets.sort((a, b) => parseFloat(a.price.replace(',', '')) - parseFloat(b.price.replace(',', '')));
-      } else if (filters.sortBy === 'price-high') {
-        filteredPets.sort((a, b) => parseFloat(b.price.replace(',', '')) - parseFloat(a.price.replace(',', '')));
-      }
-
-       // Thêm logic phân trang - hiển thị đúng 12 sản phẩm theo trang hiện tại
-    const startIndex = (currentPage - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    const paginatedPets = filteredPets.slice(startIndex, endIndex);
-    
-      setTotalItems(filteredPets.length);
-      setPets(paginatedPets);
-      setLoading(false);
-    }, 800);
-    
+    }
+    fetchPets();
   }, [activeTab, filters, currentPage, pageSize]);
 
   // Handle tab change
@@ -521,7 +486,7 @@ function Pets() {
                   {pets.length > 0 ? (
                     pets.map((pet, index) => (
                       <Col 
-                        key={pet.id} 
+                        key={pet.petId} 
                         xs={24} 
                         sm={12} 
                         md={12} 
@@ -529,12 +494,12 @@ function Pets() {
                         xl={8}
                       >
                         <PetCard 
-                          id={pet.id}
-                          name={pet.name}
-                          image={pet.image}
+                          id={pet.petId}
+                          name={pet.petName}
+                          image={pet.thumbnail}
                           gender={pet.gender}
                           age={pet.age}
-                          price={pet.price}
+                          price={pet.unitPrice}
                           petType={pet.type}
                           breed={pet.breed}
                           onAddToCart={() => handleAddToCart(pet)}

@@ -5,6 +5,7 @@ import com.java.backend.dto.request.ChangePasswordRequest;
 import com.java.backend.dto.response.ApiResponse;
 import com.java.backend.dto.response.UserResponse;
 import com.java.backend.service.UserService;
+import com.java.backend.entity.UserEntity;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -158,5 +159,23 @@ public class UserController {
             @PathVariable Long userId) {
         userService.unblockUser(userId);
         return ResponseEntity.ok(new ApiResponse<>(true, "User unblocked successfully", null));
+    }
+    
+    @Operation(
+        summary = "Get user by ID (admin)",
+        description = "Admin endpoint to get user details by user ID",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "User found"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "User not found"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @GetMapping("/admin/{userId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<UserResponse>> getUserById(@PathVariable Long userId) {
+        UserEntity user = userService.getUserById(userId);
+        UserResponse userResponse = userService.mapUserToResponse(user);
+        return ResponseEntity.ok(new ApiResponse<>(true, "User found", userResponse));
     }
 }

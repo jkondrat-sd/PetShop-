@@ -19,6 +19,8 @@ import OrderList from '~/pages/admin/Orders/OrderList';
 import OrderDetails from '~/pages/admin/Orders/OrderDetails';
 import UserList from '~/pages/admin/users/UserList';
 import UserDetails from '~/pages/admin/users/UserDetails';
+import SalesReport from '~/pages/admin/reports/SalesReport';
+import InventoryReport from '~/pages/admin/reports/InventoryReport';
 
 const RoutesAdmin = [
   //Public route
@@ -117,7 +119,14 @@ const RoutesAdmin = [
               { path: "list", element: <UserList /> },
               { path: ":id", element: <UserDetails /> },
             ],
-          }, 
+          },
+          {
+            path: "reports",
+            children: [
+              { path: "sales", element: <SalesReport /> },
+              { path: "inventory", element: <InventoryReport /> },
+            ],
+          },
           // Thêm các route khác tại đây
         ],
       },

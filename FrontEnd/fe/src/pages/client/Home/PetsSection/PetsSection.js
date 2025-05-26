@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import 'animate.css';
 import { Button, Row, Col } from 'antd';
 import { Link } from 'react-router-dom';
 import styles from './PetsSection.module.scss';
 import PetCard from '../../Components/PetCard/PetCard';
+import { getPets } from '~/services/petService';
 
 // Import hình ảnh thú cưng
 import MO231 from '../../../../assets/images/img-dogs/MO231.png';
@@ -24,6 +25,20 @@ const pets = [
 ];
 
 function PetsSection() {
+  const [pets, setPets] = useState([]);
+
+  useEffect(() => {
+    async function fetchPets() {
+      try {
+        const response = await getPets({ page: 0, size: 8 }); // Lấy 8 pet mới nhất
+        setPets(response.content || []);
+      } catch (error) {
+        setPets([]);
+      }
+    }
+    fetchPets();
+  }, []);
+
   return (
     <section className={styles.petsSection}>
       <div className={styles.container}>
@@ -44,15 +59,15 @@ function PetsSection() {
         <div className={styles.petsGrid}>
           <Row gutter={[24, 30]}>
             {pets.map((pet) => (
-              <Col xs={24} sm={12} md={8} lg={6} key={pet.id} className={styles.petCardCol}>
+              <Col xs={24} sm={12} md={8} lg={6} key={pet.petId}>
                 <PetCard
-                  id={pet.id}
-                  name={pet.name}
-                  image={pet.image}
+                  id={pet.petId}
+                  name={pet.petName}
+                  image={pet.thumbnail}
                   gender={pet.gender}
                   age={pet.age}
-                  price={pet.price}
-                  onAddToCart={() => console.log(`Added ${pet.name} to cart`)}
+                  price={pet.unitPrice}
+                  onAddToCart={() => console.log(`Added ${pet.petName} to cart`)}
                 />
               </Col>
             ))}
