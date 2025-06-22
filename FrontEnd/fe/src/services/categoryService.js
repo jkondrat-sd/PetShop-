@@ -1,11 +1,23 @@
-import * as request from "~/utils/request";
+import * as request from "../utils/request";
 
-export const getCategories = async () => {
+export const getCategories = async (params = {}) => {
   try {
-    const response = await request.get(`/categories`);
-    return response;
+    const response = await request.get("/categories", {
+      params: {
+        status: params.status || "active",
+        page: params.page || 0,
+        size: params.size || 100
+      }
+    });
+    
+    if (!response || !response.success) {
+      throw new Error(response?.message || "Failed to get categories");
+    }
+    
+    return response.data;
   } catch (error) {
-    console.log(error);
+    console.error("Get categories error:", error);
+    throw error;
   }
 };
 
@@ -66,8 +78,14 @@ export const getCategoryDocument = async (categoryId, page, size) => {
 export const getCategoryById = async (categoryId) => {
   try {
     const response = await request.get(`/categories/${categoryId}`);
-    return response;
+    
+    if (!response || !response.success) {
+      throw new Error(response?.message || "Failed to get category details");
+    }
+    
+    return response.data;
   } catch (error) {
-    console.log(error);
+    console.error("Get category details error:", error);
+    throw error;
   }
-}
+};

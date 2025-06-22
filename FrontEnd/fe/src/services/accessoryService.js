@@ -41,7 +41,11 @@ export const getAccessoryById = async (accessoryId) => {
 export const getAccessoryCategories = async () => {
   try {
     const response = await request.get('/categories', {
-      params: { type: 'accessory' }
+      params: { 
+        status: 'active',
+        page: 0,
+        size: 100 // Get all categories
+      }
     });
     
     if (!response || !response.success) {

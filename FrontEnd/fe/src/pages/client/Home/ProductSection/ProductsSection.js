@@ -1,34 +1,43 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import 'animate.css';
-import { Button, Row, Col } from 'antd';
+import { Button, Row, Col, Spin } from 'antd';
 import { Link } from 'react-router-dom';
 import styles from './ProductsSection.module.scss';
 import AccessoryCard from '../../Components/AccesssoryCard/AccesssoryCard';
-
-// Import hình ảnh phụ kiện
-import dogFood from '../../../../assets/images/img-accessories/image 2-3.png';
-import catFood from '../../../../assets/images/img-accessories/image 2-3.png';
-import scratchingToy from '../../../../assets/images/img-accessories/image 2-3.png';
-import catNest from '../../../../assets/images/img-accessories/image 2-3.png';
-import omegaGold from '../../../../assets/images/img-accessories/image 2-3.png';
-import cowboyRider from '../../../../assets/images/img-accessories/image 2-3.png';
-import chickenHeadband from '../../../../assets/images/img-accessories/image 2-3.png';
-import plushToy from '../../../../assets/images/img-accessories/image 2-3.png';
-
-const products = [
-  { id: 1, name: 'Reflex Plus Adult Dog Food Salmon', image: dogFood, category: 'Dog Food', size: '385g', price: '30', stockQuantity: 15 },
-  { id: 2, name: 'Reflex Plus Adult Cat Food Salmon', image: catFood, category: 'Cat Food', size: '700g', price: '20', stockQuantity: 20 },
-  { id: 3, name: 'Cat scratching ball toy kitten sisal rope ball', image: scratchingToy, category: 'Toy', size: 'small', price: '50', stockQuantity: 8 },
-  { id: 4, name: 'Cute Pet Cat Warm Nest', image: catNest, category: 'Toy', size: 'small', price: '20', stockQuantity: 12 },
-  { id: 5, name: 'NaturVet Dogs - Omega-Gold Plus Salmon Oil', image: omegaGold, category: 'Dog Food', size: '385g', price: '25', stockQuantity: 17 },
-  { id: 6, name: 'Costumes Fashion Pet Clother Cowboy Rider', image: cowboyRider, category: 'Costume', size: '1.5kg', price: '30', stockQuantity: 5 },
-  { id: 7, name: 'Costumes Chicken Drumstick Headband', image: chickenHeadband, category: 'Costume', size: 'small', price: '30', stockQuantity: 0 },
-  { id: 8, name: 'Plush Pet Toy', image: plushToy, category: 'Toy', size: 'small', price: '25', stockQuantity: 10 },
-];
+import { getAccessories } from '~/services/accessoryService';
 
 function ProductsSection() {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch accessories from API when component mounts
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await getAccessories({
+          page: 0,
+          size: 8, // Limit to 8 products for the homepage
+          status: 'active',
+          sortBy: 'newest'
+        });
+        
+        // Check if we have valid data
+        if (response && response.content) {
+          setProducts(response.content);
+        }
+      } catch (error) {
+        console.error('Failed to fetch accessories:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   const handleAddToCart = (product) => {
-    console.log(`Added ${product.name} to cart`);
+    console.log(`Added ${product.accessoryName} to cart`);
   };
 
   return (
@@ -48,24 +57,35 @@ function ProductsSection() {
           </div>
         </div>
         
-        <div className={styles.petsGrid}>
-          <Row gutter={[24, 30]}>
-            {products.map((product) => (
-              <Col xs={24} sm={12} md={8} lg={6} key={product.id} className={styles.productCardCol}>
-                <AccessoryCard
-                  id={product.id}
-                  name={product.name}
-                  image={product.image}
-                  categoryName={product.category}
-                  size={product.size}
-                  price={product.price}
-                  stockQuantity={product.stockQuantity}
-                  onAddToCart={() => handleAddToCart(product)}
-                />
-              </Col>
-            ))}
-          </Row>
-        </div>
+        {loading ? (
+          <div className={styles.loadingContainer}>
+            <Spin size="large" tip="Loading products..." />
+          </div>
+        ) : (
+          <div className={styles.petsGrid}>
+            <Row gutter={[24, 30]}>
+              {products.map((product) => (
+                <Col xs={24} sm={12} md={8} lg={6} key={product.accessoryId} className={styles.productCardCol}>
+                  <AccessoryCard
+                    id={product.accessoryId}
+                    name={product.accessoryName}
+                    image={product.thumbnail}
+                    categoryName={product.category}
+                    price={product.unitPrice}
+                    stockQuantity={product.stockQuantity}
+                    onAddToCart={() => handleAddToCart(product)}
+                  />
+                </Col>
+              ))}
+            </Row>
+          </div>
+        )}
+        
+        {!loading && products.length === 0 && (
+          <div className={styles.noProducts}>
+            <p>No products available at the moment.</p>
+          </div>
+        )}
       </div>
     </section>
   );

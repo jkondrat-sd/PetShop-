@@ -2,7 +2,7 @@ import * as request from '../utils/request';
 
 export const getPets = async (params = {}) => {
   try {
-    console.log("API call params:", params);
+    // console.log("API call params:", params);
     const response = await request.get('/pets', {
       params: {
         page: params.page || 0,
@@ -12,7 +12,7 @@ export const getPets = async (params = {}) => {
       }
     });
     
-    console.log("Raw API response:", response);
+    // console.log("Raw API response:", response);
     
     if (!response) {
       console.error("No response from API");

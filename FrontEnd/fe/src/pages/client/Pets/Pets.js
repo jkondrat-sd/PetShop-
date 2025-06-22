@@ -16,20 +16,18 @@ import {
 import { 
   HomeOutlined, 
   RightOutlined, 
-  SearchOutlined, 
-  FilterOutlined
+  SearchOutlined
 } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import PetCard from '../Components/PetCard/PetCard';
 import 'animate.css';
 import './Pets.scss';
 import { getPets } from '~/services/petService';
+import { getBreeds } from '~/services/breedService';
 
 // Import banner images
 import puppiesDog from '../../../assets/images/img-dogs/puppies-dog.png';
 import MO231 from '../../../assets/images/img-dogs/MO231.png';
-
-
 
 const { TabPane } = Tabs;
 const { Option } = Select;
@@ -37,11 +35,15 @@ const { Option } = Select;
 function Pets() {
   // States
   const [loading, setLoading] = useState(true);
-  const [pets, setPets] = useState([]);
+  const [allPets, setAllPets] = useState([]); // Lưu trữ tất cả pets
+  const [filteredPets, setFilteredPets] = useState([]); // Pets sau khi filter
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [pageSize, setPageSize] = useState(9);
   const [activeTab, setActiveTab] = useState('all');
+  const [error, setError] = useState(null);
+  const [breeds, setBreeds] = useState([]);
+  const [breedsLoading, setBreedsLoading] = useState(true);
   
   // Filter states
   const [filters, setFilters] = useState({
@@ -53,147 +55,6 @@ function Pets() {
     breedType: 'all', // Để lọc theo giống
     sortBy: 'newest' // Để sắp xếp kết quả
   });
-
-  // Mock data for development - DOGS
-  const mockDogs = [
-    { 
-      id: 'MO231', 
-      name: 'MO231 - Pomeranian White', 
-      image: MO231,
-      gender: 'Male',
-      age: '2 months',
-      price: '3,000',
-      type: 'dog',
-      breed: 'Pomeranian'
-    },
-    { 
-      id: 'MO235', 
-      name: 'MO235', 
-      image: MO231,
-      gender: 'Male',
-      age: '2 months',
-      price: '3,000',
-      type: 'dog',
-      breed: 'Pomeranian'
-    },
-    { 
-      id: 'MO502', 
-      name: 'MO502 - Poodle Tiny Yellow', 
-      image: MO231,
-      gender: 'Female',
-      age: '2 months',
-      price: '2,500',
-      type: 'dog',
-      breed: 'Poodle'
-    },
-    { 
-      id: 'MO102', 
-      name: 'MO102 - Poodle Tiny Sepia', 
-      image: MO231,
-      gender: 'Male',
-      age: '2 months',
-      price: '3,000',
-      type: 'dog',
-      breed: 'Poodle'
-    },
-    { 
-      id: 'MO512', 
-      name: 'MMO512 - Alaskan Malamute Grey', 
-      image: MO231,
-      gender: 'Male',
-      age: '2 months',
-      price: '5,000',
-      type: 'dog',
-      breed: 'Alaskan Malamute'
-    },
-    { 
-      id: 'MO504', 
-      name: 'MO231 - Pembroke Corgi Cream', 
-      image: MO231,
-      gender: 'Male',
-      age: '2 months',
-      price: '3,200',
-      type: 'dog',
-      breed: 'Pembroke Corgi'
-    },
-    { 
-      id: 'MO503', 
-      name: 'MO502 - Pembroke Corgi Tricolor', 
-      image: MO231,
-      gender: 'Female',
-      age: '2 months',
-      price: '3,000',
-      type: 'dog',
-      breed: 'Pembroke Corgi'
-    },
-  ];
-  
-  // Mock data for development - CATS
-  const mockCats = [
-    { 
-      id: 'MC101', 
-      name: 'MC101 - British Shorthair Blue', 
-      image: MO231,
-      gender: 'Female',
-      age: '3 months',
-      price: '2,800',
-      type: 'cat',
-      breed: 'British Shorthair'
-    },
-    { 
-      id: 'MC202', 
-      name: 'MC202 - Scottish Fold White', 
-      image: MO231,
-      gender: 'Male',
-      age: '2 months',
-      price: '3,500',
-      type: 'cat',
-      breed: 'Scottish Fold'
-    },
-    { 
-      id: 'MC303', 
-      name: 'MC303 - Ragdoll Blue Bicolor', 
-      image: MO231,
-      gender: 'Male',
-      age: '3 months',
-      price: '3,200',
-      type: 'cat',
-      breed: 'Ragdoll'
-    },
-    { 
-      id: 'MC404', 
-      name: 'MC404 - Maine Coon Brown Tabby', 
-      image: MO231,
-      gender: 'Female',
-      age: '4 months',
-      price: '4,500',
-      type: 'cat',
-      breed: 'Maine Coon'
-    },
-    { 
-      id: 'MC505', 
-      name: 'MC505 - Bengal Spotted', 
-      image: MO231,
-      gender: 'Male',
-      age: '2 months',
-      price: '5,000',
-      type: 'cat',
-      breed: 'Bengal'
-    },
-    { 
-      id: 'MC606', 
-      name: 'MC606 - Persian White', 
-      image: MO231,
-      gender: 'Female',
-      age: '3 months',
-      price: '3,800',
-      type: 'cat',
-      breed: 'Persian'
-    },
-  ];
-  
-  // Combine all pets for "All Pets" view
-  const mockAllPets = [...mockDogs, ...mockCats];
   
   // Danh sách các giống chó và mèo để lọc
   const dogBreeds = ['All', 'Pomeranian', 'Poodle', 'Alaskan Malamute', 'Pembroke Corgi'];
@@ -201,28 +62,144 @@ function Pets() {
 
   // Fetch pets data
   useEffect(() => {
+    const fetchPets = async () => {
     setLoading(true);
-    async function fetchPets() {
+      setError(null);
       try {
-        // Gọi API, truyền filter nếu muốn
+        // Fetch ALL pets from database
         const response = await getPets({
-          page: currentPage - 1, // API backend thường dùng 0-based
-          size: pageSize,
-          type: filters.type !== 'all' ? filters.type : undefined,
-          // Có thể truyền thêm breedId, gender, price... nếu backend hỗ trợ
+          page: 0, // Get all data
+          size: 1000 // Large size to get all pets
         });
-        // response.content hoặc response.data.content tùy API
-        setPets(response.content || []);
-        setTotalItems(response.totalElements || 0);
+        
+        // Handle different response formats
+        let fetchedPets = [];
+        if (response?.data?.content) {
+          fetchedPets = response.data.content;
+        } else if (response?.content) {
+          fetchedPets = response.content;
+        } else if (Array.isArray(response)) {
+          fetchedPets = response;
+        }
+        
+        setAllPets(fetchedPets);
+        setError(null);
+        
+        // Debug: Log first few pets to check data structure
+        console.log('Fetched pets sample:', fetchedPets.slice(0, 3));
+        console.log('Pet genders found:', [...new Set(fetchedPets.map(pet => pet?.gender))]);
       } catch (error) {
-        setPets([]);
-        setTotalItems(0);
+        console.error('Error fetching pets:', error);
+        setAllPets([]);
+        setError('Failed to load pets. Please try again later.');
       } finally {
         setLoading(false);
       }
-    }
+    };
+
     fetchPets();
-  }, [activeTab, filters, currentPage, pageSize]);
+  }, []);
+
+  // Fetch breeds data
+  useEffect(() => {
+    const fetchBreeds = async () => {
+      setBreedsLoading(true);
+      try {
+        const response = await getBreeds();
+        let fetchedBreeds = [];
+        
+        if (response?.data?.content) {
+          fetchedBreeds = response.data.content;
+        } else if (response?.content) {
+          fetchedBreeds = response.content;
+        } else if (Array.isArray(response)) {
+          fetchedBreeds = response;
+        }
+        
+        setBreeds(fetchedBreeds);
+      } catch (error) {
+        console.error('Error fetching breeds:', error);
+        setBreeds([]);
+      } finally {
+        setBreedsLoading(false);
+      }
+    };
+
+    fetchBreeds();
+  }, []);
+
+  // Apply filters whenever filters or allPets change
+  useEffect(() => {
+    if (allPets.length === 0) {
+      setFilteredPets([]);
+      setTotalItems(0);
+      return;
+    }
+
+    // Apply ALL filters client-side
+    let filtered = [...allPets];
+    
+    // 1. Filter by type (tab)
+    if (activeTab !== 'all') {
+      filtered = filtered.filter(pet => {
+        const petType = pet?.type?.toLowerCase();
+        return petType === activeTab;
+      });
+    }
+    
+    // 2. Filter by gender
+    if (filters.gender.length > 0) {
+      console.log('Filtering by gender:', filters.gender);
+      filtered = filtered.filter(pet => {
+        const petGender = pet?.gender?.toUpperCase();
+        const isMatch = filters.gender.some(filterGender => 
+          filterGender.toUpperCase() === petGender
+        );
+        console.log(`Pet ${pet?.petName}: gender=${pet?.gender}, petGender=${petGender}, isMatch=${isMatch}`);
+        return isMatch;
+      });
+    }
+    
+    // 3. Filter by price range
+    if (filters.minPrice && filters.minPrice !== '') {
+      filtered = filtered.filter(
+        pet => parseFloat(pet?.unitPrice || 0) >= parseFloat(filters.minPrice)
+      );
+    }
+    
+    if (filters.maxPrice && filters.maxPrice !== '') {
+      filtered = filtered.filter(
+        pet => parseFloat(pet?.unitPrice || 0) <= parseFloat(filters.maxPrice)
+      );
+    }
+    
+    // 4. Filter by age
+    if (filters.age && filters.age !== '') {
+      filtered = filtered.filter(
+        pet => parseInt(pet?.age || 0) === parseInt(filters.age)
+      );
+    }
+    
+    // 5. Filter by breed
+    if (filters.breedType !== 'all') {
+      filtered = filtered.filter(
+        pet => pet?.breed === filters.breedType
+      );
+    }
+    
+    // 6. Sort results
+    if (filters.sortBy === 'price-low') {
+      filtered.sort((a, b) => parseFloat(a?.unitPrice || 0) - parseFloat(b?.unitPrice || 0));
+    } else if (filters.sortBy === 'price-high') {
+      filtered.sort((a, b) => parseFloat(b?.unitPrice || 0) - parseFloat(a?.unitPrice || 0));
+    } else if (filters.sortBy === 'newest') {
+      // Sort by newest (assuming there's a createdAt field)
+      filtered.sort((a, b) => new Date(b?.createdAt || 0) - new Date(a?.createdAt || 0));
+    }
+    
+    setFilteredPets(filtered);
+    setTotalItems(filtered.length);
+  }, [filters, allPets, activeTab]);
 
   // Handle tab change
   const handleTabChange = (tab) => {
@@ -236,11 +213,14 @@ function Pets() {
       ...prevFilters,
       [filterType]: value
     }));
+    // Reset to page 1 when filters change
+    setCurrentPage(1);
   };
 
   // Handle checkbox changes
   const handleGenderChange = (gender) => {
-    const currentGenders = [...filters.gender];
+    setFilters(prevFilters => {
+      const currentGenders = [...prevFilters.gender];
     const index = currentGenders.indexOf(gender);
     
     if (index > -1) {
@@ -249,11 +229,11 @@ function Pets() {
       currentGenders.push(gender);
     }
     
-    handleFilterChange('gender', currentGenders);
+      return {
+        ...prevFilters,
+        gender: currentGenders
   };
-
-  // Apply filters
-  const applyFilters = () => {
+    });
     setCurrentPage(1);
   };
 
@@ -285,22 +265,42 @@ function Pets() {
 
   // Lấy tiêu đề trang dựa trên tab đang active
   const getPageTitle = () => {
-    if (activeTab === 'cats') {
+    if (activeTab === 'cat') {
       return "Our Cats";
-    } else if (activeTab === 'dogs') {
+    } else if (activeTab === 'dog') {
       return "Our Dogs";
     }
     return "Our Pets";
   };
 
+  // Đếm số lượng pets theo type
+  const getTypeCount = (type) => {
+    if (!allPets || allPets.length === 0) return 0;
+    
+    if (type === 'all') {
+      return allPets.length;
+    }
+    
+    return allPets.filter(pet => {
+      const petType = pet?.type?.toLowerCase();
+      return petType === type;
+    }).length;
+  };
+
   // Lấy danh sách các giống dựa trên tab đang active
   const getBreedList = () => {
-    if (activeTab === 'cats') {
-      return catBreeds;
-    } else if (activeTab === 'dogs') {
-      return dogBreeds;
+    if (!breeds || breeds.length === 0) return [];
+    
+    let filteredBreeds = breeds;
+    
+    // Filter breeds based on active tab
+    if (activeTab === 'cat') {
+      filteredBreeds = breeds.filter(breed => breed?.type?.toLowerCase() === 'cat');
+    } else if (activeTab === 'dog') {
+      filteredBreeds = breeds.filter(breed => breed?.type?.toLowerCase() === 'dog');
     }
-    return [...new Set([...dogBreeds, ...catBreeds])]; // Kết hợp và loại bỏ trùng lặp
+    
+    return filteredBreeds.map(breed => breed.breedName || breed.name);
   };
 
   return (
@@ -315,7 +315,7 @@ function Pets() {
                   <Link to="/">Home</Link>
                 </Breadcrumb.Item>
                 <Breadcrumb.Item>
-                  {activeTab === 'cats' ? 'Cats' : activeTab === 'dogs' ? 'Dogs' : 'Pets'}
+                  {activeTab === 'cat' ? 'Cats' : activeTab === 'dog' ? 'Dogs' : 'Pets'}
                 </Breadcrumb.Item>
               </Breadcrumb>
             </Col>
@@ -368,9 +368,9 @@ function Pets() {
             className="animate__animated animate__fadeInDown"
             centered
           >
-            <TabPane tab="All Pets" key="all" />
-            <TabPane tab="Dogs" key="dogs" />
-            <TabPane tab="Cats" key="cats" />
+            <TabPane tab={`All Pets (${getTypeCount('all')})`} key="all" />
+            <TabPane tab={`Dogs (${getTypeCount('dog')})`} key="dog" />
+            <TabPane tab={`Cats (${getTypeCount('cat')})`} key="cat" />
           </Tabs>
         </div>
       </section>
@@ -396,14 +396,14 @@ function Pets() {
                 <h3 className="filter-title">Gender</h3>
                 <div className="filter-gender">
                   <Checkbox 
-                    checked={filters.gender.includes('Male')}
-                    onChange={() => handleGenderChange('Male')}
+                    checked={filters.gender.includes('MALE')}
+                    onChange={() => handleGenderChange('MALE')}
                   >
                     Male
                   </Checkbox>
                   <Checkbox 
-                    checked={filters.gender.includes('Female')}
-                    onChange={() => handleGenderChange('Female')}
+                    checked={filters.gender.includes('FEMALE')}
+                    onChange={() => handleGenderChange('FEMALE')}
                   >
                     Female
                   </Checkbox>
@@ -443,9 +443,10 @@ function Pets() {
                   style={{ width: '100%' }}
                   value={filters.breedType}
                   onChange={(value) => handleFilterChange('breedType', value)}
+                  loading={breedsLoading}
                 >
                   <Option value="all">All Breeds</Option>
-                  {getBreedList().filter(breed => breed !== 'All').map(breed => (
+                  {getBreedList().map(breed => (
                     <Option key={breed} value={breed}>{breed}</Option>
                   ))}
                 </Select>
@@ -461,32 +462,40 @@ function Pets() {
                   <Option value="price-low">Price: Low to High</Option>
                   <Option value="price-high">Price: High to Low</Option>
                 </Select>
-
-                <Button 
-                  type="primary" 
-                  className="submit-filter"
-                  onClick={applyFilters}
-                  icon={<FilterOutlined />}
-                >
-                  Apply Filters
-                </Button>
               </div>
             </Col>
 
             {/* Pets Product Column */}
             <Col xs={24} sm={24} md={16} lg={18} xl={18}>
+              <div className="pets-header">
               <h2 className="animate__animated animate__fadeInDown">{getPageTitle()}</h2>
+                {filteredPets.length > 0 && (
+                  <p className="results-count">
+                    Showing {filteredPets.length} of {allPets.length} pets
+                  </p>
+                )}
+              </div>
               
               {loading ? (
                 <div className="loading-container">
                   <Spin size="large" />
                 </div>
+              ) : error ? (
+                <div className="error-container">
+                  <p className="error-message">{error}</p>
+                  <Button onClick={() => window.location.reload()}>Retry</Button>
+                </div>
               ) : (
                 <Row gutter={[16, 24]}>
-                  {pets.length > 0 ? (
-                    pets.map((pet, index) => (
+                  {filteredPets.length > 0 ? (
+                    (() => {
+                      const startIndex = (currentPage - 1) * pageSize;
+                      const endIndex = startIndex + pageSize;
+                      const paginatedPets = filteredPets.slice(startIndex, endIndex);
+                      
+                      return paginatedPets.map((pet) => (
                       <Col 
-                        key={pet.petId} 
+                          key={pet?.petId || Math.random()} 
                         xs={24} 
                         sm={12} 
                         md={12} 
@@ -505,10 +514,16 @@ function Pets() {
                           onAddToCart={() => handleAddToCart(pet)}
                         />
                       </Col>
-                    ))
+                      ));
+                    })()
                   ) : (
                     <div className="no-results">
-                      <p>No pets found matching your criteria.</p>
+                      <p>
+                        {activeTab === 'all' 
+                          ? 'No pets found matching your criteria.' 
+                          : `No pets found in "${getPageTitle()}" matching your criteria.`
+                        }
+                      </p>
                       <Button onClick={resetFilters}>Reset Filters</Button>
                     </div>
                   )}
@@ -516,7 +531,7 @@ function Pets() {
               )}
 
               {/* Pagination */}
-              {pets.length > 0 && (
+              {filteredPets.length > 0 && (
                 <div className="pagination-container animate__animated animate__fadeInUp">
                   <Pagination
                     current={currentPage}

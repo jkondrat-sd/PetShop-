@@ -62,6 +62,31 @@
 .accessories-tabs {
   margin-bottom: 20px;
   
+  .categories-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 0;
+    
+    p {
+      margin-top: 15px;
+      color: #607d8b;
+      font-size: 16px;
+    }
+  }
+  
+  .categories-error {
+    text-align: center;
+    padding: 40px 0;
+    color: #e74c3c;
+    
+    p {
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+  }
+  
   .ant-tabs {
     .ant-tabs-nav {
       margin-bottom: 30px;
@@ -99,6 +124,23 @@
 /* Accessories Section */
 .accessories {
   margin-bottom: 60px;
+  
+  .accessories-header {
+    margin-bottom: 20px;
+    
+    h2 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #002a48;
+      margin-bottom: 5px;
+    }
+    
+    .results-count {
+      color: #607d8b;
+      font-size: 14px;
+      margin: 0;
+    }
+  }
   
   h2 {
     font-size: 26px;
@@ -281,5 +323,35 @@
   
   .accessories .filter-title {
     font-size: 16px;
+  }
+}
+
+.error-container {
+  text-align: center;
+  padding: 40px 20px;
+  
+  .error-message {
+    color: #ff4d4f;
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .ant-btn {
+    margin-top: 8px;
+  }
+}
+
+.loading-container {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.no-results {
+  text-align: center;
+  padding: 40px 20px;
+  
+  p {
+    color: #666;
+    margin-bottom: 16px;
   }
 }

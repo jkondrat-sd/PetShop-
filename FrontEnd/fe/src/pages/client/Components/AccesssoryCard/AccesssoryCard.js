@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Button, Badge, Tooltip, Tag, notification } from "antd";
+import { Button, Tooltip, Tag, notification } from "antd";
 import { ShoppingCartOutlined } from "@ant-design/icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBox, faBoxOpen } from "@fortawesome/free-solid-svg-icons";
 import "animate.css";
 import styles from "./AccesssoryCard.module.scss";
 import { addToCart } from "~/services/cartService";
@@ -79,19 +77,13 @@ const AccessoryCard = ({
 			<div className={styles["accessory-card__inner"]}>
 				<Link to={`/accessories/${id}`} style={{ textDecoration: "none" }}>
 					<div className={styles["accessory-card__image"]}>
-						<Badge.Ribbon
-							text={stockQuantity > 0 ? "In Stock" : "Out of Stock"}
-							color={stockQuantity > 0 ? "#52c41a" : "#ff4d4f"}
-							className={styles["accessory-card__stock-badge"]}
-						>
-							<img
-								src={image}
-								alt={name}
-								className={`${styles["accessory-card__img"]} ${
-									isHovered ? styles["accessory-card__img--zoomed"] : ""
-								}`}
-							/>
-						</Badge.Ribbon>
+						<img
+							src={image}
+							alt={name}
+							className={`${styles["accessory-card__img"]} ${
+								isHovered ? styles["accessory-card__img--zoomed"] : ""
+							}`}
+						/>
 					</div>
 
 					<h3 className={styles["accessory-card__name"]}>{name}</h3>

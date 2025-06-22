@@ -12,7 +12,7 @@ const PetCard = ({
 	id,
 	name,
 	image,
-	gender = "Male",
+	gender = "MALE",
 	age = "2 months",
 	price = "3,000",
 	onAddToCart,
@@ -20,6 +20,34 @@ const PetCard = ({
 	const [isHovered, setIsHovered] = useState(false);
 	const [isVisible, setIsVisible] = useState(false);
 	const cardRef = useRef(null);
+
+	// Helper function to get gender display
+	const getGenderDisplay = (gender) => {
+		const genderMap = {
+			'MALE': 'Male',
+			'FEMALE': 'Female',
+			'Male': 'Male',
+			'Female': 'Female'
+		};
+		return genderMap[gender] || 'Unknown';
+	};
+
+	// Helper function to get gender color
+	const getGenderColor = (gender) => {
+		const colorMap = {
+			'MALE': '#003459',
+			'FEMALE': '#FF64B4',
+			'Male': '#003459',
+			'Female': '#FF64B4'
+		};
+		return colorMap[gender] || '#666666';
+	};
+
+	// Helper function to get gender icon
+	const getGenderIcon = (gender) => {
+		const upperGender = gender?.toUpperCase();
+		return upperGender === 'MALE' ? faMars : faVenus;
+	};
 
 	// Function to check if element is in viewport
 	const isInViewport = (element) => {
@@ -135,8 +163,8 @@ const PetCard = ({
 					<Link to={`/pets/${id}`} className={styles["pet-card__link"]}>
 						<div className={styles["pet-card__image"]}>
 							<Badge.Ribbon
-								text={gender === "Male" ? "Male" : "Female"}
-								color={gender === "Male" ? "#003459" : "#FF64B4"}
+								text={getGenderDisplay(gender)}
+								color={getGenderColor(gender)}
 								className={styles["pet-card__gender-badge"]}
 							>
 								<img
@@ -154,10 +182,10 @@ const PetCard = ({
 						<div className={styles["pet-card__details"]}>
 							<div className={styles["pet-card__detail"]}>
 								<FontAwesomeIcon
-									icon={gender === "Male" ? faMars : faVenus}
+									icon={getGenderIcon(gender)}
 									className={styles["pet-card__icon"]}
 								/>
-								<span>Gender: {gender}</span>
+								<span>Gender: {getGenderDisplay(gender)}</span>
 							</div>
 
 							<div className={styles["pet-card__detail"]}>

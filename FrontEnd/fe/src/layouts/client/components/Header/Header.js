@@ -22,7 +22,7 @@ import CartModal from "~/pages/client/CartModal/CartModal";
 import { deleteCookie } from "~/helpers/cookie";
 import { getUserInfo } from "~/services/usersService";
 import { getCart } from "~/services/cartService";
-// import Search from "../Search/Search";
+import Search from "../Search/Search";
 
 const cx = classNames.bind(styles);
 
@@ -53,17 +53,13 @@ function Header() {
 	useEffect(() => {
 		const handleCartUpdate = async () => {
 			try {
-				console.log("Header: Handling cart update event");
 				const response = await getCart();
 				if (response && response.success && response.data) {
-					console.log("Header: Updated cart count:", response.data.totalItems);
 					setCartItemCount(response.data.totalItems || 0);
 				} else {
-					console.log("Header: Cart response empty or invalid");
 					setCartItemCount(0);
 				}
 			} catch (error) {
-				console.error("Error updating cart count:", error);
 				setCartItemCount(0);
 			}
 		};
@@ -78,13 +74,6 @@ function Header() {
 			window.removeEventListener("cartUpdated", handleCartUpdate);
 		};
 	}, []);
-
-	// useEffect(() => {
-	// 	// Kiểm tra dữ liệu từ localStorage
-	// 	const localUserData = JSON.parse(localStorage.getItem("userData") || "{}");
-	// 	console.log("Local Storage userData:", localUserData);
-	// 	console.log("Local Storage avatarUrl:", localUserData?.avatarUrl);
-	// }, [userData]);
 
 	const showCartModal = () => {
 		setCartModalVisible(true);
@@ -112,9 +101,6 @@ function Header() {
 			onClick: handleLogout,
 		},
 	];
-
-	// console.log("User data:", userData);
-	// console.log("Is logged in:", isLoggedIn);
 
 	return (
 		<div className={cx("header-bg")}>
@@ -152,17 +138,17 @@ function Header() {
 				</nav>
 
 				<div className={cx("header-search-user")}>
-					{/* <div className={cx("header-search-wrapper")}>
+					<div className={cx("header-search-wrapper")}>
 						<Search />
-					</div> */}
-					<Input
+					</div>
+					{/* <Input
 						className={cx("header-search")}
 						placeholder="Search something here!"
 						prefix={
 							<FontAwesomeIcon icon={faSearch} style={{ color: " #003459" }} />
 						}
 						allowClear
-					/>
+					/> */}
 
 					<div className={cx("header-user-section")}>
 						{isLoggedIn ? (

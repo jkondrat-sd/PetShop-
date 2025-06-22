@@ -3,15 +3,10 @@ import { Layout, Menu } from "antd";
 import {
 	DashboardOutlined,
 	ShopOutlined,
-	TagsOutlined,
 	ShoppingCartOutlined,
 	UserOutlined,
-	CommentOutlined,
 	AppstoreOutlined,
-	FileTextOutlined,
 	PieChartOutlined,
-	TeamOutlined,
-	LockOutlined,
 } from "@ant-design/icons";
 import { useLocation, useNavigate } from "react-router-dom";
 import Logo from "../Logo";
@@ -71,11 +66,11 @@ const Sidebar = ({ collapsed }) => {
 				},
 			],
 		},
-		{
-			key: "/admin/categories",
-			icon: <TagsOutlined />,
-			label: "Categories",
-		},
+		// {
+		// 	key: "/admin/categories",
+		// 	icon: <TagsOutlined />,
+		// 	label: "Categories",
+		// },
 		{
 			key: "/admin/orders",
 			icon: <ShoppingCartOutlined />,

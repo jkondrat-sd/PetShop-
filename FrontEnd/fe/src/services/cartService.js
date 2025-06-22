@@ -14,10 +14,10 @@ export const addToCart = async (item) => {
       items: [itemData]
     };
     
-    console.log('Sending cart request with data:', payload);
+    // console.log('Sending cart request with data:', payload);
     
     const response = await request.post('/cart', payload);
-    console.log('Add to cart response:', response);
+    // console.log('Add to cart response:', response);
     
     // Lưu một bản sao vào localStorage để dự phòng
     try {
@@ -63,7 +63,7 @@ export const addToCart = async (item) => {
     // Dispatch event sau một khoảng thời gian để đảm bảo đã cập nhật Redis
     setTimeout(() => {
       window.dispatchEvent(new Event("cartUpdated"));
-      console.log('Cart updated event dispatched');
+      // console.log('Cart updated event dispatched');
     }, 300);
     
     return response;
@@ -75,18 +75,14 @@ export const addToCart = async (item) => {
 
 export const getCart = async () => {
   try {
-    console.log('Fetching cart from API');
     const response = await request.get('/cart');
-    console.log('Get cart response:', response);
     
     // Đảm bảo response có đúng cấu trúc
     if (response && response.success) {
       // Đảm bảo response.data tồn tại và có items
       if (!response.data) {
-        console.log('Response data is missing, using empty cart');
         response.data = { items: [], totalAmount: 0, totalItems: 0 };
       } else if (!response.data.items) {
-        console.log('Response data.items is missing, initializing empty array');
         response.data.items = [];
         response.data.totalAmount = response.data.totalAmount || 0;
         response.data.totalItems = response.data.totalItems || 0;
@@ -162,62 +158,6 @@ function getLocalStorageCart() {
 
 function saveLocalStorageCart(cart) {
   localStorage.setItem('cart', JSON.stringify(cart));
-}
-
-function updateLocalStorageCartItem(cart, itemData) {
-  // Xóa item nếu quantity = 0
-  if (itemData.quantity <= 0) {
-    cart.items = cart.items.filter(i => 
-      !(i.itemType === itemData.itemType && i.itemId === itemData.itemId)
-    );
-  } else {
-    // Tìm item đã tồn tại
-    const existingItem = cart.items.find(i => 
-      i.itemType === itemData.itemType && i.itemId === itemData.itemId
-    );
-    
-    if (existingItem) {
-      // Cập nhật số lượng
-      existingItem.quantity = itemData.quantity;
-      existingItem.subtotal = existingItem.price * itemData.quantity;
-    } else {
-      // Thêm item mới (với giá tạm thời)
-      cart.items.push({
-        itemId: itemData.itemId,
-        itemType: itemData.itemType,
-        name: `Item ${itemData.itemId}`,
-        price: 0, // Sẽ được cập nhật khi loadProductDetails
-        quantity: itemData.quantity,
-        subtotal: 0, // Sẽ được cập nhật khi loadProductDetails
-      });
-      
-      // Thử tải thông tin chi tiết sản phẩm
-      loadProductDetails(itemData.itemType, itemData.itemId)
-        .then(details => {
-          if (details) {
-            const updatedCart = getLocalStorageCart();
-            const itemToUpdate = updatedCart.items.find(i => 
-              i.itemType === itemData.itemType && i.itemId === itemData.itemId
-            );
-            
-            if (itemToUpdate) {
-              itemToUpdate.name = details.name;
-              itemToUpdate.price = details.price;
-              itemToUpdate.subtotal = details.price * itemToUpdate.quantity;
-              itemToUpdate.thumbnail = details.thumbnail;
-              
-              saveLocalStorageCart(updatedCart);
-              console.log('Updated item details in localStorage');
-            }
-          }
-        })
-        .catch(error => console.error('Error loading product details:', error));
-    }
-  }
-  
-  // Tính lại tổng
-  cart.totalItems = cart.items.reduce((sum, item) => sum + item.quantity, 0);
-  cart.totalAmount = cart.items.reduce((sum, item) => sum + (item.subtotal || 0), 0);
 }
 
 // Hàm tải chi tiết sản phẩm
