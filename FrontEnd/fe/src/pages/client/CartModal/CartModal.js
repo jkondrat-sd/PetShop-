@@ -88,7 +88,7 @@ const CartModal = ({ visible, onClose }) => {
 		try {
 			// Gọi API cập nhật số lượng
 			const response = await addToCart({
-				type: item.itemType, // Loại sản phẩm (pet/accessory)
+				type: item.itemType,
 				itemId: item.itemId,
 				quantity: newQuantity,
 			});
@@ -262,50 +262,42 @@ const CartModal = ({ visible, onClose }) => {
 									</div>
 
 									<div className="cart-item-price-section">
-										<div className="cart-item-price">{item.price} $</div>
-										<div className="cart-item-subtotal">
+                  <div className="cart-item-price">
 											{item.subtotal || item.price * item.quantity} $
+											</div>
+											<div className="cart-item-subtotal">{item.price} $</div>
+											
+											<Button
+												danger
+												icon={<DeleteOutlined />}
+												onClick={() => handleRemoveItem(item)}
+												className="remove-item-btn"
+												type="text"
+											/>
 										</div>
-										<Button
-											danger
-											icon={<DeleteOutlined />}
-											onClick={() => handleRemoveItem(item)}
-											className="remove-item-btn"
-											type="text"
-										/>
 									</div>
-								</div>
-							))}
-						</div>
-
+								))}
+							</div>
 						<Divider />
-
-						<div className="cart-summary">
-							<div className="cart-total">
-								<span className="total-label">Total</span>
-								<span className="total-price">{totalAmount} $</span>
-							</div>
-
-							<div className="cart-actions">
-								<Link to="/cart">
-									<Button className="view-cart-btn" onClick={onClose}>
-										View cart
-									</Button>
-								</Link>
-
-								<Button
-									type="primary"
-									className="checkout-btn"
-									onClick={handleCheckout}
-									loading={loading}
-								>
-									Checkout
-								</Button>
-
-							</div>
-						</div>
 					</>
 				)}
+			</div>
+			<div className="cart-summary">
+				<div className="cart-total">
+					<span className="total-label">Total</span>
+					<span className="total-price">{totalAmount} $</span>
+				</div>
+				<div className="cart-actions">
+					<Button
+						type="primary"
+						className="checkout-btn"
+						onClick={handleCheckout}
+						loading={loading}
+						block
+					>
+						Checkout
+					</Button>
+				</div>
 			</div>
 		</Modal>
 	);

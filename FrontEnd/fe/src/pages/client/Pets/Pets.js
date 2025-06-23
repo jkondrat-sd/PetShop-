@@ -27,7 +27,7 @@ import { getBreeds } from '~/services/breedService';
 
 // Import banner images
 import puppiesDog from '../../../assets/images/img-dogs/puppies-dog.png';
-import MO231 from '../../../assets/images/img-dogs/MO231.png';
+
 
 const { TabPane } = Tabs;
 const { Option } = Select;
@@ -35,8 +35,8 @@ const { Option } = Select;
 function Pets() {
   // States
   const [loading, setLoading] = useState(true);
-  const [allPets, setAllPets] = useState([]); // Lưu trữ tất cả pets
-  const [filteredPets, setFilteredPets] = useState([]); // Pets sau khi filter
+  const [allPets, setAllPets] = useState([]); // All pets from DB
+  const [filteredPets, setFilteredPets] = useState([]); // Pets after filter
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [pageSize, setPageSize] = useState(9);
@@ -52,27 +52,22 @@ function Pets() {
     minPrice: '',
     maxPrice: '',
     age: '',
-    breedType: 'all', // Để lọc theo giống
-    sortBy: 'newest' // Để sắp xếp kết quả
+    breedId: 'all', // Use breedId for filtering
+    sortBy: 'newest'
   });
   
-  // Danh sách các giống chó và mèo để lọc
-  const dogBreeds = ['All', 'Pomeranian', 'Poodle', 'Alaskan Malamute', 'Pembroke Corgi'];
-  const catBreeds = ['All', 'British Shorthair', 'Scottish Fold', 'Ragdoll', 'Maine Coon', 'Bengal', 'Persian'];
+
 
   // Fetch pets data
   useEffect(() => {
     const fetchPets = async () => {
-    setLoading(true);
+      setLoading(true);
       setError(null);
       try {
-        // Fetch ALL pets from database
         const response = await getPets({
-          page: 0, // Get all data
-          size: 1000 // Large size to get all pets
+          page: 0,
+          size: 1000
         });
-        
-        // Handle different response formats
         let fetchedPets = [];
         if (response?.data?.content) {
           fetchedPets = response.data.content;
@@ -81,22 +76,15 @@ function Pets() {
         } else if (Array.isArray(response)) {
           fetchedPets = response;
         }
-        
         setAllPets(fetchedPets);
         setError(null);
-        
-        // Debug: Log first few pets to check data structure
-        console.log('Fetched pets sample:', fetchedPets.slice(0, 3));
-        console.log('Pet genders found:', [...new Set(fetchedPets.map(pet => pet?.gender))]);
       } catch (error) {
-        console.error('Error fetching pets:', error);
         setAllPets([]);
         setError('Failed to load pets. Please try again later.');
       } finally {
         setLoading(false);
       }
     };
-
     fetchPets();
   }, []);
 
@@ -107,7 +95,6 @@ function Pets() {
       try {
         const response = await getBreeds();
         let fetchedBreeds = [];
-        
         if (response?.data?.content) {
           fetchedBreeds = response.data.content;
         } else if (response?.content) {
@@ -115,18 +102,27 @@ function Pets() {
         } else if (Array.isArray(response)) {
           fetchedBreeds = response;
         }
-        
         setBreeds(fetchedBreeds);
       } catch (error) {
-        console.error('Error fetching breeds:', error);
         setBreeds([]);
       } finally {
         setBreedsLoading(false);
       }
     };
-
     fetchBreeds();
   }, []);
+
+  // Sync activeTab <-> filters.type
+  useEffect(() => {
+    if (filters.type !== activeTab) {
+      setActiveTab(filters.type);
+    }
+  }, [filters.type]);
+  useEffect(() => {
+    if (activeTab !== filters.type) {
+      setFilters(prev => ({ ...prev, type: activeTab }));
+    }
+  }, [activeTab]);
 
   // Apply filters whenever filters or allPets change
   useEffect(() => {
@@ -135,75 +131,46 @@ function Pets() {
       setTotalItems(0);
       return;
     }
-
-    // Apply ALL filters client-side
     let filtered = [...allPets];
-    
-    // 1. Filter by type (tab)
-    if (activeTab !== 'all') {
-      filtered = filtered.filter(pet => {
-        const petType = pet?.type?.toLowerCase();
-        return petType === activeTab;
-      });
+    // 1. Filter by type
+    if (filters.type !== 'all') {
+      filtered = filtered.filter(pet => pet?.type?.toLowerCase() === filters.type);
     }
-    
     // 2. Filter by gender
     if (filters.gender.length > 0) {
-      console.log('Filtering by gender:', filters.gender);
-      filtered = filtered.filter(pet => {
-        const petGender = pet?.gender?.toUpperCase();
-        const isMatch = filters.gender.some(filterGender => 
-          filterGender.toUpperCase() === petGender
-        );
-        console.log(`Pet ${pet?.petName}: gender=${pet?.gender}, petGender=${petGender}, isMatch=${isMatch}`);
-        return isMatch;
-      });
+      filtered = filtered.filter(pet => filters.gender.includes((pet?.gender || '').toUpperCase()));
     }
-    
     // 3. Filter by price range
-    if (filters.minPrice && filters.minPrice !== '') {
-      filtered = filtered.filter(
-        pet => parseFloat(pet?.unitPrice || 0) >= parseFloat(filters.minPrice)
-      );
+    if (filters.minPrice !== '') {
+      filtered = filtered.filter(pet => parseFloat(pet?.unitPrice || 0) >= parseFloat(filters.minPrice));
     }
-    
-    if (filters.maxPrice && filters.maxPrice !== '') {
-      filtered = filtered.filter(
-        pet => parseFloat(pet?.unitPrice || 0) <= parseFloat(filters.maxPrice)
-      );
+    if (filters.maxPrice !== '') {
+      filtered = filtered.filter(pet => parseFloat(pet?.unitPrice || 0) <= parseFloat(filters.maxPrice));
     }
-    
     // 4. Filter by age
-    if (filters.age && filters.age !== '') {
-      filtered = filtered.filter(
-        pet => parseInt(pet?.age || 0) === parseInt(filters.age)
-      );
+    if (filters.age !== '') {
+      filtered = filtered.filter(pet => parseInt(pet?.age || 0) === parseInt(filters.age));
     }
-    
-    // 5. Filter by breed
-    if (filters.breedType !== 'all') {
-      filtered = filtered.filter(
-        pet => pet?.breed === filters.breedType
-      );
+    // 5. Filter by breedId
+    if (filters.breedId !== 'all') {
+      filtered = filtered.filter(pet => String(pet?.breedId) === String(filters.breedId));
     }
-    
-    // 6. Sort results
+    // 6. Sort
     if (filters.sortBy === 'price-low') {
       filtered.sort((a, b) => parseFloat(a?.unitPrice || 0) - parseFloat(b?.unitPrice || 0));
     } else if (filters.sortBy === 'price-high') {
       filtered.sort((a, b) => parseFloat(b?.unitPrice || 0) - parseFloat(a?.unitPrice || 0));
     } else if (filters.sortBy === 'newest') {
-      // Sort by newest (assuming there's a createdAt field)
       filtered.sort((a, b) => new Date(b?.createdAt || 0) - new Date(a?.createdAt || 0));
     }
-    
     setFilteredPets(filtered);
     setTotalItems(filtered.length);
-  }, [filters, allPets, activeTab]);
+  }, [filters, allPets]);
 
   // Handle tab change
   const handleTabChange = (tab) => {
     setActiveTab(tab);
+    setFilters(prev => ({ ...prev, type: tab }));
     setCurrentPage(1);
   };
 
@@ -213,26 +180,23 @@ function Pets() {
       ...prevFilters,
       [filterType]: value
     }));
-    // Reset to page 1 when filters change
     setCurrentPage(1);
   };
 
-  // Handle checkbox changes
+  // Handle gender checkbox
   const handleGenderChange = (gender) => {
     setFilters(prevFilters => {
       const currentGenders = [...prevFilters.gender];
-    const index = currentGenders.indexOf(gender);
-    
-    if (index > -1) {
-      currentGenders.splice(index, 1);
-    } else {
-      currentGenders.push(gender);
-    }
-    
+      const index = currentGenders.indexOf(gender);
+      if (index > -1) {
+        currentGenders.splice(index, 1);
+      } else {
+        currentGenders.push(gender);
+      }
       return {
         ...prevFilters,
         gender: currentGenders
-  };
+      };
     });
     setCurrentPage(1);
   };
@@ -245,9 +209,10 @@ function Pets() {
       minPrice: '',
       maxPrice: '',
       age: '',
-      breedType: 'all',
+      breedId: 'all',
       sortBy: 'newest'
     });
+    setActiveTab('all');
     setCurrentPage(1);
   };
 
@@ -265,42 +230,28 @@ function Pets() {
 
   // Lấy tiêu đề trang dựa trên tab đang active
   const getPageTitle = () => {
-    if (activeTab === 'cat') {
-      return "Our Cats";
-    } else if (activeTab === 'dog') {
-      return "Our Dogs";
-    }
-    return "Our Pets";
+    if (activeTab === 'cat') return 'Our Cats';
+    if (activeTab === 'dog') return 'Our Dogs';
+    return 'Our Pets';
   };
 
   // Đếm số lượng pets theo type
   const getTypeCount = (type) => {
     if (!allPets || allPets.length === 0) return 0;
-    
-    if (type === 'all') {
-      return allPets.length;
-    }
-    
-    return allPets.filter(pet => {
-      const petType = pet?.type?.toLowerCase();
-      return petType === type;
-    }).length;
+    if (type === 'all') return allPets.length;
+    return allPets.filter(pet => pet?.type?.toLowerCase() === type).length;
   };
 
   // Lấy danh sách các giống dựa trên tab đang active
   const getBreedList = () => {
     if (!breeds || breeds.length === 0) return [];
-    
     let filteredBreeds = breeds;
-    
-    // Filter breeds based on active tab
     if (activeTab === 'cat') {
       filteredBreeds = breeds.filter(breed => breed?.type?.toLowerCase() === 'cat');
     } else if (activeTab === 'dog') {
       filteredBreeds = breeds.filter(breed => breed?.type?.toLowerCase() === 'dog');
     }
-    
-    return filteredBreeds.map(breed => breed.breedName || breed.name);
+    return filteredBreeds;
   };
 
   return (
@@ -441,13 +392,13 @@ function Pets() {
                 <Select 
                   defaultValue="all"
                   style={{ width: '100%' }}
-                  value={filters.breedType}
-                  onChange={(value) => handleFilterChange('breedType', value)}
+                  value={filters.breedId}
+                  onChange={(value) => handleFilterChange('breedId', value)}
                   loading={breedsLoading}
                 >
                   <Option value="all">All Breeds</Option>
                   {getBreedList().map(breed => (
-                    <Option key={breed} value={breed}>{breed}</Option>
+                    <Option key={breed.id} value={breed.id}>{breed.breedName}</Option>
                   ))}
                 </Select>
                 

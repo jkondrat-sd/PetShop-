@@ -71,11 +71,11 @@ const CheckOutPage = () => {
 
 	const handleQuantityChange = async (itemId, newQuantity) => {
 		if (newQuantity < 1) return;
-		const item = cartItems.find((i) => i.id === itemId);
+		const item = cartItems.find((i) => i.itemId === itemId);
 		if (!item) return;
 		await cartService.addToCart({
-			type: item.type || "pet",
-			itemId: Number(item.id),
+			type: item.itemType,
+			itemId: Number(item.itemId),
 			quantity: newQuantity,
 		});
 		loadCartItems();
@@ -83,12 +83,11 @@ const CheckOutPage = () => {
 	};
 
 	const handleRemoveItem = async (itemId) => {
-		// Đặt quantity = 0 để xóa
-		const item = cartItems.find((i) => i.id === itemId);
+		const item = cartItems.find((i) => i.itemId === itemId);
 		if (!item) return;
 		await cartService.addToCart({
-			type: item.type || "pet",
-			itemId: Number(item.id),
+			type: item.itemType,
+			itemId: Number(item.itemId),
 			quantity: 0,
 		});
 		loadCartItems();
@@ -145,18 +144,18 @@ const CheckOutPage = () => {
 
 			// Transform cart items into the EXACT format expected by backend
 			const items = cartItems.map((item) => ({
-				type: item.type || "pet", // Make sure this is either "pet" or "accessory"
-				itemId: Number(item.id), // Convert to number explicitly
-				quantity: Number(item.quantity), // Convert to number explicitly
+				itemType: item.itemType || "pet",
+				itemId: Number(item.itemId),
+				quantity: Number(item.quantity),
 			}));
 
 			// Create order data structure that matches the backend OrderRequest exactly
 			const orderData = {
 				shipName: values.fullName,
 				shipAddress: `${values.address}, ${values.city}`,
-				freight: Number(shippingCost), // Convert to number explicitly
+				freight: Number(shippingCost),
 				paymentMethod: values.paymentMethod,
-				items: items, // Include the items in the request
+				items: items,
 			};
 
 			// Log the exact data being sent for debugging
@@ -211,47 +210,57 @@ const CheckOutPage = () => {
 
 							<div className="cart-items">
 								{cartItems.map((item) => (
-									<div key={item.id} className="cart-item">
+									<div key={`${item.itemType}-${item.itemId}`} className="cart-item">
 										<div className="item-image">
-											<img src={item.image} alt={item.name} />
+											<img src={item.thumbnail || item.image} alt={item.name} />
 										</div>
 
 										<div className="item-details">
 											<div className="item-info">
 												<div className="item-type-name">
-													<Text type="secondary">{item.type || "Dog"}</Text>
+													<Text type="secondary">
+														{item.itemType === "accessory"
+															? "Accessory"
+															: item.itemType === "pet"
+																? (item.type ? item.type.charAt(0).toUpperCase() + item.type.slice(1) : "Pet")
+																: "Product"}
+													</Text>
 													<Title level={5} className="item-name">
 														{item.name}
 													</Title>
 												</div>
 
 												<div className="item-quantity">
-													<Space>
-														<Button
-															onClick={() =>
-																handleQuantityChange(item.id, item.quantity - 1)
-															}
-															disabled={item.quantity <= 1}
-														>
-															-
-														</Button>
-														<InputNumber
-															min={1}
-															value={item.quantity}
-															onChange={(value) =>
-																handleQuantityChange(item.id, value)
-															}
-															controls={false}
-															className="quantity-input"
-														/>
-														<Button
-															onClick={() =>
-																handleQuantityChange(item.id, item.quantity + 1)
-															}
-														>
-															+
-														</Button>
-													</Space>
+													{item.itemType === "accessory" ? (
+														<Space>
+															<Button
+																onClick={() =>
+																	handleQuantityChange(item.itemId, item.quantity - 1)
+																}
+																disabled={item.quantity <= 1}
+															>
+																-
+															</Button>
+															<InputNumber
+																min={1}
+																value={item.quantity}
+																onChange={(value) =>
+																	handleQuantityChange(item.itemId, value)
+																}
+																controls={false}
+																className="quantity-input"
+															/>
+															<Button
+																onClick={() =>
+																	handleQuantityChange(item.itemId, item.quantity + 1)
+																}
+															>
+																+
+															</Button>
+														</Space>
+													) : (
+														<span>Quantity: 1</span>
+													)}
 												</div>
 											</div>
 
@@ -259,7 +268,7 @@ const CheckOutPage = () => {
 												<Text className="item-price">$ {item.price}</Text>
 												<Button
 													icon={<DeleteOutlined />}
-													onClick={() => handleRemoveItem(item.id)}
+													onClick={() => handleRemoveItem(item.itemId)}
 													type="text"
 													danger
 												/>

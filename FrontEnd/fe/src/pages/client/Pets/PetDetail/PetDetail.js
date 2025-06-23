@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Row, 
   Col, 
@@ -9,7 +9,8 @@ import {
   Descriptions, 
   Space, 
   Skeleton,
-  message
+  message,
+  notification
 } from 'antd';
 import { 
   ShoppingCartOutlined, 
@@ -33,17 +34,11 @@ import './PetDetail.scss';
 import { addToCart } from "../../../../services/cartService";
 import { getPetById, getPets } from "../../../../services/petService";
 
-import imgDog from '../../../../assets/images/img-dogs/MO231.png';
-import imgDog2 from '../../../../assets/images/img-dogs/MO326.png';
-import profile1 from '../../../../assets/images/img-dogs/Frame 118.png';
-import profile2 from '../../../../assets/images/img-dogs/Frame 119.png';
-import profile3 from '../../../../assets/images/img-dogs/Frame 120.png';
-import profile4 from '../../../../assets/images/img-dogs/Frame 121.png';
-
 const { Title, Text } = Typography;
 
 const PetDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [pet, setPet] = useState(null);
   const [loading, setLoading] = useState(true);
   const [mainImage, setMainImage] = useState('');
@@ -107,22 +102,122 @@ const PetDetail = () => {
 
   const handleAddToCart = async () => {
     if (!pet) return;
+
+    // Kiểm tra trạng thái pet
+    if (pet.status !== 'available') {
+      message.warn("This pet is not available for purchase");
+      return;
+    }
+    
     try {
-      await addToCart({
+      // Kiểm tra token
+      const tokenCookie = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("token="));
+      if (!tokenCookie) {
+        notification.warn({
+          message: "Login Required",
+          description: "Please login to add items to your cart",
+          placement: "bottomRight",
+        });
+        return;
+      }
+
+      const numericId = Number(pet.petId) || pet.petId;
+
+      notification.info({
+        message: "Adding to cart...",
+        description: `Adding ${pet.petName} to your cart`,
+        placement: "bottomRight",
+        duration: 2,
+      });
+
+      const response = await addToCart({
         type: "pet",
-        itemId: pet.petId,
+        itemId: numericId,
         quantity: 1,
       });
-      window.dispatchEvent(new Event("cartUpdated"));
-      message.success(`${pet.petName} has been added to your cart!`);
+
+      if (response && response.success) {
+        notification.success({
+          message: "Added to cart",
+          description: `${pet.petName} has been added to your cart`,
+          placement: "bottomRight",
+        });
+        setTimeout(() => {
+          window.dispatchEvent(new Event("cartUpdated"));
+        }, 300);
+      } else {
+        throw new Error(response?.message || "Failed to add to cart");
+      }
     } catch (error) {
-      message.error("Failed to add to cart. Please try again.");
+      console.error("Add to cart error:", error);
+      notification.error({
+        message: "Failed to add to cart",
+        description: error.message || "Please try again",
+        placement: "bottomRight",
+      });
     }
   };
 
-  const handleBuyNow = () => {
-    message.info("Redirecting to checkout...");
-    // Implement redirect to checkout
+  const handleBuyNow = async () => {
+    if (!pet) return;
+    
+    // Kiểm tra trạng thái pet
+    if (pet.status !== 'available') {
+      message.warn("This pet is not available for purchase");
+      return;
+    }
+    
+    try {
+      // Kiểm tra token
+      const tokenCookie = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("token="));
+      if (!tokenCookie) {
+        notification.warn({
+          message: "Login Required",
+          description: "Please login to add items to your cart",
+          placement: "bottomRight",
+        });
+        return;
+      }
+
+      const numericId = Number(pet.petId) || pet.petId;
+
+      // First add to cart
+      const response = await addToCart({
+        type: "pet",
+        itemId: numericId,
+        quantity: 1,
+      });
+      
+      if (response && response.success) {
+        // Dispatch cart update event
+        window.dispatchEvent(new Event("cartUpdated"));
+        
+        // Show success message
+        notification.success({
+          message: "Added to cart",
+          description: `${pet.petName} has been added to your cart, redirecting to checkout...`,
+          placement: "bottomRight",
+        });
+        
+        // Redirect to checkout after a short delay
+        setTimeout(() => {
+          navigate("/check-out");
+        }, 1000);
+      } else {
+        throw new Error(response?.message || "Failed to add to cart");
+      }
+    } catch (error) {
+      console.error("Buy now error:", error);
+      notification.error({
+        message: "Action Failed",
+        description: error.message || "Could not add to cart. Please try again.",
+        placement: "bottomRight",
+      });
+    }
   };
 
   const handleThumbnailClick = (image) => {
@@ -189,11 +284,29 @@ const PetDetail = () => {
               <Title level={2} className="product-name">{pet?.petName}</Title>
               <div className="price">${pet?.unitPrice?.toLocaleString()}</div>
 
+              {/* Status indicator */}
+              {pet?.status && (
+                <div style={{ marginBottom: 16 }}>
+                  <span style={{ 
+                    padding: '4px 12px', 
+                    borderRadius: '4px', 
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    backgroundColor: pet.status === 'available' ? '#f6ffed' : '#fff2f0',
+                    color: pet.status === 'available' ? '#52c41a' : '#ff4d4f',
+                    border: `1px solid ${pet.status === 'available' ? '#b7eb8f' : '#ffccc7'}`
+                  }}>
+                    {pet.status === 'available' ? 'Available' : 'Not Available'}
+                  </span>
+                </div>
+              )}
+
               <div className="inner-button">
                 <Button 
                   type="primary" 
                   size="large" 
                   onClick={handleBuyNow}
+                  disabled={pet?.status !== 'available'}
                   className="animate__animated animate__pulse animate__infinite animate__slower"
                 >
                   Buy Now
@@ -203,6 +316,7 @@ const PetDetail = () => {
                   size="large" 
                   icon={<ShoppingCartOutlined />} 
                   onClick={handleAddToCart}
+                  disabled={pet?.status !== 'available'}
                   className="animate__animated animate__fadeIn animate__delay-1s"
                 >
                   Add to Cart
@@ -292,6 +406,21 @@ const PetDetail = () => {
                   price={relatedPet.unitPrice}
                   onAddToCart={async () => {
                     try {
+                      // Kiểm tra trạng thái pet
+                      if (relatedPet.status !== 'available') {
+                        message.warn("This pet is not available for purchase");
+                        return;
+                      }
+                      
+                      // Kiểm tra token
+                      const tokenCookie = document.cookie
+                        .split("; ")
+                        .find((row) => row.startsWith("token="));
+                      if (!tokenCookie) {
+                        message.warn("Please login to add items to your cart");
+                        return;
+                      }
+                      
                       await addToCart({
                         type: "pet",
                         itemId: relatedPet.petId,

@@ -54,7 +54,7 @@ export const getUserOrders = async (page = 0, size = 10) => {
 };
 
 export const cancelOrder = async (orderId) => {
-  return await request.put(`/orders/${orderId}/cancel`);
+  return await request.del(`/orders/${orderId}`);
 };
 
 export const processPayment = async (orderId, paymentData) => {

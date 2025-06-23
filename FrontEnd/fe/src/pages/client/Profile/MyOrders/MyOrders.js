@@ -253,20 +253,25 @@ const MyOrders = () => {
                 </p>
                 <Divider orientation="left">Order Items</Divider>
                 <div className="order-items">
-                  {/* Use orderDetails array instead of items */}
                   {(record.orderDetails || []).map((item, index) => (
                     <div key={index} className="order-item">
                       <div className="item-image">
-                        {item.thumbnail && <img src={item.thumbnail} alt={item.name} />}
+                        <img src={item.thumbnail || item.image} alt={item.name} />
                       </div>
                       <div className="item-details">
-                        <div className="item-name">{item.name}</div>
-                        <div className="item-type">{item.itemType}</div>
+                        <div className="item-name" style={{ fontWeight: 600 }}>{item.name}</div>
+                        <div className="item-type" style={{ color: "#003459" }}>
+                          {item.itemType === "accessory"
+                            ? "Accessory"
+                            : item.itemType === "pet"
+                              ? "Pet"
+                              : item.itemType}
+                        </div>
                         <div className="item-price">
-                          ${item.unitPrice} x {item.quantity}
+                          ${parseFloat(item.unitPrice).toFixed(2)} x {item.quantity}
                         </div>
                       </div>
-                      <div className="item-total">
+                      <div className="item-total" style={{ fontWeight: 600 }}>
                         ${(item.subtotal || (item.unitPrice * item.quantity)).toFixed(2)}
                       </div>
                     </div>
