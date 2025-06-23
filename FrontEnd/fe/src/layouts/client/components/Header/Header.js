@@ -141,14 +141,6 @@ function Header() {
 					<div className={cx("header-search-wrapper")}>
 						<Search />
 					</div>
-					{/* <Input
-						className={cx("header-search")}
-						placeholder="Search something here!"
-						prefix={
-							<FontAwesomeIcon icon={faSearch} style={{ color: " #003459" }} />
-						}
-						allowClear
-					/> */}
 
 					<div className={cx("header-user-section")}>
 						{isLoggedIn ? (

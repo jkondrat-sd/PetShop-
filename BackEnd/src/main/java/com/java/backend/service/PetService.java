@@ -260,4 +260,11 @@ public class PetService {
         .updatedAt(pet.getUpdatedAt())
         .build();
   }
+
+  public List<PetResponse> searchPetsByName(String query) {
+    List<PetEntity> pets = petRepository.findByPetNameContainingIgnoreCaseAndStatus(query, "available");
+    return pets.stream()
+        .map(this::convertToPetResponse)
+        .collect(Collectors.toList());
+  }
 }

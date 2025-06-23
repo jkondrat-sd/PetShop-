@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface AccessoryRepository extends JpaRepository<AccessoryEntity, Long> {
     Page<AccessoryEntity> findByStatus(String status, Pageable pageable);
@@ -14,4 +16,5 @@ public interface AccessoryRepository extends JpaRepository<AccessoryEntity, Long
     Page<AccessoryEntity> findByAccessoryNameContainingIgnoreCase(String accessoryName, Pageable pageable);
     @Query("SELECT COALESCE(SUM(a.stockQuantity), 0) FROM AccessoryEntity a")
     int sumStock();
+    List<AccessoryEntity> findByAccessoryNameContainingIgnoreCaseAndStatus(String accessoryName, String status);
 }
