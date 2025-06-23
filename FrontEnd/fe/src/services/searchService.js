@@ -13,6 +13,10 @@ export const searchProducts = async (query, page = 0, size = 10, filters = {}) =
     });
     
     // Xử lý các định dạng response khác nhau
+    if (Array.isArray(response?.data)) {
+      return response.data;
+    }
+    
     if (response?.data?.content) {
       return response.data.content;
     }

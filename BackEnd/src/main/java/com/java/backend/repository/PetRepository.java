@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface PetRepository extends JpaRepository<PetEntity, Long> {
     Page<PetEntity> findByStatus(String status, Pageable pageable);
@@ -15,4 +17,5 @@ public interface PetRepository extends JpaRepository<PetEntity, Long> {
     Page<PetEntity> findByBreed_IdAndStatus(Long breedId, String status, Pageable pageable);
     @Query("SELECT COALESCE(SUM(p.stockQuantity), 0) FROM PetEntity p")
     int sumStock();
+    List<PetEntity> findByPetNameContainingIgnoreCaseAndStatus(String petName, String status);
 }

@@ -298,4 +298,11 @@ public class AccessoryService {
         
         return convertToAccessoryResponse(updatedAccessory);
     }
+
+    public List<AccessoryResponse> searchAccessoriesByName(String query) {
+        List<AccessoryEntity> accessories = accessoryRepository.findByAccessoryNameContainingIgnoreCaseAndStatus(query, "active");
+        return accessories.stream()
+            .map(this::convertToAccessoryResponse)
+            .collect(Collectors.toList());
+    }
 }

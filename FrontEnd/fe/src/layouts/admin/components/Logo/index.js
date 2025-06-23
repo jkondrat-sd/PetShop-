@@ -11,7 +11,7 @@ const Logo = ({ collapsed }) => {
         alignItems: 'center',
         justifyContent: collapsed ? 'center' : 'flex-start'
       }}>
-        {!collapsed && <span style={{ fontSize: '18px', fontWeight: 'bold' }}>Admin Panel</span>}
+        {!collapsed && <span style={{ fontSize: '18px', fontWeight: 'bold' }}>Admin PomPom</span>}
         {collapsed && <span style={{ fontSize: '18px', fontWeight: 'bold' }}>AP</span>}
       </div>
     </Link>
