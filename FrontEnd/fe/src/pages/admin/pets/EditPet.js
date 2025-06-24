@@ -6,7 +6,7 @@ import {
 } from 'antd';
 import { PlusOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getBreeds } from '../../../services/petService';
+import { getBreeds } from '../../../services/breedService';
 import { fetchPetById, updateExistingPet } from '../../../redux/actions/petActions';
 import './EditPet.scss';
 import 'animate.css';
@@ -69,28 +69,26 @@ const EditPet = () => {
   const fetchBreeds = async () => {
     try {
       const response = await getBreeds();
-      if (response && response.success && response.data) {
-        if (response.data.content) {
-          setBreeds(response.data.content);
-        } else if (Array.isArray(response.data)) {
-          setBreeds(response.data);
-        }
+      if (response?.content) {
+        setBreeds(response.content);
+      } else if (Array.isArray(response)) {
+        setBreeds(response);
       }
     } catch (error) {
       console.error("Failed to fetch breeds:", error);
-      message.error('Không thể tải danh sách giống thú cưng');
+      message.error('Unable to load breed list');
     }
   };
 
   const beforeUpload = (file) => {
     const isImage = file.type.startsWith('image/');
     if (!isImage) {
-      message.error('Chỉ có thể tải lên file ảnh!');
+      message.error('You can only upload image files!');
       return false;
     }
     const isLt5M = file.size / 1024 / 1024 < 5;
     if (!isLt5M) {
-      message.error('Kích thước ảnh phải nhỏ hơn 5MB!');
+      message.error('Image size must be smaller than 5MB!');
       return false;
     }
     return false; // Prevent auto upload
@@ -111,13 +109,13 @@ const EditPet = () => {
   const uploadButton = (
     <div>
       <PlusOutlined />
-      <div style={{ marginTop: 8 }}>Tải lên</div>
+      <div style={{ marginTop: 8 }}>Upload</div>
     </div>
   );
 
   const onFinish = async (values) => {
     try {
-      // Chuẩn bị dữ liệu thú cưng
+      // Prepare pet data
       const petData = {
         petName: values.petName,
         type: values.type,
@@ -128,17 +126,17 @@ const EditPet = () => {
         status: values.status
       };
 
-      // Chuẩn bị files (chỉ khi có file mới)
+      // Prepare files (only when there are new files)
       const imageFiles = imageList
         .filter(file => file.originFileObj)
         .map(file => file.originFileObj);
 
       await dispatch(updateExistingPet(id, petData, thumbnailFile, imageFiles));
-      message.success('Cập nhật thú cưng thành công');
+      message.success('Pet updated successfully');
       navigate('/admin/pets');
     } catch (error) {
       console.error("Error updating pet:", error);
-      message.error('Lỗi khi cập nhật thú cưng: ' + error.message);
+      message.error('Error updating pet: ' + error.message);
     }
   };
 
@@ -151,7 +149,7 @@ const EditPet = () => {
   }
 
   if (!currentPet) {
-    return <div style={{ textAlign: 'center', padding: '50px' }}>Đang tải dữ liệu...</div>;
+    return <div style={{ textAlign: 'center', padding: '50px' }}>Loading data...</div>;
   }
 
   return (
@@ -163,9 +161,9 @@ const EditPet = () => {
             onClick={() => navigate('/admin/pets')}
             className="back-button"
           >
-            Quay lại
+            Back
           </Button>
-          <Title level={2} className="page-title">Chỉnh sửa thú cưng</Title>
+          <Title level={2} className="page-title">Edit Pet</Title>
         </div>
       </div>
 
@@ -177,21 +175,25 @@ const EditPet = () => {
         >
           <Row gutter={24}>
             <Col span={12}>
-              <Form.Item label="Tên thú cưng" name="petName">
-                <Input disabled />
+              <Form.Item 
+                label="Pet Name" 
+                name="petName"
+                rules={[{ required: true, message: 'Please enter pet name' }]}
+              >
+                <Input placeholder="Enter pet name" />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
                 name="unitPrice"
-                label="Giá bán (VNĐ)"
-                rules={[{ required: true, message: 'Vui lòng nhập giá bán' }]}
+                label="Price (VND)"
+                rules={[{ required: true, message: 'Please enter price' }]}
               >
                 <InputNumber
                   style={{ width: '100%' }}
                   formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                   parser={value => value.replace(/\$\s?|(,*)/g, '')}
-                  placeholder="Nhập giá bán"
+                  placeholder="Enter price"
                   min={0}
                 />
               </Form.Item>
@@ -200,16 +202,24 @@ const EditPet = () => {
 
           <Row gutter={24}>
             <Col span={8}>
-              <Form.Item label="Loại thú cưng" name="type">
-                <Select disabled>
-                  <Option value="DOG">Chó</Option>
-                  <Option value="CAT">Mèo</Option>
+              <Form.Item 
+                label="Pet Type" 
+                name="type"
+                rules={[{ required: true, message: 'Please select pet type' }]}
+              >
+                <Select placeholder="Select pet type">
+                  <Option value="DOG">Dog</Option>
+                  <Option value="CAT">Cat</Option>
                 </Select>
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item label="Giống" name="breedId">
-                <Select disabled>
+              <Form.Item 
+                label="Breed" 
+                name="breedId"
+                rules={[{ required: true, message: 'Please select breed' }]}
+              >
+                <Select placeholder="Select breed">
                   {breeds.map(breed => (
                     <Option key={breed.id} value={breed.id}>{breed.breedName}</Option>
                   ))}
@@ -217,10 +227,13 @@ const EditPet = () => {
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item label="Giới tính" name="gender">
-                <Select disabled>
-                  <Option value="MALE">Đực</Option>
-                  <Option value="FEMALE">Cái</Option>
+              <Form.Item 
+                label="Gender" 
+                name="gender"
+              >
+                <Select placeholder="Select gender">
+                  <Option value="MALE">Male</Option>
+                  <Option value="FEMALE">Female</Option>
                 </Select>
               </Form.Item>
             </Col>
@@ -230,22 +243,25 @@ const EditPet = () => {
             <Col span={12}>
               <Form.Item
                 name="age"
-                label="Tuổi (tháng)"
+                label="Age (months)"
               >
                 <InputNumber 
                   min={0} 
                   max={240} 
                   style={{ width: '100%' }} 
-                  placeholder="Nhập tuổi"
+                  placeholder="Enter age"
                 />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item label="Trạng thái" name="status">
+              <Form.Item 
+                label="Status" 
+                name="status"
+              >
                 <Select>
-                  <Option value="available">Có sẵn</Option>
-                  <Option value="reserved">Đã đặt</Option>
-                  <Option value="sold">Đã bán</Option>
+                  <Option value="available">Available</Option>
+                  <Option value="reserved">Reserved</Option>
+                  <Option value="sold">Sold</Option>
                 </Select>
               </Form.Item>
             </Col>
@@ -253,7 +269,7 @@ const EditPet = () => {
 
           <Row gutter={24}>
             <Col span={12}>
-              <Form.Item label="Ảnh đại diện">
+              <Form.Item label="Thumbnail Image">
                 <Upload
                   name="thumbnail"
                   listType="picture-card"
@@ -275,7 +291,7 @@ const EditPet = () => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item label="Hình ảnh chi tiết">
+              <Form.Item label="Detail Images">
                 <Upload
                   name="images"
                   listType="picture-card"
@@ -294,10 +310,10 @@ const EditPet = () => {
           <Form.Item className="form-actions">
             <Space>
               <Button type="primary" htmlType="submit" loading={operationLoading}>
-                Cập nhật
+                Update
               </Button>
               <Button onClick={() => navigate('/admin/pets')}>
-                Hủy
+                Cancel
               </Button>
             </Space>
           </Form.Item>

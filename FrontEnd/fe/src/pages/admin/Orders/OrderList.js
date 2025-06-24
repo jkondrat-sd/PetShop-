@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import './OrderList.scss';
 import { fetchOrders } from '~/redux/actions/orderActions';
 import * as orderService from '~/services/orderService';
+import dayjs from 'dayjs';
 
 const OrderList = () => {
   const dispatch = useDispatch();
@@ -59,7 +60,12 @@ const OrderList = () => {
     },
     { title: 'Order ID', dataIndex: 'id', key: 'id' },
     { title: 'Customer', dataIndex: 'userName', key: 'userName' },
-    { title: 'Order Date', dataIndex: 'orderDate', key: 'orderDate' },
+    {
+      title: 'Order Date',
+      dataIndex: 'orderDate',
+      key: 'orderDate',
+      render: (date) => date ? dayjs(date).format('DD/MM/YYYY HH:mm:ss') : '',
+    },
     { title: 'Total', dataIndex: 'totalAmount', key: 'totalAmount', render: (v) => `$${v}` },
     { title: 'Status', dataIndex: 'status', key: 'status', render: (status) => <Tag color={status === 'pending' ? 'blue' : status === 'cancelled' ? 'red' : 'green'}>{status}</Tag> },
     {

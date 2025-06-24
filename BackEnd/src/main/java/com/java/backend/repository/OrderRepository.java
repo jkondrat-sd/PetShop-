@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,24 +24,29 @@ BigDecimal sumRevenueBetween(@Param("from") java.time.LocalDateTime from, @Param
 
 int countByOrderDateBetween(LocalDateTime from, LocalDateTime to);
 
-@Query("SELECT FUNCTION('DATE', o.orderDate) as date, SUM(o.totalAmount) as revenue FROM OrderEntity o WHERE o.orderDate BETWEEN :from AND :to GROUP BY FUNCTION('DATE', o.orderDate)")
-List<Object[]> sumRevenueGroupByDate(@Param("from") LocalDate from, @Param("to") LocalDate to);
+@Query(value = "SELECT DATE(o.order_date) as date, SUM(o.total_amount) as revenue " +
+        "FROM orders o " +
+        "WHERE o.order_date BETWEEN :from AND :to " +
+        "GROUP BY DATE(o.order_date)", nativeQuery = true)
+List<Object[]> sumRevenueGroupByDate(@Param("from") java.sql.Timestamp from, @Param("to") java.sql.Timestamp to);
 
     // Top sold pets
-    @Query(value = "SELECT p.id, p.name, SUM(od.quantity), SUM(od.price * od.quantity) " +
-            "FROM order_details od JOIN pets p ON od.pet_id = p.id " +
-            "JOIN orders o ON od.order_id = o.id " +
-            "WHERE o.created_at BETWEEN :from AND :to " +
-            "GROUP BY p.id, p.name " +
+    @Query(value = "SELECT p.pet_id, p.pet_name, SUM(od.quantity), SUM(od.unit_price * od.quantity) " +
+            "FROM order_details od " +
+            "JOIN pets p ON od.pet_id = p.pet_id " +
+            "JOIN orders o ON od.order_id = o.order_id " +
+            "WHERE o.order_date BETWEEN :from AND :to " +
+            "GROUP BY p.pet_id, p.pet_name " +
             "ORDER BY SUM(od.quantity) DESC LIMIT :limit", nativeQuery = true)
-    List<Object[]> topSoldPets(@Param("from") LocalDate from, @Param("to") LocalDate to, @Param("limit") int limit);
+    List<Object[]> topSoldPets(@Param("from") java.sql.Timestamp from, @Param("to") java.sql.Timestamp to, @Param("limit") int limit);
 
     // Top sold accessories
-    @Query(value = "SELECT a.id, a.name, SUM(od.quantity), SUM(od.price * od.quantity) " +
-            "FROM order_details od JOIN accessories a ON od.accessory_id = a.id " +
-            "JOIN orders o ON od.order_id = o.id " +
-            "WHERE o.created_at BETWEEN :from AND :to " +
-            "GROUP BY a.id, a.name " +
+    @Query(value = "SELECT a.accessories_id, a.accessory_name, SUM(od.quantity), SUM(od.unit_price * od.quantity) " +
+            "FROM order_details od " +
+            "JOIN accessories a ON od.accessory_id = a.accessories_id " +
+            "JOIN orders o ON od.order_id = o.order_id " +
+            "WHERE o.order_date BETWEEN :from AND :to " +
+            "GROUP BY a.accessories_id, a.accessory_name " +
             "ORDER BY SUM(od.quantity) DESC LIMIT :limit", nativeQuery = true)
-    List<Object[]> topSoldAccessories(@Param("from") LocalDate from, @Param("to") LocalDate to, @Param("limit") int limit);
+    List<Object[]> topSoldAccessories(@Param("from") java.sql.Timestamp from, @Param("to") java.sql.Timestamp to, @Param("limit") int limit);
 }

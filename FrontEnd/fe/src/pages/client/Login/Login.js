@@ -52,7 +52,20 @@ const onFinish = async (values) => {
     }
   } catch (error) {
     console.error('Login error:', error);
-    message.error(error.message || 'Đăng nhập thất bại!');
+    // Luôn kiểm tra mã lỗi 401 hoặc message liên quan xác thực
+    let errorMsg = 'Đăng nhập thất bại!';
+    if (
+      (error.response && error.response.status === 401) ||
+      (error.response && error.response.data && (
+        error.response.data.message?.toLowerCase().includes('authentication failed') ||
+        error.response.data.message?.toLowerCase().includes('bad credentials')
+      ))
+    ) {
+      errorMsg = 'Sai tên đăng nhập hoặc mật khẩu!';
+    } else if (error.response && error.response.data && error.response.data.message) {
+      errorMsg = error.response.data.message;
+    }
+    message.error(errorMsg);
   } finally {
     setLoading(false);
   }
