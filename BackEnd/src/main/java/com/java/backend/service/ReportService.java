@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -43,7 +44,10 @@ public class ReportService {
         LocalDate fromDate = from != null ? LocalDate.parse(from) : LocalDate.now().minusMonths(1);
         LocalDate toDate = to != null ? LocalDate.parse(to) : LocalDate.now();
 
-        List<Object[]> rows = orderRepository.sumRevenueGroupByDate(fromDate, toDate);
+        Timestamp fromTimestamp = Timestamp.valueOf(fromDate.atStartOfDay());
+        Timestamp toTimestamp = Timestamp.valueOf(toDate.plusDays(1).atStartOfDay());
+
+        List<Object[]> rows = orderRepository.sumRevenueGroupByDate(fromTimestamp, toTimestamp);
         List<SalesChartDTO> result = new ArrayList<>();
         for (Object[] row : rows) {
             result.add(new SalesChartDTO(
@@ -59,8 +63,11 @@ public class ReportService {
         LocalDate fromDate = from != null ? LocalDate.parse(from) : LocalDate.now().minusMonths(1);
         LocalDate toDate = to != null ? LocalDate.parse(to) : LocalDate.now();
 
-        List<Object[]> petRows = orderRepository.topSoldPets(fromDate, toDate, 5);
-        List<Object[]> accRows = orderRepository.topSoldAccessories(fromDate, toDate, 5);
+        Timestamp fromTimestamp = Timestamp.valueOf(fromDate.atStartOfDay());
+        Timestamp toTimestamp = Timestamp.valueOf(toDate.plusDays(1).atStartOfDay());
+
+        List<Object[]> petRows = orderRepository.topSoldPets(fromTimestamp, toTimestamp, 5);
+        List<Object[]> accRows = orderRepository.topSoldAccessories(fromTimestamp, toTimestamp, 5);
 
         List<TopProductDTO> result = new ArrayList<>();
         for (Object[] row : petRows) {

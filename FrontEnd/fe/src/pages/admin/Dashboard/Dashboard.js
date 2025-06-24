@@ -1,277 +1,189 @@
-import React, { useState, useEffect } from "react";
-import {
-	Card,
-	Row,
-	Col,
-	Table,
-	Button,
-	Progress,
-	Typography,
-	Space,
-	List,
-	Avatar,
-} from "antd";
-import {
-	ShoppingCartOutlined,
-	UserOutlined,
-	DollarOutlined,
-	TagOutlined,
-	ArrowUpOutlined,
-	ArrowDownOutlined,
-} from "@ant-design/icons";
-import { Line, Pie } from "@ant-design/plots";
-import "./Dashboard.scss";
+import React, { useEffect } from "react";
+import { Row, Col, Card, Statistic, Avatar, Table, Tag, List, Select, Spin } from "antd";
+import { UserOutlined, ShoppingCartOutlined, AppstoreOutlined, SolutionOutlined } from "@ant-design/icons";
+import { Pie } from '@ant-design/charts';
+import { useSelector, useDispatch } from "react-redux";
+import { fetchUsers } from "~/redux/actions/userActions";
+import { fetchPets } from "~/redux/actions/petActions";
+import { fetchAccessories } from "~/redux/actions/accessoryActions";
+import { fetchOrders } from "~/redux/actions/orderActions";
 import "animate.css";
+import "./Dashboard.scss";
 
-const { Title, Text } = Typography;
+const { Option } = Select;
 
 const Dashboard = () => {
-	// const [stats, setStats] = useState({
-	// 	totalSales: 0,
-	// 	totalOrders: 0,
-	// 	totalUsers: 0,
-	// 	totalProducts: 0,
-	// 	recentOrders: [],
-	// 	salesData: [],
-	// 	productDistribution: [],
-	// });
-	// const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
 
-	// useEffect(() => {
-	// 	// TODO: Replace with real API call
-	// 	// fetch('/api/dashboard')
-	// 	//   .then(res => res.json())
-	// 	//   .then(data => {
-	// 	//     setStats(data);
-	// 	//     setLoading(false);
-	// 	//   })
-	// 	//   .catch(() => setLoading(false));
-	// 	setTimeout(() => {
-	// 		setStats({
-	// 			totalSales: 152500000,
-	// 			totalOrders: 182,
-	// 			totalUsers: 95,
-	// 			totalProducts: 48,
-	// 			recentOrders: [
-	// 				{
-	// 					id: "ORD-001",
-	// 					customer: "John Doe",
-	// 					date: "2023-05-22",
-	// 					total: 850000,
-	// 					status: "completed",
-	// 				},
-	// 				{
-	// 					id: "ORD-002",
-	// 					customer: "Jane Smith",
-	// 					date: "2023-05-22",
-	// 					total: 1250000,
-	// 					status: "processing",
-	// 				},
-	// 				{
-	// 					id: "ORD-003",
-	// 					customer: "Alice Brown",
-	// 					date: "2023-05-21",
-	// 					total: 950000,
-	// 					status: "completed",
-	// 				},
-	// 				{
-	// 					id: "ORD-004",
-	// 					customer: "Bob Lee",
-	// 					date: "2023-05-21",
-	// 					total: 2150000,
-	// 					status: "completed",
-	// 				},
-	// 			],
-	// 			salesData: [
-	// 				{ month: "Jan", sales: 10500000 },
-	// 				{ month: "Feb", sales: 12000000 },
-	// 				{ month: "Mar", sales: 15800000 },
-	// 				{ month: "Apr", sales: 20200000 },
-	// 				{ month: "May", sales: 25000000 },
-	// 			],
-	// 			productDistribution: [
-	// 				{ type: "Dog", value: 35 },
-	// 				{ type: "Cat", value: 30 },
-	// 				{ type: "Food", value: 20 },
-	// 				{ type: "Accessory", value: 15 },
-	// 			],
-	// 		});
-	// 		setLoading(false);
-	// 	}, 1500);
-	// }, []);
+  // Lấy dữ liệu từ redux
+  const { list: users = [], loading: loadingUsers, pagination: userPagination = {} } = useSelector(state => state.user);
+  const { pets = [], loading: loadingPets, pagination: petPagination = {} } = useSelector(state => state.pet);
+  const { list: accessories = [], loading: loadingAccessories, pagination: accessoryPagination = {} } = useSelector(state => state.accessory);
+  const { list: orders = [], loading: loadingOrders, pagination: orderPagination = {} } = useSelector(state => state.order);
 
-	// const orderColumns = [
-	// 	{ title: "ID", dataIndex: "id", key: "id" },
-	// 	{ title: "Customer", dataIndex: "customer", key: "customer" },
-	// 	{ title: "Date", dataIndex: "date", key: "date" },
-	// 	{
-	// 		title: "Total",
-	// 		dataIndex: "total",
-	// 		key: "total",
-	// 		render: (total) => `${total.toLocaleString("en-US")}₫`,
-	// 	},
-	// 	{
-	// 		title: "Status",
-	// 		dataIndex: "status",
-	// 		key: "status",
-	// 		render: (status) => {
-	// 			const statusMap = {
-	// 				completed: { text: "Completed", className: "status-completed" },
-	// 				processing: { text: "Processing", className: "status-processing" },
-	// 				cancelled: { text: "Cancelled", className: "status-cancelled" },
-	// 			};
-	// 			const { text, className } = statusMap[status] || {};
-	// 			return <span className={`status-badge ${className}`}>{text}</span>;
-	// 		},
-	// 	},
-	// ];
+  useEffect(() => {
+    dispatch(fetchUsers({ page: 0, size: 5 }));
+    dispatch(fetchPets({ page: 0, size: 5 }));
+    dispatch(fetchAccessories({ page: 0, size: 5 }));
+    dispatch(fetchOrders({ page: 0, size: 1000 }));
+  }, [dispatch]);
 
-	// const formatCurrency = (value) => {
-	// 	return value.toLocaleString("en-US");
-	// };
+  // Lấy tổng số thực tế
+  const totalUsers = userPagination.totalElements || users.length;
+  const totalPets = petPagination.totalElements || pets.length;
+  const totalAccessories = accessoryPagination.totalElements || accessories.length;
+  const totalOrders = orderPagination.totalElements || orders.length;
 
-	return (
-    <></>
-		// <div className="admin-dashboard animate__animated animate__fadeIn">
-		// 	<Title level={2} className="page-title">
-		// 		Overview
-		// 	</Title>
+  // Lấy 5 user mới nhất
+  const newUsers = users.slice(0, 5);
 
-		// 	<Row gutter={[24, 24]} className="stats-cards">
-		// 		<Col xs={24} sm={12} lg={6}>
-		// 			<Card
-		// 				className="stat-card animate__animated animate__zoomIn"
-		// 				loading={loading}
-		// 			>
-		// 				<div className="stat-value-row">
-		// 					<span className="stat-icon"><DollarOutlined /></span>
-		// 					<span className="stat-title">Revenue</span>
-		// 				</div>
-		// 				<div className="stat-value" style={{ color: "#3f8600", fontSize: 28, fontWeight: 600 }}>
-		// 					{formatCurrency(stats.totalSales)} ₫
-		// 				</div>
-		// 				<div className="growth-indicator positive">
-		// 					<ArrowUpOutlined /> 15% compared to last month
-		// 				</div>
-		// 			</Card>
-		// 		</Col>
-		// 		<Col xs={24} sm={12} lg={6}>
-		// 			<Card
-		// 				className="stat-card animate__animated animate__zoomIn animate__delay-1s"
-		// 				loading={loading}
-		// 			>
-		// 				<div className="stat-value-row">
-		// 					<span className="stat-icon"><ShoppingCartOutlined /></span>
-		// 					<span className="stat-title">Orders</span>
-		// 				</div>
-		// 				<div className="stat-value" style={{ color: "#1890ff", fontSize: 28, fontWeight: 600 }}>
-		// 					{formatCurrency(stats.totalOrders)}
-		// 				</div>
-		// 				<div className="growth-indicator positive">
-		// 					<ArrowUpOutlined /> 8% compared to last month
-		// 				</div>
-		// 			</Card>
-		// 		</Col>
-		// 		<Col xs={24} sm={12} lg={6}>
-		// 			<Card
-		// 				className="stat-card animate__animated animate__zoomIn animate__delay-2s"
-		// 				loading={loading}
-		// 			>
-		// 				<div className="stat-value-row">
-		// 					<span className="stat-icon"><UserOutlined /></span>
-		// 					<span className="stat-title">Users</span>
-		// 				</div>
-		// 				<div className="stat-value" style={{ color: "#722ed1", fontSize: 28, fontWeight: 600 }}>
-		// 					{formatCurrency(stats.totalUsers)}
-		// 				</div>
-		// 				<div className="growth-indicator positive">
-		// 					<ArrowUpOutlined /> 12% compared to last month
-		// 				</div>
-		// 			</Card>
-		// 		</Col>
-		// 		<Col xs={24} sm={12} lg={6}>
-		// 			<Card
-		// 				className="stat-card animate__animated animate__zoomIn animate__delay-3s"
-		// 				loading={loading}
-		// 			>
-		// 				<div className="stat-value-row">
-		// 					<span className="stat-icon"><TagOutlined /></span>
-		// 					<span className="stat-title">Products</span>
-		// 				</div>
-		// 				<div className="stat-value" style={{ color: "#fa8c16", fontSize: 28, fontWeight: 600 }}>
-		// 					{formatCurrency(stats.totalProducts)}
-		// 				</div>
-		// 				<div className="growth-indicator negative">
-		// 					<ArrowDownOutlined /> 2% compared to last month
-		// 				</div>
-		// 			</Card>
-		// 		</Col>
-		// 	</Row>
+  // Lấy 5 đơn hàng gần nhất
+  const recentOrders = orders.slice(0, 5);
 
-		// 	<Row gutter={[24, 24]} className="chart-section">
-		// 		<Col xs={24} lg={16}>
-		// 			<Card
-		// 				title="Monthly Revenue"
-		// 				className="chart-card animate__animated animate__fadeInUp"
-		// 			>
-		// 				{!loading && stats.salesData && stats.salesData.length > 0 && (
-		// 					<Line
-		// 						data={stats.salesData}
-		// 						padding="auto"
-		// 						xField="month"
-		// 						yField="sales"
-		// 						smooth={true}
-		// 						meta={{
-		// 							sales: {
-		// 								formatter: (v) => `${(v / 1000000).toFixed(1)}M`,
-		// 							},
-		// 						}}
-		// 					/>
-		// 				)}
-		// 			</Card>
-		// 		</Col>
-		// 		<Col xs={24} lg={8}>
-		// 			<Card
-		// 				title="Product Distribution"
-		// 				className="chart-card animate__animated animate__fadeInUp animate__delay-1s"
-		// 			>
-		// 				{!loading &&
-		// 					stats.productDistribution &&
-		// 					stats.productDistribution.length > 0 && (
-		// 						<Pie
-		// 							data={stats.productDistribution}
-		// 							angleField="value"
-		// 							colorField="type"
-		// 							radius={0.8}
-		// 							label={{
-		// 								type: "outer",
-		// 								content: "{name} {percentage}",
-		// 							}}
-		// 							interactions={[
-		// 								{ type: "pie-legend-active" },
-		// 								{ type: "element-active" },
-		// 							]}
-		// 						/>
-		// 					)}
-		// 			</Card>
-		// 		</Col>
-		// 	</Row>
+  // Gom nhóm tất cả status thực tế trong orders
+  const statusMap = {};
+  orders.forEach(o => {
+    if (o.status && typeof o.status === 'string' && o.status.trim() !== '') {
+      statusMap[o.status] = (statusMap[o.status] || 0) + 1;
+    }
+  });
+  const orderStatusData = Object.entries(statusMap).map(([type, value]) => ({ type, value }));
 
-		// 	<Card
-		// 		title="Recent Orders"
-		// 		className="recent-orders-card animate__animated animate__fadeInUp animate__delay-2s"
-		// 		extra={<Button type="link">View All</Button>}
-		// 	>
-		// 		<Table
-		// 			columns={orderColumns}
-		// 			dataSource={stats.recentOrders}
-		// 			loading={loading}
-		// 			pagination={false}
-		// 			rowKey="id"
-		// 		/>
-		// 	</Card>
-		// </div>
-	);
+  const pieConfig = {
+    data: orderStatusData,
+    angleField: 'value',
+    colorField: 'type',
+    radius: 0.8,
+    label: {
+      content: (data) => `${data.type}: ${(data.percent * 100).toFixed(0)}%`
+    },
+    legend: { position: 'bottom' },
+    height: 260,
+  };
+
+  // Cột cho bảng đơn hàng
+  const orderColumns = [
+    { title: "Order ID", dataIndex: "id", key: "id" },
+    { title: "Customer", dataIndex: "userName", key: "userName" },
+    { title: "Total", dataIndex: "totalAmount", key: "totalAmount", render: v => `$${v}` },
+    { title: "Status", dataIndex: "status", key: "status", render: status => <Tag color={status === "pending" ? "blue" : status === "cancelled" ? "red" : status === "shipped" ? "green" : status === "paid" ? "lime" : "orange"}>{status}</Tag> },
+  ];
+
+  return (
+    <div className="admin-dashboard">
+      <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
+        <Col>
+          <h2 className="page-title animate__animated animate__fadeInLeft">Dashboard</h2>
+        </Col>
+        <Col>
+          <Select defaultValue="This Month" style={{ width: 120 }}>
+            <Option value="This Month">This Month</Option>
+            <Option value="Last Month">Last Month</Option>
+          </Select>
+        </Col>
+      </Row>
+
+      {/* Thống kê tổng quan */}
+      <Row gutter={16} className="stats-cards">
+        <Col span={6}>
+          <Card className="stat-card animate__animated animate__fadeInUp delay-1">
+            <Statistic
+              title="Total Users"
+              value={totalUsers}
+              prefix={<UserOutlined />}
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card className="stat-card animate__animated animate__fadeInUp delay-2">
+            <Statistic
+              title="Total Pets"
+              value={totalPets}
+              prefix={<SolutionOutlined />}
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card className="stat-card animate__animated animate__fadeInUp delay-3">
+            <Statistic
+              title="Total Accessories"
+              value={totalAccessories}
+              prefix={<AppstoreOutlined />}
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card className="stat-card animate__animated animate__fadeInUp delay-4">
+            <Statistic
+              title="Total Orders"
+              value={totalOrders}
+              prefix={<ShoppingCartOutlined />}
+            />
+          </Card>
+        </Col>
+      </Row>
+
+      <Row gutter={16}>
+        {/* New Users */}
+        <Col span={12}>
+          <Card title="New Users" className="animate__animated animate__fadeInUp chart-card">
+            <Spin spinning={loadingUsers}>
+              <List
+                itemLayout="horizontal"
+                dataSource={newUsers}
+                renderItem={user => (
+                  <List.Item>
+                    <List.Item.Meta
+                      avatar={
+                        user.avatarUrl
+                          ? <Avatar src={user.avatarUrl} />
+                          : <Avatar style={{ background: "#ff4d94" }}>{user.username ? user.username[0].toUpperCase() : <UserOutlined />}</Avatar>
+                      }
+                      title={user.username}
+                      description={user.email}
+                    />
+                    <Tag color={user.enabled ? "green" : "red"}>{user.enabled ? "Active" : "Blocked"}</Tag>
+                  </List.Item>
+                )}
+              />
+            </Spin>
+          </Card>
+        </Col>
+        {/* Recent Orders */}
+        <Col span={12}>
+          <Card title="Recent Orders" className="animate__animated animate__fadeInUp chart-card">
+            <Spin spinning={loadingOrders}>
+              <Table
+                dataSource={recentOrders}
+                columns={orderColumns}
+                rowKey="id"
+                pagination={false}
+                size="small"
+              />
+            </Spin>
+          </Card>
+        </Col>
+      </Row>
+
+      <Row gutter={16} style={{ marginTop: 24 }}>
+        <Col span={12}>
+          <Card title="Order Status Analytics" className="animate__animated animate__fadeInUp chart-card">
+            <Pie
+              data={orderStatusData}
+              angleField="value"
+              colorField="type"
+              radius={0.8}
+              label={{
+                content: (data) => `${data.type}: ${(data.percent * 100).toFixed(0)}%`
+              }}
+              legend={{ position: 'bottom' }}
+              height={260}
+            />
+          </Card>
+        </Col>
+      </Row>
+    </div>
+  );
 };
 
 export default Dashboard;

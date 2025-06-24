@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Input, Button, Row, Col } from 'antd';
+import { Form, Input, Button, Row, Col, message } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined, PhoneOutlined, HomeOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import 'animate.css';
@@ -17,25 +17,43 @@ function Register() {
       const lastName = nameParts.pop();
       const firstName = nameParts.join(' ');
       
-      // Based on RegisterRequest.java requirements
-      const response = await register(
-        values.email,
-        values.username,
-        values.password,
+      //Truyền object userData đúng định dạng backend yêu cầu
+      const response = await register({
+        username: values.username,
+        password: values.password,
+        email: values.email,
         firstName,
         lastName,
-        values.phone,
-        values.address
-      );
+        phone: values.phone,
+        address: values.address
+      });
       
       console.log('Registration response:', response);
       
-      if (response && response.data && response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data));
+      if (response && response.token) {
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('user', JSON.stringify(response));
         navigate('/');
       }
     } catch (error) {
+      // Kiểm tra lỗi trả về từ backend
+      let errorMsg = 'Registration error!';
+      if (error.response && error.response.data && error.response.data.message) {
+        if (
+          error.response.data.message.includes('USER_EXISTED') ||
+          error.response.data.message.toLowerCase().includes('username')
+        ) {
+          errorMsg = 'Username đã tồn tại!';
+        } else if (
+          error.response.data.message.includes('EMAIL_EXISTED') ||
+          error.response.data.message.toLowerCase().includes('email')
+        ) {
+          errorMsg = 'Email đã tồn tại!';
+        } else {
+          errorMsg = error.response.data.message;
+        }
+      }
+      message.error(errorMsg);
       console.error('Registration error:', error);
     }
   };

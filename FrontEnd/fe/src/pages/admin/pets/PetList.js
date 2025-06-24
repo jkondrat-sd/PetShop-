@@ -174,6 +174,13 @@ const PetList = () => {
 
 	const columns = [
 		{
+			title: 'STT',
+			key: 'stt',
+			width: 60,
+			align: 'center',
+			render: (_text, _record, index) => currentPage * pageSize + index + 1,
+		},
+		{
 			title: "Image",
 			dataIndex: "thumbnail",
 			key: "thumbnail",
@@ -234,7 +241,7 @@ const PetList = () => {
 			sorter: (a, b) => (a.unitPrice || 0) - (b.unitPrice || 0),
 			render: (price) =>
 				price ? (
-					<span className="pet-price">{price.toLocaleString("en-US")}₫</span>
+					<span className="pet-price">{price.toLocaleString("en-US")}$</span>
 				) : (
 					<span>-</span>
 				),

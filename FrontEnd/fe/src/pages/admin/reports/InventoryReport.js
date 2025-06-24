@@ -19,24 +19,10 @@ const InventoryReport = () => {
         reportService.getInventoryPie(),
         reportService.getLowStockProducts()
       ]);
-      
-      console.log("Pie Response:", pieRes);
-      console.log("Low Stock Response:", lowStockRes);
-      
-      if (pieRes && pieRes.data) {
-        setInventoryPie(pieRes.data);
-      } else {
-        message.error("Failed to load inventory pie data");
-      }
-      
-      if (lowStockRes && lowStockRes.data) {
-        setLowStock(lowStockRes.data);
-      } else {
-        message.error("Failed to load low stock data");
-      }
+      setInventoryPie(pieRes.data || []);
+      setLowStock(lowStockRes.data || []);
     } catch (error) {
-      console.error("Error fetching inventory data:", error);
-      message.error(error.response?.data?.message || "Failed to load inventory data");
+      message.error("Failed to load inventory data");
     } finally {
       setLoading(false);
     }
@@ -51,35 +37,16 @@ const InventoryReport = () => {
     label: {
       content: (datum) => `${datum.type}: ${datum.value} (${(datum.percent * 100).toFixed(0)}%)`
     },
-    interactions: [
-      { type: "element-active" }
-    ]
+    interactions: [{ type: "element-active" }]
   };
 
   const columns = [
-    {
-      title: "Product",
-      dataIndex: "name",
-      key: "name"
-    },
-    {
-      title: "Type",
-      dataIndex: "type",
-      key: "type"
-    },
-    {
-      title: "Stock",
-      dataIndex: "stock",
-      key: "stock"
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
+    { title: "Product", dataIndex: "name", key: "name" },
+    { title: "Type", dataIndex: "type", key: "type" },
+    { title: "Stock", dataIndex: "stock", key: "stock" },
+    { title: "Status", dataIndex: "status", key: "status",
       render: (status) => (
-        <span style={{ 
-          color: status === "Out" ? "red" : status === "Low" ? "orange" : "green" 
-        }}>
+        <span style={{ color: status === "Out" ? "red" : status === "Low" ? "orange" : "green" }}>
           {status}
         </span>
       )

@@ -86,16 +86,26 @@ export const createPet = async (petData, thumbnailFile, imageFiles) => {
 export const updatePet = async (petId, petData, thumbnailFile, imageFiles) => {
   try {
     const formData = new FormData();
-    // Đúng chuẩn backend: gửi petRequest là JSON string
-    formData.append('petRequest', JSON.stringify(petData));
+    
+    // Add pet data as individual form fields
+    Object.keys(petData).forEach(key => {
+      if (petData[key] !== null && petData[key] !== undefined) {
+        formData.append(key, petData[key]);
+      }
+    });
+    
+    // Add thumbnail file if provided
     if (thumbnailFile) {
       formData.append('thumbnail', thumbnailFile);
     }
+    
+    // Add image files if provided
     if (imageFiles && imageFiles.length > 0) {
       imageFiles.forEach(file => {
         formData.append('images', file);
       });
     }
+    
     const response = await request.put(`/pets/${petId}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'

@@ -15,9 +15,14 @@ const request = axios.create({
 // Đảm bảo request.interceptors.request.use đang xử lý token đúng cách
 request.interceptors.request.use(
   (config) => {
-    // Kiểm tra token một cách chắc chắn hơn
-    const token = getCookie('token'); // Sử dụng helper function thay vì parse trực tiếp
-    
+    // Không gắn token cho các API public
+    if (
+      config.url.includes('/auth/register') ||
+      config.url.includes('/auth/login')
+    ) {
+      return config;
+    }
+    const token = getCookie('token');
     if (token) {
       console.log('Using token: Valid token present');
       config.headers.Authorization = `Bearer ${token}`;

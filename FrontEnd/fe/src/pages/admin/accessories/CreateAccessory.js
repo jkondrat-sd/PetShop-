@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { message } from 'antd';
+import { message, Card, Typography, Button } from 'antd';
 import AccessoryForm from '~/components/forms/AccessoryForm';
 import * as accessoryService from '~/services/accessoryService';
+import { ArrowLeftOutlined } from '@ant-design/icons';
+
+const { Title } = Typography;
 
 const CreateAccessory = () => {
   const [loading, setLoading] = useState(false);
@@ -37,13 +40,20 @@ const CreateAccessory = () => {
   };
 
   return (
-    <div>
-      <h2>Create New Accessory</h2>
-      <AccessoryForm
-        categories={categories}
-        onFinish={handleSubmit}
-        loading={loading}
-      />
+    <div className="create-accessory-page animate__animated animate__fadeIn">
+      <div className="page-header">
+        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/admin/accessories')} className="back-button">
+          Back
+        </Button>
+        <Title level={2} className="page-title">Add New Accessory</Title>
+      </div>
+      <Card className="form-card">
+        <AccessoryForm
+          categories={categories}
+          onFinish={handleSubmit}
+          loading={loading}
+        />
+      </Card>
     </div>
   );
 };
