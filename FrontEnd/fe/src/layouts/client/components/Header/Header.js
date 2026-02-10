@@ -37,10 +37,8 @@ function Header() {
 		// Clear authentication token
 		deleteCookie("token");
 
-		// Clear user data from localStorage
 		localStorage.removeItem("userData");
 
-		// Clear any other user-related data
 		localStorage.removeItem("userEmail");
 
 		// Update Redux state
@@ -64,7 +62,7 @@ function Header() {
 			}
 		};
 
-		// Lắng nghe sự kiện cartUpdated
+		// cartUpdated
 		window.addEventListener("cartUpdated", handleCartUpdate);
 
 		// Fetch cart ngay khi component mount

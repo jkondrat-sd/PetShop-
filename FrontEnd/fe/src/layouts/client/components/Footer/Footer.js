@@ -16,7 +16,6 @@ const Footer = () => {
   const handleSubscribe = () => {
     if (email) {
       console.log('Subscribing with email:', email);
-      // Add your subscription logic here
       setEmail('');
     }
   };

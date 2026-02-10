@@ -66,11 +66,6 @@ const Sidebar = ({ collapsed }) => {
 				},
 			],
 		},
-		// {
-		// 	key: "/admin/categories",
-		// 	icon: <TagsOutlined />,
-		// 	label: "Categories",
-		// },
 		{
 			key: "/admin/orders",
 			icon: <ShoppingCartOutlined />,
@@ -81,16 +76,6 @@ const Sidebar = ({ collapsed }) => {
 			icon: <UserOutlined />,
 			label: "Users",
 		},
-		// {
-		// 	key: "/admin/roles",
-		// 	icon: <LockOutlined />,
-		// 	label: "Roles",
-		// },
-		// {
-		// 	key: "/admin/reviews",
-		// 	icon: <CommentOutlined />,
-		// 	label: "Reviews",
-		// },
 		{
 			key: "/admin/reports",
 			icon: <PieChartOutlined />,

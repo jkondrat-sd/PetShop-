@@ -15,7 +15,6 @@ const Header = ({ collapsed, toggle }) => {
   const { token } = theme.useToken();
 
   useEffect(() => {
-    // Lấy thông tin từ localStorage thay vì gọi API
     try {
       const userData = JSON.parse(localStorage.getItem('userData'));
       if (userData) {

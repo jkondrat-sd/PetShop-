@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-@Order(1) // Must run before AdminSeeder
+@Order(1) 
 public class RoleSeeder implements CommandLineRunner {
     private final RoleRepository roleRepository;
 

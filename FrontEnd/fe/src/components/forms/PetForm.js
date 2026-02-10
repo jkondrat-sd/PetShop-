@@ -290,14 +290,6 @@ const PetForm = ({
 					</Col>
 				</Row>
 
-				{/* <Form.Item name="status" label="Status">
-					<Select>
-						<Option value="available">Available</Option>
-						<Option value="out_of_stock">Out of stock</Option>
-						<Option value="LOW_STOCK">Sắp hết hàng</Option>
-					</Select>
-				</Form.Item> */}
-
 				<Form.Item>
 					<Button type="primary" htmlType="submit" loading={loading}>
 						{submitButtonText}
