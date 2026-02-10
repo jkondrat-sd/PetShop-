@@ -93,6 +93,21 @@ function Login() {
               {loading ? "Đang đăng nhập..." : "Đăng nhập"}
             </button>
           </div>
+
+          {/* Demo Account Info */}
+          <div style={{ 
+            background: '#fef3c7', 
+            border: '1px solid #f59e0b', 
+            borderRadius: '8px', 
+            padding: '12px', 
+            marginTop: '16px',
+            fontSize: '13px',
+            textAlign: 'left'
+          }}>
+            <div style={{ fontWeight: 'bold', marginBottom: '4px', color: '#d97706' }}>🔐 Tài khoản Demo:</div>
+            <div><strong>Admin:</strong> admin / admin123</div>
+            <div><strong>User:</strong> user / user123</div>
+          </div>
         </form>
       </div>
     </>

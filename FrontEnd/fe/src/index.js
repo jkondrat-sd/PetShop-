@@ -7,7 +7,7 @@ import App from "~/App";
 import reportWebVitals from "./reportWebVitals";
 import store from "./redux/store";
 import "~/assets/scss/global.scss";
-import { makeServer } from "./server";
+import { makeServer } from "./mockData/server";
 
 // Initialize MirageJS mock server in production (Vercel) or when USE_MOCK is enabled
 if (

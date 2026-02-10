@@ -124,6 +124,20 @@ const onFinish = async (values) => {
             <div className="forgot-password">
               <Link to="/forgot-password">Forgot your password?</Link>
             </div>
+
+            {/* Demo Account Info */}
+            <div style={{ 
+              background: '#f0f9ff', 
+              border: '1px solid #0ea5e9', 
+              borderRadius: '8px', 
+              padding: '12px', 
+              marginBottom: '16px',
+              fontSize: '13px'
+            }}>
+              <div style={{ fontWeight: 'bold', marginBottom: '4px', color: '#0284c7' }}>🎮 Demo Account:</div>
+              <div><strong>Admin:</strong> admin / admin123</div>
+              <div><strong>User:</strong> user / user123</div>
+            </div>
             
             <Form.Item>
               <Button 
