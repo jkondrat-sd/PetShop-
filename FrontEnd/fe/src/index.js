@@ -7,6 +7,16 @@ import App from "~/App";
 import reportWebVitals from "./reportWebVitals";
 import store from "./redux/store";
 import "~/assets/scss/global.scss";
+import { makeServer } from "./server";
+
+// Initialize MirageJS mock server in production (Vercel) or when USE_MOCK is enabled
+if (
+  process.env.NODE_ENV === "production" ||
+  process.env.REACT_APP_USE_MOCK === "true"
+) {
+  makeServer({ environment: "production" });
+  console.log("🚀 MirageJS mock server started");
+}
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

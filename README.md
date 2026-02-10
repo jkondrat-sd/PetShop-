@@ -164,3 +164,69 @@ LT_Web/
 
 ---
 
+## 🎭 Mock Server (MirageJS) - Deploy không cần Backend
+
+Project hỗ trợ **MirageJS** để mock toàn bộ API layer, cho phép deploy Frontend lên **Vercel** mà không cần Backend thật.
+
+### Khi nào Mock Server được bật?
+- ✅ Khi `NODE_ENV === "production"` (deploy Vercel)
+- ✅ Khi set `REACT_APP_USE_MOCK=true` trong file `.env`
+- ❌ Development bình thường → dùng Backend thật
+
+### Test Mock Server Local
+
+**Cách 1: Dùng biến môi trường**
+```bash
+cd FrontEnd/fe
+
+# Windows PowerShell
+$env:REACT_APP_USE_MOCK="true"
+npm start
+
+# Windows CMD
+set REACT_APP_USE_MOCK=true && npm start
+
+# Linux/Mac
+REACT_APP_USE_MOCK=true npm start
+```
+
+**Cách 2: Sửa file .env.development**
+```env
+REACT_APP_USE_MOCK=true
+```
+
+### Tài khoản test Mock
+| Username | Password | Role |
+|----------|----------|------|
+| admin | 123456 | ADMIN |
+| user | 123456 | USER |
+
+### Mock Data có sẵn
+- 🐕 20 thú cưng (chó, mèo các giống)
+- 🎁 12 phụ kiện (thức ăn, đồ chơi, vệ sinh...)
+- 📁 6 danh mục phụ kiện
+- 🏷️ 20 giống (breeds)
+
+### Deploy lên Vercel
+
+```bash
+# 1. Push code lên GitHub
+git add .
+git commit -m "Add MirageJS mock server"
+git push origin main
+
+# 2. Trên Vercel:
+# - Import project từ GitHub
+# - Root Directory: FrontEnd/fe
+# - Build Command: npm run build
+# - Output Directory: build
+# - Framework: Create React App
+```
+
+Hoặc dùng Vercel CLI:
+```bash
+cd FrontEnd/fe
+npx vercel --prod
+```
+
+---

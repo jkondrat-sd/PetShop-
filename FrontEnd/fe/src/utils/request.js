@@ -3,8 +3,23 @@ import { message } from "antd";
 
 import { getCookie } from "~/helpers/cookie";
 
+// Determine baseURL based on environment
+// In production or when using mock, use relative URL "/api" for MirageJS
+// In development with real backend, use full URL
+const getBaseURL = () => {
+  const useMock = 
+    process.env.NODE_ENV === "production" || 
+    process.env.REACT_APP_USE_MOCK === "true";
+  
+  if (useMock) {
+    return "/api"; // MirageJS will intercept these requests
+  }
+  
+  return process.env.REACT_APP_API_URL || "http://localhost:8089/api";
+};
+
 const request = axios.create({
-  baseURL: "http://localhost:8089/api",
+  baseURL: getBaseURL(),
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
